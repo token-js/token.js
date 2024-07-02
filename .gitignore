@@ -1,0 +1,14 @@
+# dependencies
+/node_modules
+
+# debug
+.pnpm-debug.log*
+
+# env
+.env
+
+# typescript
+.tsbuildinfo
+
+# vscode
+.vscode
