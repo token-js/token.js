@@ -10,10 +10,12 @@
   "keywords": [],
   "license": "ISC",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "openai": "^4.52.2"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",
+    "typescript": "^5.5.3",
     "vite-node": "^1.6.0"
   }
 }
