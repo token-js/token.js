@@ -8,5 +8,12 @@
   },
   "author": "Sam Goldman",
   "keywords": [],
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^4.52.2"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "vite-node": "^1.6.0"
+  }
 }
