@@ -10,7 +10,7 @@ import {
   UsageMetadata
 } from "@google/generative-ai"
 import { getTimestamp } from "./utils";
-import { CompletionParams } from "../chat";
+import { CompletionParamsGemini } from "../chat";
 
 const parseImage = (image: string): { content: string, mimeType: string } => {
   const parts = image.split(";base64,")
@@ -90,7 +90,7 @@ const convertFinishReason = (finishReason: FinishReason): 'stop' | 'length' | 't
 
 const fetchResponse = async (
   model: GenerativeModel,
-  body: CompletionParams
+  body: CompletionParamsGemini
 ): Promise<CompletionResponse> => {
   const timestamp = getTimestamp()
   const result = await model.generateContent({
@@ -134,7 +134,7 @@ const convertUsageData = (usageMetadata: UsageMetadata): CompletionResponse['usa
 
 async function* fetchStreamResponse(
   model: GenerativeModel,
-  body: CompletionParams
+  body: CompletionParamsGemini
 ): StreamCompletionResponse {
   const timestamp = getTimestamp()
   const result = await model.generateContentStream({
@@ -169,7 +169,7 @@ async function* fetchStreamResponse(
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
 export class GeminiHandler extends BaseHandler {
   async create(
-    body: CompletionParams,
+    body: CompletionParamsGemini,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
     const apiKey = this.opts.apiKey ?? process.env.GEMINI_API_KEY;
     if (apiKey === undefined) {
@@ -186,7 +186,8 @@ export class GeminiHandler extends BaseHandler {
         topP: body.top_p ?? undefined,
         stopSequences: stop ?? undefined,
         candidateCount: body.n ?? undefined,
-      }
+      },
+      safetySettings: body.safety_settings
       // Google also supports configurable safety settings which do not fit into the OpenAI format (this was an issue for us in the past, so we'll likely need to address it at some point)
       // Google also supports cached content which does not fit into the OpenAI format
     })

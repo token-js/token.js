@@ -3,9 +3,10 @@ import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completion
 import { ChatCompletion, ChatCompletionChunk } from 'openai/resources/index.mjs';
 import { Stream } from 'openai/streaming.mjs';
 import { getHandler } from '../handlers/utils';
-import { ConfigOptions, LLMChatModel } from '../handlers/types';
+import { ConfigOptions, GeminiModel, OpenAIModel } from '../handlers/types';
+import { SafetySetting } from '@google/generative-ai';
 
-// This is a best guess at the options to include, we can revise as needed
+// Define the base types
 type CompletionBase = Pick<ChatCompletionCreateParamsBase, 
   'messages' | 
   'temperature' | 
@@ -15,23 +16,49 @@ type CompletionBase = Pick<ChatCompletionCreateParamsBase,
   'n' | 
   'max_tokens'
 > & {
-  model: LLMChatModel;
+  model: OpenAIModel | GeminiModel;
 }
 
-type CompletionStreaming = CompletionBase & {
+type CompletionStreamingBase = CompletionBase & {
   stream: true;
 }
 
-type CompletionNonStreaming = CompletionBase & {
+type CompletionNonStreamingBase = CompletionBase & {
   stream?: false | null;
 }
 
-export type CompletionParams = CompletionStreaming | CompletionNonStreaming;
+export type CompletionStreamingOpenAI = CompletionStreamingBase & {
+  model: OpenAIModel;
+  safety_settings?: never;
+}
+
+export type CompletionNonStreamingOpenAI = CompletionNonStreamingBase & {
+  model: OpenAIModel;
+  safety_settings?: never;
+}
+
+export type CompletionStreamingGemini = CompletionStreamingBase & {
+  model: GeminiModel;
+  safety_settings?: SafetySetting[];
+}
+
+export type CompletionNonStreamingGemini = CompletionNonStreamingBase & {
+  model: GeminiModel;
+  safety_settings?: SafetySetting[];
+}
+
+type CompletionNonStreaming = CompletionNonStreamingOpenAI | CompletionNonStreamingGemini;
+type CompletionStreaming = CompletionStreamingOpenAI | CompletionStreamingGemini;
+export type CompletionParamsOpenAI = CompletionStreamingOpenAI | CompletionNonStreamingOpenAI;
+export type CompletionParamsGemini = CompletionStreamingGemini | CompletionNonStreamingGemini;
+export type CompletionParams = CompletionParamsOpenAI | CompletionParamsGemini;
+
+type ExtractModel<T> = T extends { model: infer M } ? M : never;
 
 export class LLMCompletions {
   private opts: ConfigOptions;
 
-  constructor (opts: ConfigOptions) {
+  constructor(opts: ConfigOptions) {
     this.opts = opts;
   }
 
@@ -42,13 +69,26 @@ export class LLMCompletions {
     body: CompletionStreaming,
   ): APIPromise<Stream<ChatCompletionChunk>>;
   create(
-    body: CompletionBase,
+    body: CompletionParams,
   ): APIPromise<Stream<ChatCompletionChunk> | ChatCompletion>;
+
+  create(
+    body: CompletionNonStreaming,
+  ): APIPromise<ChatCompletion>;
+  create(
+    body: CompletionStreaming,
+  ): APIPromise<Stream<ChatCompletionChunk>>;
   create(
     body: CompletionParams,
-  ): APIPromise<ChatCompletion | Stream<ChatCompletionChunk>> {
+  ): APIPromise<Stream<ChatCompletionChunk> | ChatCompletion>;
+
+  create<T extends CompletionParams>(
+    body: T & { model: ExtractModel<T> }
+  ): T extends CompletionStreamingOpenAI | CompletionStreamingGemini
+      ? APIPromise<Stream<ChatCompletionChunk>>
+      : APIPromise<ChatCompletion> {
     const handler = getHandler(body.model, this.opts);
-    return handler.create(body);
+    return handler.create(body) as any;
   }
 }
 

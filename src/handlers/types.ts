@@ -5,10 +5,11 @@ import { ChatCompletion } from "openai/src/resources/index.js";
 import { APIPromise } from "openai/core.mjs";
 import { Stream } from "openai/streaming.mjs";
 
-export type GeminiModels = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
+export type GeminiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
+export type OpenAIModel = ChatModel
 
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModels
+export type LLMChatModel = ChatModel | GeminiModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'>;

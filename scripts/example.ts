@@ -1,6 +1,7 @@
 import { OpenAI } from 'openai';
 import { LLM } from '../src';
 import * as dotenv from 'dotenv';
+import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 dotenv.config();
 
 const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -14,8 +15,26 @@ const callLLM = async () => {
   const llm = new LLM()
   const result = await llm.chat.completions.create({
     stream: true,
+    model: 'gemini-1.0-pro',
     messages,
-    model: 'gpt-4o'
+    safety_settings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+      }
+    ]
+  })
+
+  const invalid = await llm.chat.completions.create({
+    stream: true,
+    model: 'gpt-3.5-turbo',
+    messages,
+    safety_settings: [
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE
+      }
+    ]
   })
 
   // console.log(result.choices[0].message.content)
