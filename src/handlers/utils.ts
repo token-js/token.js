@@ -1,8 +1,10 @@
+import { GeminiHandler } from "./gemini";
 import { OpenAIHandler } from "./openai";
 import { ConfigOptions } from "./types";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
+  'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts)
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): any => {
@@ -14,3 +16,7 @@ export const getHandler = (modelName: string, opts: ConfigOptions): any => {
 
   throw new Error(`Could not find provider for model. Are you sure the model name is correct and the provider is supported?`);
 };
+
+export const getTimestamp = () => {
+  return Math.floor(new Date().getTime() / 1000)
+}

@@ -5,11 +5,23 @@ import { ChatCompletion } from "openai/src/resources/index.js";
 import { APIPromise } from "openai/core.mjs";
 import { Stream } from "openai/streaming.mjs";
 
+export type GeminiModels = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
+
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel
+export type LLMChatModel = ChatModel | GeminiModels
 
 // We can pick addtional options if we want to extend the configuration
-export type ConfigOptions = Pick<ClientOptions, 'apiKey'>;
+export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'>;
+
+export type CompletionResponseFields = 'choices' | 'created' | 'model' | 'usage' | 'object'
+export type CompletionResponse = Pick<ChatCompletion, CompletionResponseFields> & {
+  id: string | null
+}
+export type CompletionResponseChunk = Pick<ChatCompletionChunk, CompletionResponseFields>  & {
+  id: string | null
+}
+export type StreamCompletionResponse = AsyncIterable<CompletionResponseChunk>
+
 
 // This is the base handler type used to support different providers. We can extend this to support
 // additional features as needed.
@@ -26,5 +38,13 @@ export abstract class BaseHandler {
 
   abstract create(
     body: CompletionParams,
-  ): APIPromise<ChatCompletion | Stream<ChatCompletionChunk>>;
+  ): Promise<CompletionResponse | StreamCompletionResponse>;
+}
+
+export class InputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+    Error.captureStackTrace(this, this.constructor);
+  }
 }

@@ -11,16 +11,18 @@ const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
 ]
 
 const callLLM = async () => {
-  const llm = new LLM({
-    apiKey: process.env.OPENAI_API_KEY
-  })
-
+  const llm = new LLM()
   const result = await llm.chat.completions.create({
+    stream: true,
     messages,
     model: 'gpt-4o'
   })
 
-  console.log(result.choices[0].message.content)
+  // console.log(result.choices[0].message.content)
+
+  for await (const part of result) {
+    process.stdout.write(part.choices[0]?.delta?.content || "");
+  }
 
   // We can also stream and the response type is correctly inferred, uncomment to check
   // const stream = await llm.chat.completions.create({
