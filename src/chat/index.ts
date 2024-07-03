@@ -12,11 +12,8 @@ type CompletionBase = Pick<ChatCompletionCreateParamsBase,
   'top_p' | 
   'stop' | 
   'presence_penalty' | 
-  'response_format' | 
   'n' | 
-  'max_tokens' | 
-  'functions' | 
-  'function_call'
+  'max_tokens'
 > & {
   model: LLMChatModel;
 }
