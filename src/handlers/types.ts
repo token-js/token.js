@@ -2,13 +2,19 @@ import { ClientOptions } from "openai";
 import { ChatCompletionChunk, ChatModel } from "openai/resources/index.mjs";
 import { CompletionParams } from "../chat";
 import { ChatCompletion } from "openai/src/resources/index.js";
-import { APIPromise } from "openai/core.mjs";
-import { Stream } from "openai/streaming.mjs";
+
+export type AnthropicModel = 'claude-3-5-sonnet-20240620'
+| 'claude-3-opus-20240229'
+| 'claude-3-sonnet-20240229'
+| 'claude-3-haiku-20240307'
+| 'claude-2.1'
+| 'claude-2.0'
+| 'claude-instant-1.2';
 
 export type GeminiModels = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
 
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModels
+export type LLMChatModel = ChatModel | GeminiModels | AnthropicModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'>;
@@ -21,7 +27,6 @@ export type CompletionResponseChunk = Pick<ChatCompletionChunk, CompletionRespon
   id: string | null
 }
 export type StreamCompletionResponse = AsyncIterable<CompletionResponseChunk>
-
 
 // This is the base handler type used to support different providers. We can extend this to support
 // additional features as needed.
@@ -48,3 +53,15 @@ export class InputError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
+
+export class InvariantError extends Error {
+  constructor(message: string) {
+    super(
+      `${message}.\n` +
+      `Should never happen. Please report this error to the developers.`
+    )
+    this.name = 'InvariantError'
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+

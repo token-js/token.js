@@ -15,7 +15,7 @@ const callLLM = async () => {
   const result = await llm.chat.completions.create({
     stream: true,
     messages,
-    model: 'gpt-4o'
+    model: 'claude-3-5-sonnet-20240620',
   })
 
   // console.log(result.choices[0].message.content)
@@ -23,13 +23,6 @@ const callLLM = async () => {
   for await (const part of result) {
     process.stdout.write(part.choices[0]?.delta?.content || "");
   }
-
-  // We can also stream and the response type is correctly inferred, uncomment to check
-  // const stream = await llm.chat.completions.create({
-  //   stream: true,
-  //   messages,
-  //   model: 'gpt-4o'
-  // })
 }
 
 const callOpenAI = async () => {
@@ -39,10 +32,16 @@ const callOpenAI = async () => {
 
   const result = await openai.chat.completions.create({
     messages,
-    model: 'gpt-4o'
+    model: 'gpt-4o',
+    stream: true
   })
 
-  console.log(result.choices[0].message.content)
+  for await (const part of result) {
+    console.log(part.choices[0].finish_reason);
+  }
+
+  // console.log(result.choices[0].message.content)
 }
 
+// callOpenAI()
 callLLM()
