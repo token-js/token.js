@@ -1,13 +1,15 @@
+import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
 import { OpenAIHandler } from "./openai";
-import { ConfigOptions } from "./types";
+import { BaseHandler, ConfigOptions } from "./types";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
+  'claude-': (opts: ConfigOptions) => new AnthropicHandler(opts),
   'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts)
 };
 
-export const getHandler = (modelName: string, opts: ConfigOptions): any => {
+export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
   for (const handlerKey in Handlers) {
     if (modelName.startsWith(handlerKey)) {
       return Handlers[handlerKey](opts);
