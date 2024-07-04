@@ -12,9 +12,11 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
     "@google/generative-ai": "^0.14.1",
+    "chalk": "^5.3.0",
     "openai": "^4.52.2"
   },
   "devDependencies": {
+    "cohere-ai": "^7.10.6",
     "dotenv": "^16.4.5",
     "typescript": "^5.5.3",
     "vite-node": "^1.6.0"

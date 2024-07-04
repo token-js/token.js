@@ -15,7 +15,7 @@ const callLLM = async () => {
   const result = await llm.chat.completions.create({
     stream: true,
     messages,
-    model: 'claude-3-5-sonnet-20240620',
+    model: 'command-r',
   })
 
   // console.log(result.choices[0].message.content)
