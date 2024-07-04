@@ -11,10 +11,14 @@ export type AnthropicModel = 'claude-3-5-sonnet-20240620'
 | 'claude-2.0'
 | 'claude-instant-1.2';
 
-export type GeminiModels = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
+export type GeminiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
+
+export type CohereModel = 'command-r-plus' | 'command-r' | 'command' | 'command-nightly' | 'command-light' | 'command-light-nightly'
+
+export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
 
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModels | AnthropicModel
+export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'>;

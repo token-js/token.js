@@ -158,7 +158,7 @@ const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): Complet
   } else if (stopReason === "tool_use") {
     return 'tool_calls'
   } else {
-    throw new Error(`Unknown stop reason: ${stopReason}`)
+    return 'stop'
   }
 }
 
@@ -172,7 +172,7 @@ const toFinishReasonStreaming = (stopReason: Message['stop_reason']): Completion
   } else if (stopReason === "tool_use") {
     return 'tool_calls'
   } else {
-    throw new Error(`Unknown stop reason: ${stopReason}`)
+    return 'stop'
   }
 }
 
@@ -204,11 +204,7 @@ export const convertStopSequences = (
   }
 }
 
-
 export class AnthropicHandler extends BaseHandler {
-  /**
-   * 
-   */
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
@@ -218,7 +214,7 @@ export class AnthropicHandler extends BaseHandler {
 
     const apiKey = this.opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
     if (apiKey === undefined) {
-      throw new InputError("No Anthropic API key detected. Please define a 'GEMINI_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
+      throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
     }
     
     const stream = typeof body.stream === 'boolean' ? body.stream : undefined 
