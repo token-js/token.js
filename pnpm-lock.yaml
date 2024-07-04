@@ -14,6 +14,9 @@ dependencies:
   '@google/generative-ai':
     specifier: ^0.14.1
     version: 0.14.1
+  '@mistralai/mistralai':
+    specifier: ^0.5.0
+    version: 0.5.0
   chalk:
     specifier: ^5.3.0
     version: 5.3.0
@@ -893,6 +896,14 @@ packages:
   /@google/generative-ai@0.14.1:
     resolution: {integrity: sha512-pevEyZCb0Oc+dYNlSberW8oZBm4ofeTD5wN01TowQMhTwdAbGAnJMtQzoklh6Blq2AKsx8Ox6FWa44KioZLZiA==}
     engines: {node: '>=18.0.0'}
+    dev: false
+
+  /@mistralai/mistralai@0.5.0:
+    resolution: {integrity: sha512-56xfoC/0CiT0RFHrRNoJYSKCNc922EyHzEPJYY6ttalQ5KZdrNVgXeOetIGX0lDx7IjbxAJrrae2MQgUIlL9+g==}
+    dependencies:
+      node-fetch: 2.7.0
+    transitivePeerDependencies:
+      - encoding
     dev: false
 
   /@rollup/rollup-android-arm-eabi@4.18.0:
