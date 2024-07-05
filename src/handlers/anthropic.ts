@@ -1,8 +1,7 @@
-import { APIResource } from "@anthropic-ai/sdk/resource.mjs";
-import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError } from "./types";
+import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
-import { MessageCreateParams, MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
-import { getTimestamp } from "./utils";
+import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
+import { consoleWarn, fetchThenParseImage, getTimestamp } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
 import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
@@ -209,9 +208,9 @@ export const getDefaultMaxTokens = (model: string): number => {
 }
 }
 
-export const convertMessages = (
+export const convertMessages = async (
   messages: CompletionParams['messages']
-): MessageCreateParamsNonStreaming['messages'] => {
+): Promise<MessageCreateParamsNonStreaming['messages']> => {
   const output: MessageCreateParamsNonStreaming['messages'] = [];
   const clonedMessages = structuredClone(messages)
 
@@ -225,7 +224,7 @@ export const convertMessages = (
   }
 
   let previousRole: 'user' | 'assistant' = 'user'
-  let currentParams: Array<TextBlockParam> = []
+  let currentParams: Array<TextBlockParam | ImageBlockParam> = []
   for (const message of clonedMessages) {
     if (message.role === 'user' || message.role === 'assistant' || message.role === 'system')  {
       // Anthropic doesn't support the `system` role in their `messages` array, so if the user
@@ -250,7 +249,7 @@ export const convertMessages = (
           text: text
         })
       } else if (Array.isArray(message.content)) {
-        const convertedContent: Array<TextBlockParam> = message.content.map(e => {
+        const convertedContent: Array<TextBlockParam | ImageBlockParam> = await Promise.all(message.content.map(async e => {
           if (e.type === 'text') {
             const text = message.role === 'system' ? `System: ${e.text}` : e.text
             return {
@@ -258,9 +257,17 @@ export const convertMessages = (
               text
             }
           } else {
-            throw new Error(`Images are not supported.`)
+            const parsedImage = await fetchThenParseImage(e.image_url.url)
+            return {
+              type: 'image',
+              source: {
+                data: parsedImage.content,
+                media_type: parsedImage.mimeType,
+                type: 'base64'
+              }
+            }
           }
-        })
+        }))
         currentParams.push(...convertedContent)
       }
 
@@ -292,19 +299,47 @@ export const convertStopSequences = (
   }
 }
 
+const validateInputs = (
+  body: CompletionParams,
+  opts: ConfigOptions
+): void => {
+  if (typeof body.n === 'number' && body.n > 1) {
+    throw new InputError(`Anthropic does not support setting 'n' greater than 1.`)
+  }
+
+  const apiKey = opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
+  if (apiKey === undefined) {
+    throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
+  }
+  
+  let logImageDetailWarning: boolean = false
+  for (const message of body.messages) {
+    if (Array.isArray(message.content)) {
+      for (const e of message.content) {
+        if (e.type === 'image_url') {
+          if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
+            logImageDetailWarning = true
+          }
+
+          if (body.model === 'claude-instant-1.2' || body.model === 'claude-2.0' || body.model === 'claude-2.1') {
+            throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use Claude version 3 or later.`)
+          }
+        }
+      }
+    }
+  }
+
+  if (logImageDetailWarning) {
+    consoleWarn(`Anthropic does not support the 'detail' field for images. The default image quality will be used.`)
+  }
+}
+
 export class AnthropicHandler extends BaseHandler {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
-    if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(`Anthropic does not support setting 'n' greater than 1.`)
-    }
+    validateInputs(body, this.opts)
 
-    const apiKey = this.opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
-    if (apiKey === undefined) {
-      throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
-    }
-    
     const stream = typeof body.stream === 'boolean' ? body.stream : undefined 
     const maxTokens = body.max_tokens ?? getDefaultMaxTokens(body.model)
     const client = new Anthropic(this.opts)
@@ -317,7 +352,7 @@ export class AnthropicHandler extends BaseHandler {
       : undefined
     const systemMessageParam = popSystemMessageParam(body.messages)
     const system = systemMessageParam?.content ?? undefined
-    const messages = convertMessages(body.messages)
+    const messages = await convertMessages(body.messages)
 
     if (stream === true) {
       const convertedBody: MessageCreateParamsStreaming = {

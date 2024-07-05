@@ -9,20 +9,8 @@ import {
   FinishReason,
   UsageMetadata
 } from "@google/generative-ai"
-import { consoleWarn, getTimestamp } from "./utils";
+import { consoleWarn, getTimestamp, parseImage } from "./utils";
 import { CompletionParams } from "../chat";
-
-const parseImage = (image: string): { content: string, mimeType: string } => {
-  const parts = image.split(";base64,")
-  if (parts.length === 2) {
-    return {
-      content: parts[1],
-      mimeType: parts[0].replace('data:', '')
-    }
-  } else {
-    throw new InputError("Invalid image URL")
-  }
-}
 
 const convertContentToPart = (content: Array<ChatCompletionContentPart>): Part[] => {
   if (typeof content === "string") {
