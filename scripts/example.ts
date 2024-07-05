@@ -15,7 +15,8 @@ const callLLM = async () => {
   const result = await llm.chat.completions.create({
     stream: true,
     messages,
-    model: 'command-r',
+    model: 'groq/gemma-7b-it',
+    temperature: 2
   })
 
   // console.log(result.choices[0].message.content)

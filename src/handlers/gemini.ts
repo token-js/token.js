@@ -9,7 +9,7 @@ import {
   FinishReason,
   UsageMetadata
 } from "@google/generative-ai"
-import { getTimestamp } from "./utils";
+import { consoleWarn, getTimestamp } from "./utils";
 import { CompletionParams } from "../chat";
 
 const parseImage = (image: string): { content: string, mimeType: string } => {
@@ -174,6 +174,10 @@ export class GeminiHandler extends BaseHandler {
     const apiKey = this.opts.apiKey ?? process.env.GEMINI_API_KEY;
     if (apiKey === undefined) {
       throw new InputError("API key is required for Gemini, define GEMINI_API_KEY in your environment or specifty the apiKey option.");
+    }
+
+    if (this.opts.baseURL) {
+      consoleWarn(`The 'baseUrl' will be ignored by Gemini because it does not support this field.`)
     }
 
     const stop = typeof body.stop === 'string' ? [body.stop] : body.stop
