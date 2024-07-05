@@ -5,6 +5,7 @@ import { MessageCreateParams, MessageCreateParamsNonStreaming, MessageCreatePara
 import { getTimestamp } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
+import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 
 dotenv.config()
 
@@ -144,6 +145,24 @@ const toChatCompletionChoiceMessage = (content: Message['content'], role: Messag
   }
 }
 
+/**
+ * Removes the first element from the user-defined `messages` array if it begins with a 'system'
+ * message. The returned element will be used for Anthropic's `system` parameter. We only pop the
+ * system message if it's the first element in the array so that the order of the messages remains
+ * unchanged.
+ */
+const popSystemMessageParam = (
+  messages: CompletionParams['messages']
+): ChatCompletionSystemMessageParam | undefined => {
+  if (messages.length > 0 && messages[0].role === 'system') {
+    const systemMessage = messages[0]
+    messages.shift();
+    return systemMessage
+  } else {
+    return undefined;
+  }
+}
+
 const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): CompletionResponse['choices'][0]['finish_reason'] => {
   if (stopReason === null) {
     // Anthropic's documentation says that the `stop_reason` will never be `null` for non-streaming
@@ -190,6 +209,53 @@ export const getDefaultMaxTokens = (model: string): number => {
 }
 }
 
+const convertMessages = (
+  messages: CompletionParams['messages']
+): MessageCreateParamsNonStreaming['messages'] => {
+  const convertedMessages: MessageCreateParamsNonStreaming['messages'] = []
+
+  // Anthropic requires that the first message in the array is from a 'user' role, so we inject a
+  // placeholder user message if the array doesn't already begin with a message from a 'user' role.
+  if (messages[0].role !== 'user') {
+    convertedMessages.push({
+      role: 'user',
+      content: 'Empty'
+    })
+  }
+
+  for (const message of messages){
+    if (message.role === 'user' || message.role === 'assistant') {
+      if (typeof message.content === 'string') {
+        convertedMessages.push({
+          role: message.role,
+          content: message.content
+        })
+      } else if (Array.isArray(message.content)) {
+        for (const e of message.content) {
+          if (e.type === 'text') {
+            convertedMessages.push({
+              role: message.role,
+              content: e.text
+            })
+          }
+        }
+      }
+    } else if (message.role === 'system') {
+      // Anthropic doesn't support the `system` role in their `messages` array, so we use the `user`
+      // role and prepend 'System: ' to the content. We do this instead of putting every system
+      // message in Anthropic's `system` string parameter so that the order of the user-defined
+      // `messages` remains the same, even when the system messages are interspersed with messages
+      // from other roles.
+      convertedMessages.push({
+        role: 'user',
+        content: `System: ${message.content}`
+      })
+    }
+  }
+
+  return convertedMessages
+}
+
 export const convertStopSequences = (
   stop?: CompletionParams['stop']
 ): Array<string> | undefined => {
@@ -227,15 +293,9 @@ export class AnthropicHandler extends BaseHandler {
       // 0 to 2.
       ? body.temperature / 2
       : undefined
-
-    let messages: any[]
-    let systemMessage: string | undefined
-    if (body.messages[0].role === 'system') {
-      systemMessage = body.messages[0].content
-      messages = body.messages.slice(1)
-    } else {
-      messages = body.messages
-    }
+    const systemMessageParam = popSystemMessageParam(body.messages)
+    const system = systemMessageParam?.content ?? undefined
+    const messages = convertMessages(body.messages)
 
     if (stream === true) {
       const convertedBody: MessageCreateParamsStreaming = {
@@ -246,6 +306,7 @@ export class AnthropicHandler extends BaseHandler {
         temperature,
         top_p: topP,
         stream,
+        system
       }
       const created = getTimestamp()
       const response = client.messages.stream(convertedBody)
@@ -259,6 +320,7 @@ export class AnthropicHandler extends BaseHandler {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
+        system
       }
       const created = getTimestamp()
       const response = await client.messages.create(convertedBody)

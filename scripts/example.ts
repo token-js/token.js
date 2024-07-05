@@ -15,7 +15,7 @@ const callLLM = async () => {
   const result = await llm.chat.completions.create({
     stream: true,
     messages,
-    model: 'command-r',
+    model: 'gpt-4o',
   })
 
   // console.log(result.choices[0].message.content)
