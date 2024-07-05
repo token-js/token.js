@@ -158,7 +158,7 @@ const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): Complet
   } else if (stopReason === "tool_use") {
     return 'tool_calls'
   } else {
-    return 'stop'
+    return 'unknown'
   }
 }
 
@@ -172,7 +172,7 @@ const toFinishReasonStreaming = (stopReason: Message['stop_reason']): Completion
   } else if (stopReason === "tool_use") {
     return 'tool_calls'
   } else {
-    return 'stop'
+    return 'unknown'
   }
 }
 

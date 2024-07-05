@@ -25,7 +25,7 @@ export class LLM implements LLMInterface {
 
   constructor({
     ...opts
-  }: ClientOptions = {}) {
+  }: ConfigOptions = {}) {
     this.opts = opts;
 
     // We pass a reference to the LLM instance to the LLMChat instance so that the completions object can access the opts

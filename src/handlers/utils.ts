@@ -5,12 +5,14 @@ import { OpenAIHandler } from "./openai";
 import { BaseHandler, ConfigOptions } from "./types";
 import chalk from 'chalk'
 import { CohereHandler } from "./cohere";
+import { BedrockHandler } from "./bedrock";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
   'claude-': (opts: ConfigOptions) => new AnthropicHandler(opts),
   'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts),
   'command-': (opts: ConfigOptions) => new CohereHandler(opts),
+  'bedrock/': (opts: ConfigOptions) => new BedrockHandler(opts),
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {

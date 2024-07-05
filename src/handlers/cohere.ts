@@ -20,7 +20,7 @@ const convertRole = (
   } else if (role === 'user') {
     return 'USER'
   } else {
-    throw new InputError(`Unkown role: ${role}`)
+    throw new InputError(`Unknown role: ${role}`)
   }
 }
 
@@ -33,8 +33,10 @@ const convertFinishReason = (
     return 'length'
   } else if (finishReason === 'ERROR_TOXIC') {
     return 'content_filter'
+  } else if (finishReason === 'ERROR' || finishReason === 'ERROR_LIMIT') {
+    return 'error'
   } else {
-    return 'stop'
+    return 'unknown'
   }
 }
 
@@ -73,7 +75,7 @@ const convertStopSequences = (
   } else if (Array.isArray(stop) && stop.every(e => typeof e === 'string')) {
     return stop
   } else {
-    throw new Error(`Unknown stop sequence: ${stop}`)
+    throw new Error(`Unknown stop sequence type: ${stop}`)
   }
 }
 
