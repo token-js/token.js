@@ -79,6 +79,8 @@ type ChatCompletionChunkChoice = Omit<ChatCompletionChunk.Choice, 'finish_reason
   finish_reason: ChatCompletionChunk.Choice['finish_reason'] | 'unknown'
 }
 
+export type MIMEType = "image/jpeg" | "image/png" | "image/gif" | "image/webp"
+
 export type CompletionResponseFields = 'created' | 'model' | 'usage' | 'object'
 export type CompletionResponse = Pick<ChatCompletion, CompletionResponseFields> & {
   id: string | null
