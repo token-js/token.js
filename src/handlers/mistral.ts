@@ -1,6 +1,6 @@
 import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ChatRequest, Message } from "@mistralai/mistralai";
 import { CompletionParams } from "../chat";
-import { BaseHandler, CompletionResponse, StreamCompletionResponse } from "./types";
+import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
 
@@ -84,13 +84,25 @@ export class MistralHandler extends BaseHandler {
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     const apiKey = this.opts.apiKey ?? process.env.MISTRAL_API_KEY;
-    const client = new MistralClient(apiKey);
+
+    if (apiKey === undefined) {
+      throw new InputError("API key is required for Mistral, define MISTRAL_API_KEY in your environment or specifty the apiKey option.");
+    }
+
+    const endpoint = this.opts.baseURL ?? undefined
+    const client = new MistralClient(apiKey, endpoint);
     const model = body.model.replace(MISTRAL_PREFIX, '')
+
+    const temperature = typeof body.temperature === 'number'
+      // We divide by two because Mistral's temperature range is 0 to 1 and the input temperature
+      // range is 0 to 2.
+      ? body.temperature / 2
+      : undefined
 
     const options: ChatRequest = {
       model,
       messages: convertMessages(body.messages),
-      temperature: body.temperature ?? undefined,
+      temperature,
       maxTokens: body.max_tokens ?? undefined,
       topP: body.top_p ?? undefined,
       // Mistral does not support `stop`
