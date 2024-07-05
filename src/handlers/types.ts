@@ -52,8 +52,15 @@ export type MistralModel = 'mistral/open-mistral-7b'
 | 'mistral/codestral-latest'
 | 'mistral/codestral-2405'
 
+export type GroqModel = 'groq/llama3-8b-8192'
+| 'groq/llama3-70b-8192' 
+| 'groq/mixtral-8x7b-32768' 
+| 'groq/gemma-7b-it'
+| 'groq/gemma2-9b-it'
+| 'groq/whisper-large-v3' 
+
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel
+export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel | GroqModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
