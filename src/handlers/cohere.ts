@@ -63,9 +63,9 @@ const popLastUserMessageContentString = (
     }
   }
 
-  // Return an empty string if the user didn't include a text message. We include a whitespace in
-  // the string because Cohere throws an error if the user's message contains zero tokens.
-  return " "
+  // Return a placeholder string if the user didn't include a text message. We include a whitespace
+  // in the string because Cohere throws an error if the user's message contains zero tokens.
+  return "Empty"
 }
 
 const convertStopSequences = (
