@@ -44,7 +44,7 @@ const convertCompletionReason = (
   } else if (completionReason === 'LENGTH') {
     return 'length'
   } else if (completionReason === 'RAG_QUERY_WHEN_RAG_DISABLED') {
-    return 'error'
+    throw new Error(`The query failed because RAG is disabled.`)
   } else if (completionReason === 'CONTENT_FILTERED') {
     return 'content_filter'
   } else {

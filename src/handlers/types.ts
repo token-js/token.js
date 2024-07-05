@@ -50,11 +50,11 @@ export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
 }
 
 type ChatCompletionChoice = Omit<ChatCompletion.Choice, 'finish_reason'> & {
-  finish_reason: ChatCompletion.Choice['finish_reason'] | 'error' | 'unknown'
+  finish_reason: ChatCompletion.Choice['finish_reason'] | 'unknown'
 }
 
 type ChatCompletionChunkChoice = Omit<ChatCompletionChunk.Choice, 'finish_reason'> & {
-  finish_reason: ChatCompletionChunk.Choice['finish_reason'] | 'error' | 'unknown'
+  finish_reason: ChatCompletionChunk.Choice['finish_reason'] | 'unknown'
 }
 
 export type CompletionResponseFields = 'created' | 'model' | 'usage' | 'object'

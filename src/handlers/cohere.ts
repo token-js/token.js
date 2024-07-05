@@ -27,14 +27,17 @@ const convertRole = (
 const convertFinishReason = (
   finishReason?: FinishReason
 ): CompletionResponse['choices'][0]['finish_reason'] => {
-  if (finishReason === undefined || finishReason === 'COMPLETE' || finishReason === 'USER_CANCEL' || finishReason === 'STOP_SEQUENCE') {
+  if (finishReason === 'COMPLETE' || finishReason === 'USER_CANCEL' || finishReason === 'STOP_SEQUENCE') {
     return 'stop'
   } else if (finishReason === 'MAX_TOKENS') {
     return 'length'
   } else if (finishReason === 'ERROR_TOXIC') {
     return 'content_filter'
-  } else if (finishReason === 'ERROR' || finishReason === 'ERROR_LIMIT') {
-    return 'error'
+  } else if (finishReason === 'ERROR_LIMIT') {
+    // OpenAI throws an error in when the model's context limit is reached, so we do too for consistency.
+    throw new Error(`The generation could not be completed because the model’s context limit was reached.`)
+  } else if (finishReason === 'ERROR') {
+    throw new Error(`The generation could not be completed due to an error.`)
   } else {
     return 'unknown'
   }
