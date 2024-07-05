@@ -37,8 +37,30 @@ type BedrockModel =
 
 export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
 
+export type MistralModel = 'mistral/open-mistral-7b' 
+| 'mistral/mistral-tiny-2312' 
+| 'mistral/open-mixtral-8x7b' 
+| 'mistral/mistral-small-2312' 
+| 'mistral/open-mixtral-8x22b'
+| 'mistral/open-mixtral-8x22b-2404'
+| 'mistral/mistral-small-latest'
+| 'mistral/mistral-small-2402'
+| 'mistral/mistral-medium-latest'
+| 'mistral/mistral-medium-2312'
+| 'mistral/mistral-large-latest'
+| 'mistral/mistral-large-2402'
+| 'mistral/codestral-latest'
+| 'mistral/codestral-2405'
+
+export type GroqModel = 'groq/llama3-8b-8192'
+| 'groq/llama3-70b-8192' 
+| 'groq/mixtral-8x7b-32768' 
+| 'groq/gemma-7b-it'
+| 'groq/gemma2-9b-it'
+| 'groq/whisper-large-v3' 
+
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel
+export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel | GroqModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {

@@ -1,11 +1,12 @@
-import { ChatCompletionMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
+import { MISTRAL_PREFIX, MistralHandler } from "./mistral";
 import { OpenAIHandler } from "./openai";
-import { BaseHandler, ConfigOptions } from "./types";
+import { BaseHandler, ConfigOptions, InputError } from "./types";
 import chalk from 'chalk'
 import { CohereHandler } from "./cohere";
 import { BedrockHandler } from "./bedrock";
+import { GROQ_PREFIX, GroqHandler } from "./groq";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
@@ -13,6 +14,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts),
   'command-': (opts: ConfigOptions) => new CohereHandler(opts),
   'bedrock/': (opts: ConfigOptions) => new BedrockHandler(opts),
+  [MISTRAL_PREFIX]: (opts: ConfigOptions) => new MistralHandler(opts),
+  [GROQ_PREFIX]: (opts: ConfigOptions) => new GroqHandler(opts),
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
@@ -31,4 +34,10 @@ export const getTimestamp = () => {
 
 export const consoleWarn = (message: string): void => {
   console.warn(chalk.yellow.bold(`Warning: ${message}\n`));
+}
+
+export const assertNIsOne = (n: number | null | undefined, provider: string): void => {
+  if (typeof n === 'number' && n > 1) {
+    throw new InputError(`${provider} does not support setting 'n' greater than 1.`)
+  }
 }
