@@ -1,7 +1,7 @@
 import { APIResource } from "@anthropic-ai/sdk/resource.mjs";
 import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
-import { MessageCreateParams, MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock } from "@anthropic-ai/sdk/resources/messages.mjs";
+import { MessageCreateParams, MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { getTimestamp } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
@@ -209,52 +209,74 @@ export const getDefaultMaxTokens = (model: string): number => {
 }
 }
 
-const convertMessages = (
+export const convertMessages = (
   messages: CompletionParams['messages']
 ): MessageCreateParamsNonStreaming['messages'] => {
-  const convertedMessages: MessageCreateParamsNonStreaming['messages'] = []
+  const output: MessageCreateParamsNonStreaming['messages'] = [];
+  const clonedMessages = structuredClone(messages)
 
   // Anthropic requires that the first message in the array is from a 'user' role, so we inject a
   // placeholder user message if the array doesn't already begin with a message from a 'user' role.
-  if (messages[0].role !== 'user') {
-    convertedMessages.push({
+  if (clonedMessages[0].role !== 'user' && clonedMessages[0].role !== 'system') {
+    clonedMessages.unshift({
       role: 'user',
       content: 'Empty'
     })
   }
 
-  for (const message of messages){
-    if (message.role === 'user' || message.role === 'assistant') {
+  let previousRole: 'user' | 'assistant' = 'user'
+  let currentParams: Array<TextBlockParam> = []
+  for (const message of clonedMessages) {
+    if (message.role === 'user' || message.role === 'assistant' || message.role === 'system')  {
+      // Anthropic doesn't support the `system` role in their `messages` array, so if the user
+      // defines system messages, we replace it with the `user` role and prepend 'System: ' to its
+      // content. We do this instead of putting every system message in Anthropic's `system` string
+      // parameter so that the order of the user-defined `messages` remains the same, even when the
+      // system messages are interspersed with messages from other roles.
+      const newRole = message.role === 'user' || message.role === 'system' ? 'user' : 'assistant'
+
+      if (previousRole !== newRole) {
+        output.push({
+          role: previousRole,
+          content: currentParams
+        })
+        currentParams = []
+      }
+
       if (typeof message.content === 'string') {
-        convertedMessages.push({
-          role: message.role,
-          content: message.content
+        const text = message.role === 'system' ? `System: ${message.content}` : message.content
+        currentParams.push({
+          type: 'text',
+          text: text
         })
       } else if (Array.isArray(message.content)) {
-        for (const e of message.content) {
+        const convertedContent: Array<TextBlockParam> = message.content.map(e => {
           if (e.type === 'text') {
-            convertedMessages.push({
-              role: message.role,
-              content: e.text
-            })
+            const text = message.role === 'system' ? `System: ${e.text}` : e.text
+            return {
+              type: 'text',
+              text
+            }
+          } else {
+            throw new Error(`Images are not supported.`)
           }
-        }
+        })
+        currentParams.push(...convertedContent)
       }
-    } else if (message.role === 'system') {
-      // Anthropic doesn't support the `system` role in their `messages` array, so we use the `user`
-      // role and prepend 'System: ' to the content. We do this instead of putting every system
-      // message in Anthropic's `system` string parameter so that the order of the user-defined
-      // `messages` remains the same, even when the system messages are interspersed with messages
-      // from other roles.
-      convertedMessages.push({
-        role: 'user',
-        content: `System: ${message.content}`
-      })
+
+      previousRole = newRole
     }
   }
 
-  return convertedMessages
-}
+  if (currentParams.length > 0) {
+    output.push({
+      role: previousRole,
+      content: currentParams
+    })
+  }
+
+  return output
+};
 
 export const convertStopSequences = (
   stop?: CompletionParams['stop']
