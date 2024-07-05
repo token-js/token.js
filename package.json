@@ -19,9 +19,11 @@
     "openai": "^4.52.2"
   },
   "devDependencies": {
+    "axios": "^1.7.2",
     "cohere-ai": "^7.10.6",
     "dotenv": "^16.4.5",
     "typescript": "^5.5.3",
-    "vite-node": "^1.6.0"
+    "vite-node": "^1.6.0",
+    "vitest": "^1.6.0"
   }
 }
