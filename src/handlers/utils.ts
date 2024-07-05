@@ -1,6 +1,6 @@
-import { ChatCompletionMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
+import { MISTRAL_PREFIX, MistralHandler } from "./mistral";
 import { OpenAIHandler } from "./openai";
 import { BaseHandler, ConfigOptions } from "./types";
 import chalk from 'chalk'
@@ -13,6 +13,7 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts),
   'command-': (opts: ConfigOptions) => new CohereHandler(opts),
   'bedrock/': (opts: ConfigOptions) => new BedrockHandler(opts),
+  [MISTRAL_PREFIX]: (opts: ConfigOptions) => new MistralHandler(opts)
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
