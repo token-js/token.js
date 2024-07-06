@@ -60,8 +60,24 @@ export type GroqModel = 'groq/llama3-8b-8192'
 | 'groq/gemma2-9b-it'
 | 'groq/whisper-large-v3' 
 
+export type PerplexityModel = 'perplexity/llama-3-sonar-small-32k-chat'
+| 'perplexity/llama-3-sonar-small-32k-online'
+| 'perplexity/llama-3-sonar-large-32k-chat'
+| 'perplexity/llama-3-sonar-large-32k-online'
+| 'perplexity/llama-3-8b-instruct'
+| 'perplexity/llama-3-70b-instruct'
+| 'perplexity/mixtral-8x7b-instruct'
+
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel | GroqModel | AI21Model
+export type LLMChatModel = ChatModel 
+| GeminiModel
+| AnthropicModel
+| CohereModel
+| BedrockModel
+| MistralModel
+| GroqModel
+| AI21Model
+| PerplexityModel
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {

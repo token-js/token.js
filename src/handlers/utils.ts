@@ -11,6 +11,7 @@ import axios from 'axios'
 import { CompletionParams } from "../chat";
 import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { AI21Handler } from "./ai21";
+import { PERPLEXITY_PREFIX, PerplexityHandler } from "./perplexity";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
@@ -21,6 +22,7 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   [MISTRAL_PREFIX]: (opts: ConfigOptions) => new MistralHandler(opts),
   [GROQ_PREFIX]: (opts: ConfigOptions) => new GroqHandler(opts),
   'jamba-': (opts: ConfigOptions) => new AI21Handler(opts),
+  [PERPLEXITY_PREFIX]: (opts: ConfigOptions) => new PerplexityHandler(opts),
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
