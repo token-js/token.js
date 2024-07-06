@@ -8,6 +8,9 @@ import { CohereHandler } from "./cohere";
 import { BedrockHandler } from "./bedrock";
 import { GROQ_PREFIX, GroqHandler } from "./groq";
 import axios from 'axios'
+import { CompletionParams } from "../chat";
+import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { AI21Handler } from "./ai21";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
@@ -17,6 +20,7 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   'bedrock/': (opts: ConfigOptions) => new BedrockHandler(opts),
   [MISTRAL_PREFIX]: (opts: ConfigOptions) => new MistralHandler(opts),
   [GROQ_PREFIX]: (opts: ConfigOptions) => new GroqHandler(opts),
+  'jamba-': (opts: ConfigOptions) => new AI21Handler(opts),
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
