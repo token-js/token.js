@@ -3,6 +3,7 @@ import { ChatCompletionChunk, ChatModel } from "openai/resources/index.mjs";
 import { CompletionParams } from "../chat";
 import { ChatCompletion } from "openai/src/resources/index.js";
 
+export type AI21Model = "jamba-instruct"
 export type AnthropicModel = 'claude-3-5-sonnet-20240620'
 | 'claude-3-opus-20240229'
 | 'claude-3-sonnet-20240229'
@@ -60,7 +61,7 @@ export type GroqModel = 'groq/llama3-8b-8192'
 | 'groq/whisper-large-v3' 
 
 // We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel | GroqModel
+export type LLMChatModel = ChatModel | GeminiModel | AnthropicModel | CohereModel | BedrockModel | MistralModel | GroqModel | AI21Model
 
 // We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
@@ -71,7 +72,7 @@ export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
   }
 }
 
-type ChatCompletionChoice = Omit<ChatCompletion.Choice, 'finish_reason'> & {
+export type ChatCompletionChoice = Omit<ChatCompletion.Choice, 'finish_reason'> & {
   finish_reason: ChatCompletion.Choice['finish_reason'] | 'unknown'
 }
 

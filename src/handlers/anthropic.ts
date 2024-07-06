@@ -299,6 +299,12 @@ export const convertStopSequences = (
   }
 }
 
+const getApiKey = (
+  apiKey?: string
+): string | undefined => {
+  return apiKey ?? process.env.ANTHROPIC_API_KEY
+}
+
 const validateInputs = (
   body: CompletionParams,
   opts: ConfigOptions
@@ -307,7 +313,7 @@ const validateInputs = (
     throw new InputError(`Anthropic does not support setting 'n' greater than 1.`)
   }
 
-  const apiKey = opts.apiKey ?? process.env.ANTHROPIC_API_KEY;
+  const apiKey = getApiKey(opts.apiKey)
   if (apiKey === undefined) {
     throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
   }
@@ -342,7 +348,7 @@ export class AnthropicHandler extends BaseHandler {
 
     const stream = typeof body.stream === 'boolean' ? body.stream : undefined 
     const maxTokens = body.max_tokens ?? getDefaultMaxTokens(body.model)
-    const client = new Anthropic(this.opts)
+    const client = new Anthropic({apiKey: getApiKey(this.opts.apiKey)! })
     const stopSequences = convertStopSequences(body.stop)
     const topP = typeof body.top_p === 'number' ? body.top_p : undefined
     const temperature = typeof body.temperature === 'number'
