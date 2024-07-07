@@ -144,24 +144,6 @@ const toChatCompletionChoiceMessage = (content: Message['content'], role: Messag
   }
 }
 
-/**
- * Removes the first element from the user-defined `messages` array if it begins with a 'system'
- * message. The returned element will be used for Anthropic's `system` parameter. We only pop the
- * system message if it's the first element in the array so that the order of the messages remains
- * unchanged.
- */
-const popSystemMessageParam = (
-  messages: CompletionParams['messages']
-): ChatCompletionSystemMessageParam | undefined => {
-  if (messages.length > 0 && messages[0].role === 'system') {
-    const systemMessage = messages[0]
-    messages.shift();
-    return systemMessage
-  } else {
-    return undefined;
-  }
-}
-
 const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): CompletionResponse['choices'][0]['finish_reason'] => {
   if (stopReason === null) {
     // Anthropic's documentation says that the `stop_reason` will never be `null` for non-streaming
@@ -210,9 +192,19 @@ export const getDefaultMaxTokens = (model: string): number => {
 
 export const convertMessages = async (
   messages: CompletionParams['messages']
-): Promise<MessageCreateParamsNonStreaming['messages']> => {
+): Promise<{messages: MessageCreateParamsNonStreaming['messages'], systemMessage: string | undefined}> => {
   const output: MessageCreateParamsNonStreaming['messages'] = [];
   const clonedMessages = structuredClone(messages)
+
+  // Pop the first element from the user-defined `messages` array if it begins with a 'system'
+  // message. The returned element will be used for Anthropic's `system` parameter. We only pop the
+  // system message if it's the first element in the array so that the order of the messages remains
+  // unchanged.
+  let systemMessage: string | undefined
+  if (clonedMessages.length > 0 && clonedMessages[0].role === 'system') {
+    systemMessage = clonedMessages[0].content
+    clonedMessages.shift();
+  }
 
   // Anthropic requires that the first message in the array is from a 'user' role, so we inject a
   // placeholder user message if the array doesn't already begin with a message from a 'user' role.
@@ -282,7 +274,7 @@ export const convertMessages = async (
     })
   }
 
-  return output
+  return { messages: output, systemMessage }
 };
 
 export const convertStopSequences = (
@@ -356,9 +348,7 @@ export class AnthropicHandler extends BaseHandler {
       // 0 to 2.
       ? body.temperature / 2
       : undefined
-    const systemMessageParam = popSystemMessageParam(body.messages)
-    const system = systemMessageParam?.content ?? undefined
-    const messages = await convertMessages(body.messages)
+    const {messages, systemMessage} = await convertMessages(body.messages)
 
     if (stream === true) {
       const convertedBody: MessageCreateParamsStreaming = {
@@ -369,7 +359,7 @@ export class AnthropicHandler extends BaseHandler {
         temperature,
         top_p: topP,
         stream,
-        system
+        system: systemMessage
       }
       const created = getTimestamp()
       const response = client.messages.stream(convertedBody)
@@ -383,7 +373,7 @@ export class AnthropicHandler extends BaseHandler {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
-        system
+        system: systemMessage
       }
       const created = getTimestamp()
       const response = await client.messages.create(convertedBody)

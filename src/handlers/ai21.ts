@@ -1,7 +1,7 @@
 import axios from "axios";
 import { CompletionParams } from "../chat";
 import { AI21Model, BaseHandler, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, LLMChatModel, StreamCompletionResponse } from "./types";
-import { getTimestamp, popSystemMessageParam } from "./utils";
+import { getTimestamp } from "./utils";
 import { IncomingMessage } from 'http';
 import { ChatCompletionAssistantMessageParam, ChatCompletionContentPart, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 
