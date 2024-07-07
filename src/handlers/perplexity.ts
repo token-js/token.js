@@ -1,7 +1,8 @@
 import OpenAI from "openai";
 import { Stream } from "openai/streaming.mjs";
-import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { CompletionResponse, InputError, PerplexityModel, StreamCompletionResponse } from "./types";
 import { CompletionParams } from "../chat";
+import { BaseHandler } from "./base";
 
 export const PERPLEXITY_PREFIX = "perplexity/";
 
@@ -13,7 +14,7 @@ async function* streamPerplexity(
   }
 }
 
-export class PerplexityHandler extends BaseHandler {
+export class PerplexityHandler extends BaseHandler<PerplexityModel> {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse> {

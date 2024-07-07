@@ -1,9 +1,10 @@
 import axios from "axios";
 import { CompletionParams } from "../chat";
-import { AI21Model, BaseHandler, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, LLMChatModel, StreamCompletionResponse } from "./types";
+import { AI21Model, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, LLMChatModel, StreamCompletionResponse } from "./types";
 import { getTimestamp } from "./utils";
 import { IncomingMessage } from 'http';
 import { ChatCompletionAssistantMessageParam, ChatCompletionContentPart, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
+import { BaseHandler } from "./base";
 
 type AI21ChatCompletionParams = {
   model: string;
@@ -52,40 +53,6 @@ type AI21ChatCompletionResponseStreaming = {
     completion_tokens: number;
     total_tokens: number;
   };
-}
-
-const getApiKey = (
-  apiKey?: string
-): string | undefined => {
-  return apiKey ?? process.env.AI21_API_KEY
-}
-
-const validateInputs = (
-  body: CompletionParams,
-  opts: ConfigOptions
-): void => {
-  const apiKey = opts.apiKey ?? process.env.AI21_API_KEY
-  if (apiKey === undefined) {
-    throw new InputError("No AI21 API key detected. Please define an 'AI21_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
-  }
-
-  if (typeof body.n === 'number' && (body.n > 16 || body.n < 0)) {
-    throw new InputError(`AI21 requires that the 'n' parameter is a value between 0 and 16, inclusive. Instead, got: ${body.n}`)
-  }
-
-  if (typeof body.n === 'number' && body.stream === true && body.n > 1) {
-    throw new InputError(`AI21 requires that 'n' equals '1' when streaming is enabled. Received an 'n' value of: ${body.n}`)
-  }
-
-  for (const message of body.messages) {
-    if (Array.isArray(message.content)) {
-      for (const e of message.content) {
-        if (e.type === 'image_url') {
-          throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use a different model.`)
-        }
-      }
-    }
-  }
 }
 
 const convertMessages = (
@@ -193,13 +160,41 @@ async function* createCompletionResponseStreaming(
   }
 }
 
-export class AI21Handler extends BaseHandler {
+export class AI21Handler extends BaseHandler<AI21Model> {
+  validateInputs(
+    body: CompletionParams
+  ): void {  
+    super.validateInputs(body)
+
+    if (typeof body.n === 'number' && (body.n > 16 || body.n < 0)) {
+      throw new InputError(`AI21 requires that the 'n' parameter is a value between 0 and 16, inclusive. Instead, got: ${body.n}`)
+    }
+  
+    if (typeof body.n === 'number' && body.stream === true && body.n > 1) {
+      throw new InputError(`AI21 requires that 'n' equals '1' when streaming is enabled. Received an 'n' value of: ${body.n}`)
+    }
+  
+    for (const message of body.messages) {
+      if (Array.isArray(message.content)) {
+        for (const e of message.content) {
+          if (e.type === 'image_url') {
+            throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use a different model.`)
+          }
+        }
+      }
+    }
+  }  
+
+
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
-    validateInputs(body, this.opts)
+    this.validateInputs(body)
 
-    const apiKey = getApiKey()!
+    const apiKey = this.opts.apiKey ?? process.env.AI21_API_KEY
+    if (apiKey === undefined) {
+      throw new InputError("No AI21 API key detected. Please define an 'AI21_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
+    }
 
     const messages = convertMessages(body.messages)
 

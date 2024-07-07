@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { ChatCompletionContentPart } from "openai/resources/index.mjs";
-import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { CompletionResponse, GeminiModel, InputError, StreamCompletionResponse } from "./types";
 import { 
   GoogleGenerativeAI, 
   Content,
@@ -11,6 +11,7 @@ import {
 } from "@google/generative-ai"
 import { consoleWarn, getTimestamp, parseImage } from "./utils";
 import { CompletionParams } from "../chat";
+import { BaseHandler } from "./base";
 
 const convertContentToPart = (content: Array<ChatCompletionContentPart>): Part[] => {
   if (typeof content === "string") {
@@ -155,10 +156,12 @@ async function* fetchStreamResponse(
 
 // To support a new provider, we just create a handler for them extending the BaseHandler class and implement the create method.
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
-export class GeminiHandler extends BaseHandler {
+export class GeminiHandler extends BaseHandler<GeminiModel> {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
+    this.validateInputs(body)
+
     const apiKey = this.opts.apiKey ?? process.env.GEMINI_API_KEY;
     if (apiKey === undefined) {
       throw new InputError("API key is required for Gemini, define GEMINI_API_KEY in your environment or specifty the apiKey option.");
@@ -168,6 +171,7 @@ export class GeminiHandler extends BaseHandler {
       consoleWarn(`The 'baseUrl' will be ignored by Gemini because it does not support this field.`)
     }
 
+    const responseMimeType = body.response_format?.type === 'json_object' ? "application/json" : undefined
     const stop = typeof body.stop === 'string' ? [body.stop] : body.stop
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({
@@ -178,6 +182,7 @@ export class GeminiHandler extends BaseHandler {
         topP: body.top_p ?? undefined,
         stopSequences: stop ?? undefined,
         candidateCount: body.n ?? undefined,
+        responseMimeType
       }
       // Google also supports configurable safety settings which do not fit into the OpenAI format (this was an issue for us in the past, so we'll likely need to address it at some point)
       // Google also supports cached content which does not fit into the OpenAI format

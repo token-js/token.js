@@ -1,10 +1,11 @@
 import { ApiMetaBilledUnits, ChatRequest, ChatStreamRequest, FinishReason, Message, NonStreamedChatResponse, StreamedChatResponse } from "cohere-ai/api";
 import { CompletionParams } from "../chat";
-import { BaseHandler, CompletionResponse, CompletionResponseChunk, InputError, InvariantError, LLMChatModel, MessageRole, StreamCompletionResponse } from "./types";
+import { CohereModel, CompletionResponse, CompletionResponseChunk, InputError, InvariantError, LLMChatModel, MessageRole, StreamCompletionResponse } from "./types";
 import { consoleWarn, getTimestamp } from "./utils";
 import { ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 import { CohereClient } from "cohere-ai";
 import { Stream } from "cohere-ai/core";
+import { BaseHandler } from "./base";
 
 type CohereMessageRole = "CHATBOT" | "SYSTEM" | "USER" | "TOOL"
 
@@ -191,10 +192,12 @@ async function* createCompletionResponseStreaming(
   }
 }
 
-export class CohereHandler extends BaseHandler {
+export class CohereHandler extends BaseHandler<CohereModel> {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
+    this.validateInputs(body)
+
     if (this.opts.baseURL) {
       consoleWarn(`The 'baseUrl' will be ignored by Cohere because it does not support this field.`)
     }

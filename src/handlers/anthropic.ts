@@ -1,10 +1,11 @@
-import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
+import { CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { consoleWarn, fetchThenParseImage, getTimestamp } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
 import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { BaseHandler } from "./base";
 
 dotenv.config()
 
@@ -297,46 +298,47 @@ const getApiKey = (
   return apiKey ?? process.env.ANTHROPIC_API_KEY
 }
 
-const validateInputs = (
-  body: CompletionParams,
-  opts: ConfigOptions
-): void => {
-  if (typeof body.n === 'number' && body.n > 1) {
-    throw new InputError(`Anthropic does not support setting 'n' greater than 1.`)
-  }
+export class AnthropicHandler extends BaseHandler<AnthropicModel> {
+  validateInputs(
+    body: CompletionParams
+  ): void {
+    super.validateInputs(body)
 
-  const apiKey = getApiKey(opts.apiKey)
-  if (apiKey === undefined) {
-    throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
-  }
+    if (typeof body.n === 'number' && body.n > 1) {
+      throw new InputError(`Anthropic does not support setting 'n' greater than 1.`)
+    }
+    
+    let logImageDetailWarning: boolean = false
+    for (const message of body.messages) {
+      if (Array.isArray(message.content)) {
+        for (const e of message.content) {
+          if (e.type === 'image_url') {
+            if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
+              logImageDetailWarning = true
+            }
   
-  let logImageDetailWarning: boolean = false
-  for (const message of body.messages) {
-    if (Array.isArray(message.content)) {
-      for (const e of message.content) {
-        if (e.type === 'image_url') {
-          if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
-            logImageDetailWarning = true
-          }
-
-          if (body.model === 'claude-instant-1.2' || body.model === 'claude-2.0' || body.model === 'claude-2.1') {
-            throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use Claude version 3 or later.`)
+            if (body.model === 'claude-instant-1.2' || body.model === 'claude-2.0' || body.model === 'claude-2.1') {
+              throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use Claude version 3 or later.`)
+            }
           }
         }
       }
     }
-  }
+  
+    if (logImageDetailWarning) {
+      consoleWarn(`Anthropic does not support the 'detail' field for images. The default image quality will be used.`)
+    }
+  }  
 
-  if (logImageDetailWarning) {
-    consoleWarn(`Anthropic does not support the 'detail' field for images. The default image quality will be used.`)
-  }
-}
-
-export class AnthropicHandler extends BaseHandler {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
-    validateInputs(body, this.opts)
+    this.validateInputs(body)
+
+    const apiKey = getApiKey(this.opts.apiKey)
+    if (apiKey === undefined) {
+      throw new InputError("No Anthropic API key detected. Please define an 'ANTHROPIC_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
+    }
 
     const stream = typeof body.stream === 'boolean' ? body.stream : undefined 
     const maxTokens = body.max_tokens ?? getDefaultMaxTokens(body.model)

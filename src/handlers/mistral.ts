@@ -1,8 +1,9 @@
-import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ChatRequest, Message } from "@mistralai/mistralai";
+import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat } from "@mistralai/mistralai";
 import { CompletionParams } from "../chat";
-import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { CompletionResponse, InputError, MistralModel, StreamCompletionResponse } from "./types";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
+import { BaseHandler } from "./base";
 import { ModelPrefix } from "../constants";
 
 const convertMessages = (messages: ChatCompletionMessageParam[]): Array<Message> => {
@@ -78,10 +79,12 @@ const toCompletionResponse = (result: ChatCompletionResponse): CompletionRespons
   }
 }
 
-export class MistralHandler extends BaseHandler {
+export class MistralHandler extends BaseHandler<MistralModel> {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
+    this.validateInputs(body)
+
     const apiKey = this.opts.apiKey ?? process.env.MISTRAL_API_KEY;
 
     if (apiKey === undefined) {
@@ -91,6 +94,9 @@ export class MistralHandler extends BaseHandler {
     const endpoint = this.opts.baseURL ?? undefined
     const client = new MistralClient(apiKey, endpoint);
     const model = body.model.replace(ModelPrefix.Mistral, '')
+    const responseFormat: ResponseFormat | undefined = body.response_format?.type === 'json_object' ? {
+      type: "json_object"
+    } : undefined
 
     const temperature = typeof body.temperature === 'number'
       // We divide by two because Mistral's temperature range is 0 to 1 and the input temperature
@@ -104,6 +110,7 @@ export class MistralHandler extends BaseHandler {
       temperature,
       maxTokens: body.max_tokens ?? undefined,
       topP: body.top_p ?? undefined,
+      responseFormat
       // Mistral does not support `stop`
     }
 

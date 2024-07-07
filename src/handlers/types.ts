@@ -2,82 +2,30 @@ import { ClientOptions } from "openai";
 import { ChatCompletionChunk, ChatModel } from "openai/resources/index.mjs";
 import { CompletionParams } from "../chat";
 import { ChatCompletion } from "openai/src/resources/index.js";
+import { models } from "../models";
 
-export type AI21Model = "jamba-instruct"
-export type AnthropicModel = 'claude-3-5-sonnet-20240620'
-| 'claude-3-opus-20240229'
-| 'claude-3-sonnet-20240229'
-| 'claude-3-haiku-20240307'
-| 'claude-2.1'
-| 'claude-2.0'
-| 'claude-instant-1.2';
-export type GeminiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
-export type CohereModel = 'command-r-plus' | 'command-r' | 'command' | 'command-nightly' | 'command-light' | 'command-light-nightly'
-export type BedrockModel =
-  'bedrock/amazon.titan-text-lite-v1' |
-  'bedrock/amazon.titan-text-express-v1' |
-  'bedrock/anthropic.claude-3-opus-20240229-v1:0' |
-  'bedrock/anthropic.claude-3-sonnet-20240229-v1:0' |
-  'bedrock/anthropic.claude-3-haiku-20240307-v1:0' |
-  "bedrock/anthropic.claude-v2:1" |
-  "bedrock/anthropic.claude-v2" |
-  "bedrock/anthropic.claude-instant-v1" |
-  "bedrock/cohere.command-r-plus-v1:0" |
-  "bedrock/cohere.command-r-v1:0" |
-  "bedrock/cohere.command-text-v14" |
-  "bedrock/cohere.command-light-text-v14" |
-  "bedrock/meta.llama3-8b-instruct-v1:0" |
-  "bedrock/meta.llama3-70b-instruct-v1:0" |
-  "bedrock/meta.llama2-13b-chat-v1" |
-  "bedrock/meta.llama2-70b-chat-v1" |
-  "bedrock/mistral.mistral-7b-instruct-v0:2" |
-  "bedrock/mistral.mixtral-8x7b-instruct-v0:1" |
-  "bedrock/mistral.mistral-large-2402-v1:0"
+export type OpenAIModel = (typeof models.openai.models)[number];
+export type AI21Model = (typeof models.ai21.models)[number];
+export type AnthropicModel = (typeof models.anthropic.models)[number];
+export type GeminiModel = (typeof models.gemini.models)[number];
+export type CohereModel = (typeof models.cohere.models)[number];
+export type BedrockModel =(typeof models.bedrock.models)[number];
+export type MistralModel = (typeof models.mistral.models)[number];
+export type PerplexityModel = (typeof models.perplexity.models)[number];
+export type GroqModel = (typeof models.groq.models)[number];
 
 export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
 
-export type MistralModel = 'mistral/open-mistral-7b' 
-| 'mistral/mistral-tiny-2312' 
-| 'mistral/open-mixtral-8x7b' 
-| 'mistral/mistral-small-2312' 
-| 'mistral/open-mixtral-8x22b'
-| 'mistral/open-mixtral-8x22b-2404'
-| 'mistral/mistral-small-latest'
-| 'mistral/mistral-small-2402'
-| 'mistral/mistral-medium-latest'
-| 'mistral/mistral-medium-2312'
-| 'mistral/mistral-large-latest'
-| 'mistral/mistral-large-2402'
-| 'mistral/codestral-latest'
-| 'mistral/codestral-2405'
-
-export type GroqModel = 'groq/llama3-8b-8192'
-| 'groq/llama3-70b-8192' 
-| 'groq/mixtral-8x7b-32768' 
-| 'groq/gemma-7b-it'
-| 'groq/gemma2-9b-it'
-| 'groq/whisper-large-v3' 
-
-export type PerplexityModel = 'perplexity/llama-3-sonar-small-32k-chat'
-| 'perplexity/llama-3-sonar-small-32k-online'
-| 'perplexity/llama-3-sonar-large-32k-chat'
-| 'perplexity/llama-3-sonar-large-32k-online'
-| 'perplexity/llama-3-8b-instruct'
-| 'perplexity/llama-3-70b-instruct'
-| 'perplexity/mixtral-8x7b-instruct'
-
-// We can extend this with additional model names from other providers
-export type LLMChatModel = ChatModel 
+export type LLMChatModel = OpenAIModel
 | GeminiModel
 | AnthropicModel
 | CohereModel
-| BedrockModel
 | MistralModel
 | GroqModel
 | AI21Model
 | PerplexityModel
+| BedrockModel
 
-// We can pick addtional options if we want to extend the configuration
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
   bedrock?: {
     region?: string
@@ -106,24 +54,6 @@ export type CompletionResponseChunk = Pick<ChatCompletionChunk, CompletionRespon
   choices: Array<ChatCompletionChunkChoice>
 }
 export type StreamCompletionResponse = AsyncIterable<CompletionResponseChunk>
-
-// This is the base handler type used to support different providers. We can extend this to support
-// additional features as needed.
-// To do so we:
-// - 1. Add the required handler functions for the feature to this class (the specific function(s) need to be implemented for the feature to work)
-// - 2. Add a new client object to support the feature. This should be similar to the LLMChat class in ./src/chat/index.ts, and should be added to the LLM class in ./src/index.ts.
-// - 3. Implement the new handlers for the feature in each of the provider handler classes
-export abstract class BaseHandler {
-  opts: ConfigOptions;
-
-  constructor(opts: ConfigOptions) {
-    this.opts = opts;
-  }
-
-  abstract create(
-    body: CompletionParams,
-  ): Promise<CompletionResponse | StreamCompletionResponse>;
-}
 
 export class InputError extends Error {
   constructor(message: string) {

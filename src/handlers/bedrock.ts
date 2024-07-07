@@ -1,9 +1,12 @@
 import { BedrockRuntimeClient, ContentBlock, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, InternalServerException, InvokeModelCommand, InvokeModelCommandInput, InvokeModelWithResponseStreamCommand, InvokeModelWithResponseStreamCommandInput, InvokeModelWithResponseStreamCommandOutput, ResponseStream, SystemContentBlock } from "@aws-sdk/client-bedrock-runtime";
 import { CompletionParams } from "../chat";
-import { BaseHandler, BedrockModel, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, InvariantError, LLMChatModel, MessageRole, MIMEType, StreamCompletionResponse } from "./types";
+import { BedrockModel, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, InvariantError, LLMChatModel, MessageRole, MIMEType, StreamCompletionResponse } from "./types";
 import { consoleWarn, fetchThenParseImage, getTimestamp, normalizeTemperature } from "./utils";
 import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompletionContentPartText } from "openai/resources/index.mjs";
 import { ModelPrefix } from "../constants";
+import { BaseHandler } from "./base";
+import { ResponseFormat } from "@mistralai/mistralai";
+
 
 const normalizeMIMEType = (
   mimeType: MIMEType
@@ -258,46 +261,47 @@ async function* createCompletionResponseStreaming(
   }
 }
 
-const validateInputs = (
-  body: CompletionParams,
-  opts: ConfigOptions
-): void => {
-  if (opts.baseURL) {
-    consoleWarn(`The 'baseUrl' parameter will be ignored by Bedrock because it does not support this field.`)
-  }
-  if (typeof opts.apiKey === 'string') {
-    consoleWarn(`The 'apiKey' parameter will be ignored by Bedrock, which uses the 'accessKeyId' and 'secretAccessKey' fields on the 'bedrock' object instead.`)
-  }
+export class BedrockHandler extends BaseHandler<BedrockModel> {
+  validateInputs(
+    body: CompletionParams,
+  ): void {
+    super.validateInputs(body)
 
-  let logImageDetailWarning: boolean = false
-  for (const message of body.messages) {
-    if (Array.isArray(message.content)) {
-      for (const e of message.content) {
-        if (e.type === 'image_url') {
-          if (!supportsImages(body.model)) {
-            throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use a model that supports images.`)
-          } else if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
-            logImageDetailWarning = true
+    let logImageDetailWarning: boolean = false
+    for (const message of body.messages) {
+      if (Array.isArray(message.content)) {
+        for (const e of message.content) {
+          if (e.type === 'image_url') {
+            if (!supportsImages(body.model)) {
+              throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use a model that supports images.`)
+            } else if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
+              logImageDetailWarning = true
+            }
           }
         }
       }
     }
-  }
+  
+    if (logImageDetailWarning) {
+      consoleWarn(`Bedrock does not support the 'detail' field for images. The default image quality will be used.`)
+    }
+  
+    if (typeof body.n === 'number' && body.n > 1) {
+      throw new InputError(`Bedrock does not support setting 'n' greater than 1.`)
+    }
+  }  
 
-  if (logImageDetailWarning) {
-    consoleWarn(`Bedrock does not support the 'detail' field for images. The default image quality will be used.`)
-  }
-
-  if (typeof body.n === 'number' && body.n > 1) {
-    throw new InputError(`Bedrock does not support setting 'n' greater than 1.`)
-  }
-}
-
-export class BedrockHandler extends BaseHandler {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
-    validateInputs(body, this.opts)
+    this.validateInputs(body)
+
+    if (this.opts.baseURL) {
+      consoleWarn(`The 'baseUrl' parameter will be ignored by Bedrock because it does not support this field.`)
+    }
+    if (typeof this.opts.apiKey === 'string') {
+      consoleWarn(`The 'apiKey' parameter will be ignored by Bedrock, which uses the 'accessKeyId' and 'secretAccessKey' fields on the 'bedrock' object instead.`)
+    }
 
     const region = this.opts.bedrock?.region ?? process.env.AWS_REGION_NAME
     if (!region) {
