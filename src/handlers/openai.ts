@@ -1,7 +1,8 @@
 import OpenAI from "openai";
 import { Stream } from "openai/streaming.mjs";
-import { BaseHandler, CompletionResponse, StreamCompletionResponse } from "./types";
+import { CompletionResponse, InputError, LLMChatModel, OpenAIModel, StreamCompletionResponse } from "./types";
 import { CompletionParams } from "../chat";
+import { BaseHandler } from "./base";
 
 async function* streamOpenAI(
   response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
@@ -13,10 +14,12 @@ async function* streamOpenAI(
 
 // To support a new provider, we just create a handler for them extending the BaseHandler class and implement the create method.
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
-export class OpenAIHandler extends BaseHandler {
+export class OpenAIHandler extends BaseHandler<OpenAIModel> {
   async create(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
+    this.validateInputs(body)
+
     // Uses the OPENAI_API_KEY environment variable, if the apiKey is not provided.
     // This makes the UX better for switching between providers because you can just
     // define all the environment variables and then change the model field without doing anything else.

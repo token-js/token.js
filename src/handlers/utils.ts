@@ -2,7 +2,8 @@ import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
 import { MistralHandler } from "./mistral";
 import { OpenAIHandler } from "./openai";
-import { BaseHandler, ConfigOptions, InputError, LLMChatModel, MIMEType } from "./types";
+import { ConfigOptions, InputError, LLMChatModel, MIMEType } from "./types";
+import { BaseHandler } from "./base";
 import chalk from 'chalk'
 import { CohereHandler } from "./cohere";
 import { BedrockHandler } from "./bedrock";
@@ -13,20 +14,21 @@ import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { AI21Handler } from "./ai21";
 import { ModelPrefix } from "../constants";
 import { PERPLEXITY_PREFIX, PerplexityHandler } from "./perplexity";
+import { models } from "../models";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
-  [ModelPrefix.OpenAI]: (opts: ConfigOptions) => new OpenAIHandler(opts),
-  [ModelPrefix.Anthropic]: (opts: ConfigOptions) => new AnthropicHandler(opts),
-  [ModelPrefix.Gemini]: (opts: ConfigOptions) => new GeminiHandler(opts),
-  [ModelPrefix.Cohere]: (opts: ConfigOptions) => new CohereHandler(opts),
-  [ModelPrefix.Bedrock]: (opts: ConfigOptions) => new BedrockHandler(opts),
-  [ModelPrefix.Mistral]: (opts: ConfigOptions) => new MistralHandler(opts),
-  [ModelPrefix.Groq]: (opts: ConfigOptions) => new GroqHandler(opts),
-  [ModelPrefix.AI21]: (opts: ConfigOptions) => new AI21Handler(opts),
-  [PERPLEXITY_PREFIX]: (opts: ConfigOptions) => new PerplexityHandler(opts),
+  [ModelPrefix.OpenAI]: (opts: ConfigOptions) => new OpenAIHandler(opts, models.openai.models, models.openai.supportsJSON),
+  [ModelPrefix.Anthropic]: (opts: ConfigOptions) => new AnthropicHandler(opts, models.anthropic.models, models.anthropic.supportsJSON),
+  [ModelPrefix.Gemini]: (opts: ConfigOptions) => new GeminiHandler(opts, models.gemini.models, models.gemini.supportsJSON),
+  [ModelPrefix.Cohere]: (opts: ConfigOptions) => new CohereHandler(opts, models.cohere.models, models.cohere.supportsJSON),
+  [ModelPrefix.Bedrock]: (opts: ConfigOptions) => new BedrockHandler(opts, models.bedrock.models, models.bedrock.supportsJSON),
+  [ModelPrefix.Mistral]: (opts: ConfigOptions) => new MistralHandler(opts, models.mistral.models, models.mistral.supportsJSON),
+  [ModelPrefix.Groq]: (opts: ConfigOptions) => new GroqHandler(opts, models.groq.models, models.groq.supportsJSON),
+  [ModelPrefix.AI21]: (opts: ConfigOptions) => new AI21Handler(opts, models.ai21.models, models.ai21.supportsJSON),
+  [PERPLEXITY_PREFIX]: (opts: ConfigOptions) => new PerplexityHandler(opts, models.perplexity.models, models.perplexity.supportsJSON),
 };
 
-export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
+export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler<any> => {
   for (const handlerKey in Handlers) {
     if (modelName.startsWith(handlerKey)) {
       return Handlers[handlerKey](opts);

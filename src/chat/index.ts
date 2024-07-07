@@ -4,14 +4,14 @@ import { Stream } from 'openai/streaming.mjs';
 import { getHandler } from '../handlers/utils';
 import { CompletionResponse, ConfigOptions, LLMChatModel, StreamCompletionResponse } from '../handlers/types';
 
-// This is a best guess at the options to include, we can revise as needed
 type CompletionBase = Pick<ChatCompletionCreateParamsBase, 
   'messages' | 
   'temperature' | 
   'top_p' | 
   'stop' | 
   'n' | 
-  'max_tokens'
+  'max_tokens' |
+  'response_format'
 > & {
   model: LLMChatModel;
 }
