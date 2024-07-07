@@ -3,8 +3,7 @@ import { CompletionParams } from "../chat";
 import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
-
-export const MISTRAL_PREFIX = 'mistral/'
+import { ModelPrefix } from "../constants";
 
 const convertMessages = (messages: ChatCompletionMessageParam[]): Array<Message> => {
   return messages.map((message) => {
@@ -91,7 +90,7 @@ export class MistralHandler extends BaseHandler {
 
     const endpoint = this.opts.baseURL ?? undefined
     const client = new MistralClient(apiKey, endpoint);
-    const model = body.model.replace(MISTRAL_PREFIX, '')
+    const model = body.model.replace(ModelPrefix.Mistral, '')
 
     const temperature = typeof body.temperature === 'number'
       // We divide by two because Mistral's temperature range is 0 to 1 and the input temperature

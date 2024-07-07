@@ -13,28 +13,26 @@ export type AnthropicModel = 'claude-3-5-sonnet-20240620'
 | 'claude-instant-1.2';
 export type GeminiModel = 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-1.0-pro'
 export type CohereModel = 'command-r-plus' | 'command-r' | 'command' | 'command-nightly' | 'command-light' | 'command-light-nightly'
-type BedrockModel =
+export type BedrockModel =
   'bedrock/amazon.titan-text-lite-v1' |
-  'bedrock/amazon.titan-text-express-v1'
-  // 'bedrock/ai21.j2-ultra-v1' |
-  // 'bedrock/ai21.j2-mid-v1' |
-  // 'bedrock/anthropic.claude-3-opus-20240229-v1:0' |
-  // 'bedrock/anthropic.claude-3-sonnet-20240229-v1:0' |
-  // 'bedrock/anthropic.claude-3-haiku-20240307-v1:0' |
-  // "bedrock/anthropic.claude-v2:1" |
-  // "bedrock/anthropic.claude-v2" |
-  // "bedrock/anthropic.claude-instant-v1" |
-  // "bedrock/cohere.command-r-plus-v1:0" |
-  // "bedrock/cohere.command-r-v1:0" |
-  // "bedrock/cohere.command-text-v14" |
-  // "bedrock/cohere.command-light-text-v14" |
-  // "bedrock/meta.llama3-8b-instruct-v1:0" |
-  // "bedrock/meta.llama3-70b-instruct-v1:0" |
-  // "bedrock/meta.llama2-13b-chat-v1" |
-  // "bedrock/meta.llama2-70b-chat-v1" |
-  // "bedrock/mistral.mistral-7b-instruct-v0:2" |
-  // "bedrock/mistral.mixtral-8x7b-instruct-v0:1" |
-  // "bedrock/mistral.mistral-large-2402-v1:0"
+  'bedrock/amazon.titan-text-express-v1' |
+  'bedrock/anthropic.claude-3-opus-20240229-v1:0' |
+  'bedrock/anthropic.claude-3-sonnet-20240229-v1:0' |
+  'bedrock/anthropic.claude-3-haiku-20240307-v1:0' |
+  "bedrock/anthropic.claude-v2:1" |
+  "bedrock/anthropic.claude-v2" |
+  "bedrock/anthropic.claude-instant-v1" |
+  "bedrock/cohere.command-r-plus-v1:0" |
+  "bedrock/cohere.command-r-v1:0" |
+  "bedrock/cohere.command-text-v14" |
+  "bedrock/cohere.command-light-text-v14" |
+  "bedrock/meta.llama3-8b-instruct-v1:0" |
+  "bedrock/meta.llama3-70b-instruct-v1:0" |
+  "bedrock/meta.llama2-13b-chat-v1" |
+  "bedrock/meta.llama2-70b-chat-v1" |
+  "bedrock/mistral.mistral-7b-instruct-v0:2" |
+  "bedrock/mistral.mixtral-8x7b-instruct-v0:1" |
+  "bedrock/mistral.mistral-large-2402-v1:0"
 
 export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
 
