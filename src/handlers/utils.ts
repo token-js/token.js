@@ -12,6 +12,7 @@ import { CompletionParams, LLMChat } from "../chat";
 import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { AI21Handler } from "./ai21";
 import { ModelPrefix } from "../constants";
+import { PERPLEXITY_PREFIX, PerplexityHandler } from "./perplexity";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   [ModelPrefix.OpenAI]: (opts: ConfigOptions) => new OpenAIHandler(opts),
@@ -22,6 +23,7 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   [ModelPrefix.Mistral]: (opts: ConfigOptions) => new MistralHandler(opts),
   [ModelPrefix.Groq]: (opts: ConfigOptions) => new GroqHandler(opts),
   [ModelPrefix.AI21]: (opts: ConfigOptions) => new AI21Handler(opts),
+  [PERPLEXITY_PREFIX]: (opts: ConfigOptions) => new PerplexityHandler(opts),
 };
 
 export const getHandler = (modelName: string, opts: ConfigOptions): BaseHandler => {
