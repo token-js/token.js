@@ -97,6 +97,35 @@ const getUsageTokens = (
   }
 }
 
+const convertMessages = (
+  messages: CompletionParams['messages']
+): {messages: Array<Message>, lastUserMessage: string } => {
+  const clonedMessages = structuredClone(messages)
+  const lastUserMessage = popLastUserMessageContentString(clonedMessages)
+  const chatHistory: ChatRequest['chatHistory'] = []
+  for (const message of clonedMessages) {
+    if (typeof message.content === 'string') {
+      chatHistory.push({
+        role: convertRole(message.role),
+        message: message.content
+      })
+    } else if (message.content) {
+      for (const e of message.content) {
+        if (e.type === 'text') {
+          chatHistory.push({
+            role: convertRole(message.role),
+            message: e.text
+          })
+        } else {
+          throw new InputError(`Cohere does not support images. Please remove them from your prompt message.`)
+        }
+      }
+    }
+  }
+
+  return { messages: chatHistory, lastUserMessage }
+}
+
 async function* createCompletionResponseStreaming(
   response: Stream<StreamedChatResponse>,
   model: LLMChatModel,
@@ -188,32 +217,12 @@ export class CohereHandler extends BaseHandler {
       ? body.temperature / 2
       : undefined
 
-    const lastUserMessage = popLastUserMessageContentString(body.messages)
-    const chatHistory: ChatRequest['chatHistory'] = []
-    for (const message of body.messages) {
-      if (typeof message.content === 'string') {
-        chatHistory.push({
-          role: convertRole(message.role),
-          message: message.content
-        })
-      } else if (message.content) {
-        for (const e of message.content) {
-          if (e.type === 'text') {
-            chatHistory.push({
-              role: convertRole(message.role),
-              message: e.text
-            })
-          } else {
-            throw new InputError(`Cohere does not support images. Please remove them from your prompt message.`)
-          }
-        }
-      }
-    }
+    const { messages, lastUserMessage } = convertMessages(body.messages)
 
     const input = {
       maxTokens,
       message: lastUserMessage,
-      chatHistory,
+      chatHistory: messages,
       model: body.model,
       stopSequences,
       temperature,
