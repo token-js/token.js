@@ -2,8 +2,7 @@ import Groq from "groq-sdk";
 import { BaseHandler, CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { CompletionParams } from "../chat";
 import { assertNIsOne, consoleWarn } from "./utils";
-
-export const GROQ_PREFIX = 'groq/'
+import { ModelPrefix } from "../constants";
 
 // Groq is very compatible with OpenAI's API, so we could likely reuse the OpenAI SDK for this handler
 // to reducee the bundle size.
@@ -23,7 +22,7 @@ export class GroqHandler extends BaseHandler {
     }
 
     assertNIsOne(body.n, 'Groq')
-    const model = body.model.replace(GROQ_PREFIX, '')
+    const model = body.model.replace(ModelPrefix.Groq, '')
 
     return client.chat.completions.create({
       stream: body.stream,

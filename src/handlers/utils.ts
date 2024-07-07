@@ -1,27 +1,28 @@
 import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
-import { MISTRAL_PREFIX, MistralHandler } from "./mistral";
+import { MistralHandler } from "./mistral";
 import { OpenAIHandler } from "./openai";
-import { BaseHandler, ConfigOptions, InputError, MIMEType } from "./types";
+import { BaseHandler, ConfigOptions, InputError, LLMChatModel, MIMEType } from "./types";
 import chalk from 'chalk'
 import { CohereHandler } from "./cohere";
 import { BedrockHandler } from "./bedrock";
-import { GROQ_PREFIX, GroqHandler } from "./groq";
+import { GroqHandler } from "./groq";
 import axios from 'axios'
-import { CompletionParams } from "../chat";
+import { CompletionParams, LLMChat } from "../chat";
 import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { AI21Handler } from "./ai21";
+import { ModelPrefix } from "../constants";
 import { PERPLEXITY_PREFIX, PerplexityHandler } from "./perplexity";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
-  'gpt-': (opts: ConfigOptions) => new OpenAIHandler(opts),
-  'claude-': (opts: ConfigOptions) => new AnthropicHandler(opts),
-  'gemini-': (opts: ConfigOptions) => new GeminiHandler(opts),
-  'command-': (opts: ConfigOptions) => new CohereHandler(opts),
-  'bedrock/': (opts: ConfigOptions) => new BedrockHandler(opts),
-  [MISTRAL_PREFIX]: (opts: ConfigOptions) => new MistralHandler(opts),
-  [GROQ_PREFIX]: (opts: ConfigOptions) => new GroqHandler(opts),
-  'jamba-': (opts: ConfigOptions) => new AI21Handler(opts),
+  [ModelPrefix.OpenAI]: (opts: ConfigOptions) => new OpenAIHandler(opts),
+  [ModelPrefix.Anthropic]: (opts: ConfigOptions) => new AnthropicHandler(opts),
+  [ModelPrefix.Gemini]: (opts: ConfigOptions) => new GeminiHandler(opts),
+  [ModelPrefix.Cohere]: (opts: ConfigOptions) => new CohereHandler(opts),
+  [ModelPrefix.Bedrock]: (opts: ConfigOptions) => new BedrockHandler(opts),
+  [ModelPrefix.Mistral]: (opts: ConfigOptions) => new MistralHandler(opts),
+  [ModelPrefix.Groq]: (opts: ConfigOptions) => new GroqHandler(opts),
+  [ModelPrefix.AI21]: (opts: ConfigOptions) => new AI21Handler(opts),
   [PERPLEXITY_PREFIX]: (opts: ConfigOptions) => new PerplexityHandler(opts),
 };
 
@@ -112,4 +113,17 @@ export const assertNIsOne = (n: number | null | undefined, provider: string): vo
   if (typeof n === 'number' && n > 1) {
     throw new InputError(`${provider} does not support setting 'n' greater than 1.`)
   }
+}
+
+export const normalizeTemperature = (temperature: number, model: LLMChatModel): number => {
+  if (model.startsWith(ModelPrefix.Anthropic) || model.startsWith(ModelPrefix.Cohere) || model.startsWith(ModelPrefix.Mistral)) {
+    return temperature / 2
+  } else if (model.startsWith(ModelPrefix.Bedrock)) {
+    const parsedModel = model.replace(ModelPrefix.Bedrock, '')
+    if (parsedModel.startsWith('amazon') || parsedModel.startsWith('anthropic') || parsedModel.startsWith('cohere') || parsedModel.startsWith('mistral') || parsedModel.startsWith('meta')) {
+      return temperature / 2
+    }
+  }
+
+  return temperature
 }
