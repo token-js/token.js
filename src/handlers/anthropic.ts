@@ -1,7 +1,7 @@
 import { CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam, ToolUseBlockParam, ToolResultBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
-import { consoleWarn, fetchThenParseImage, getTimestamp } from "./utils";
+import { consoleWarn, fetchThenParseImage, getTimestamp, isEmptyObject } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
 import { ChatCompletionMessageToolCall, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
@@ -66,23 +66,44 @@ export async function* createCompletionResponseStreaming(
     }
 
     let newStopReason: Message['stop_reason'] | undefined
-    let textBlock: TextBlock | undefined
 
+    let delta: CompletionResponseChunk['choices'][0]['delta'] = {}
     if (chunk.type === 'content_block_start') {
-      if (isToolUseBlock(chunk.content_block)) {
-        throw new Error(`Tool calls are not supported yet.`)
-      }
-      textBlock = {
-        type: 'text',
-        text: chunk.content_block.text
+      if (chunk.content_block.type === 'text') {
+        delta = {
+          content: chunk.content_block.text
+        }
+      } else {
+        delta = {
+          tool_calls: [
+            {
+              "index": chunk.index,
+              "id": chunk.content_block.id,
+              "type": "function",
+              "function": {
+                "name": chunk.content_block.name,
+                "arguments": isEmptyObject(chunk.content_block.input) ? '' : JSON.stringify(chunk.content_block.input)
+              }
+            }
+          ]
+        }
       }
     } else if (chunk.type === 'content_block_delta') {
       if (chunk.delta.type === 'input_json_delta') {
-        throw new Error(`Tool calls are not supported yet.`)
-      }
-      textBlock = {
-        type: 'text',
-        text: chunk.delta.text
+        delta = {
+          "tool_calls": [
+            {
+              "index": chunk.index,
+              "function": {
+                "arguments": chunk.delta.partial_json
+              }
+            }
+          ]
+        }
+      } else {
+        delta = {
+          content: chunk.delta.text
+        }
       }
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
@@ -90,13 +111,6 @@ export async function* createCompletionResponseStreaming(
 
     const stopReason = newStopReason !== undefined ? newStopReason : message.stop_reason
     const finishReason = toFinishReasonStreaming(stopReason)
-
-    const content = textBlock !== undefined ? [textBlock] : []
-    const chatMessage = toChatCompletionChoiceMessage(content, message.role, toolChoice)
-    const delta = textBlock !== undefined ? {
-      content: chatMessage.content,
-      role: chatMessage.role
-    } : {}
 
     const chunkChoice = {
       index: 0,
