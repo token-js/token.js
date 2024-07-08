@@ -17,9 +17,9 @@ export type GroqModel = (typeof models.groq.models)[number];
 export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
 
 export type LLMChatModel = OpenAIModel
-| GeminiModel
-| AnthropicModel
 | CohereModel
+| AnthropicModel
+| GeminiModel
 | MistralModel
 | GroqModel
 | AI21Model

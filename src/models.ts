@@ -38,7 +38,7 @@ export const models = {
     ] as const
   },
   ai21: {
-    models: ["jamba-instruct"],
+    models: ["jamba-instruct"] as const,
     supportsJSON: []
   },
   anthropic: {
@@ -50,15 +50,15 @@ export const models = {
 'claude-2.1',
 'claude-2.0',
 'claude-instant-1.2'
-    ],
+    ] as const,
     supportsJSON: []
   },
   gemini: {
-    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'],
+    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
     supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash']
   },
   cohere: {
-    models: ['command-r-plus',  'command-r',  'command',  'command-nightly', 'command-light', 'command-light-nightly'],
+    models: ['command-r-plus',  'command-r',  'command',  'command-nightly', 'command-light', 'command-light-nightly'] as const,
     supportsJSON: []
   },
   bedrock: {
@@ -82,7 +82,7 @@ export const models = {
       "bedrock/mistral.mistral-7b-instruct-v0:2",
       "bedrock/mistral.mixtral-8x7b-instruct-v0:1",
       "bedrock/mistral.mistral-large-2402-v1:0"
-    ],
+    ] as const,
     // At the time of writing, the only models that Bedrock supports which allow JSON are Mistral
     // models. However, Bedrock's `additionalModelRequestFields` field, which is designed to allow
     // us to pass arbitrary parameters to the model, does not appear to work for Mistral's
@@ -105,7 +105,7 @@ export const models = {
       'mistral/mistral-large-2402',
       'mistral/codestral-latest',
       'mistral/codestral-2405'
-    ],
+    ] as const,
     // Mistral claims that all of its models support JSON, but several of their weaker models either
     // fail to produce valid JSON or produce very low quality results for the following prompt:
     // "Generate a JSON that maps ten athletes to their jersey numbers". We removed these models
@@ -129,7 +129,7 @@ export const models = {
 'groq/gemma-7b-it',
 'groq/gemma2-9b-it',
 'groq/whisper-large-v3' 
-    ],
+    ] as const,
     // Groq claims that all of its models support JSON, but some of the weaker models either fail to
     // produce valid JSON or produce very low quality results for the following prompt: "Generate a
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
@@ -149,7 +149,7 @@ export const models = {
 'perplexity/llama-3-8b-instruct',
 'perplexity/llama-3-70b-instruct',
 'perplexity/mixtral-8x7b-instruct'
-    ],
+    ] as const,
     supportsJSON: []
   }
 }
