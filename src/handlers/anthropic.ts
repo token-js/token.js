@@ -1,17 +1,19 @@
 import { CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
-import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
+import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam, ToolUseBlockParam, ToolResultBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { consoleWarn, fetchThenParseImage, getTimestamp } from "./utils";
 import { CompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
-import { ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { ChatCompletionMessageToolCall, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
+import { ChatCompletionAssistantMessageParam } from "openai/src/resources/index.js";
+import { ToolResultBlock } from "@aws-sdk/client-bedrock-runtime";
 
 dotenv.config()
 
-export const createCompletionResponseNonStreaming = (response: Message, created: number): CompletionResponse => {
+export const createCompletionResponseNonStreaming = (response: Message, created: number, toolChoice: CompletionParams['tool_choice']): CompletionResponse => {
   const finishReason = toFinishReasonNonStreaming(response.stop_reason)
-  const chatMessage = toChatCompletionChoiceMessage(response.content, response.role)
+  const chatMessage = toChatCompletionChoiceMessage(response.content, response.role, toolChoice)
   const choice = {
     index: 0,
     logprobs: null,
@@ -36,7 +38,8 @@ export const createCompletionResponseNonStreaming = (response: Message, created:
 
 export async function* createCompletionResponseStreaming(
   response: MessageStream,
-  created: number
+  created: number,
+  toolChoice: CompletionParams['tool_choice']
 ): StreamCompletionResponse {
   let message: Message | undefined
 
@@ -89,7 +92,7 @@ export async function* createCompletionResponseStreaming(
     const finishReason = toFinishReasonStreaming(stopReason)
 
     const content = textBlock !== undefined ? [textBlock] : []
-    const chatMessage = toChatCompletionChoiceMessage(content, message.role)
+    const chatMessage = toChatCompletionChoiceMessage(content, message.role, toolChoice)
     const delta = textBlock !== undefined ? {
       content: chatMessage.content,
       role: chatMessage.role
@@ -122,11 +125,41 @@ const isToolUseBlock = (contentBlock: ContentBlock): contentBlock is ToolUseBloc
   return contentBlock.type === 'tool_use'
 }
 
-const toChatCompletionChoiceMessage = (content: Message['content'], role: Message['role']): CompletionResponse['choices'][0]['message'] => {
+const toChatCompletionChoiceMessage = (content: Message['content'], role: Message['role'], toolChoice: CompletionParams['tool_choice']): CompletionResponse['choices'][0]['message'] => {
   const textBlocks = content.filter(isTextBlock)
   if (textBlocks.length > 1) {
-    throw new Error(`Detected more than one text block. Should not happen when tool calls haven't been implemented.`)
-  } else if (textBlocks.length === 0) {
+    consoleWarn(`Received multiple text blocks from Anthropic, which is unexpected. Concatenating the text blocks into a single string.`)
+  }
+
+  let toolUseBlocks: Anthropic.Messages.ToolUseBlock[]
+  if (typeof toolChoice !== 'string' && toolChoice?.type === 'function') {
+    // When the user-defined tool_choice type is 'function', OpenAI always returns a single tool use
+    // block, but Anthropic can return multiple tool use blocks. We select just one of these blocks
+    // to conform to OpenAI's API.
+    const selected = content.filter(isToolUseBlock).find(block => block.name === toolChoice.function.name)
+    if (!selected) {
+      throw new InvariantError(`Did not receive a tool use block from Anthropic for the function: ${toolChoice.function.name}`)
+    }
+    toolUseBlocks = [selected]
+  } else {
+    toolUseBlocks = content.filter(isToolUseBlock)
+  }
+
+  let toolCalls: Array<ChatCompletionMessageToolCall> | undefined
+  if (toolUseBlocks.length > 0) {
+    toolCalls = toolUseBlocks.map(toolUse => {
+      return {
+        id: toolUse.id,
+        function: {
+          name: toolUse.name,
+          arguments: JSON.stringify(toolUse.input),
+        },
+        type: 'function'
+      }
+    })
+  }
+  
+  if (textBlocks.length === 0) {
     // There can be zero text blocks if either of these scenarios happen:
     // - A stop sequence is immediately hit, in which case Anthropic's `content` array is empty. In this
     //   scenario, OpenAI returns an empty string `content` field.
@@ -134,13 +167,15 @@ const toChatCompletionChoiceMessage = (content: Message['content'], role: Messag
     const messageContent = content.every(isToolUseBlock) ? null : ''
     return {
       role,
-      content: messageContent
+      content: messageContent,
+      tool_calls: toolCalls
     }
   } else {
-    const textBlock = textBlocks[0]
+    const content = textBlocks.map(textBlock => textBlock.text).join('\n')
     return {
       role,
-      content: textBlock.text
+      content,
+      tool_calls: toolCalls
     }
   }
 }
@@ -161,6 +196,34 @@ const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): Complet
   } else {
     return 'unknown'
   }
+}
+
+const convertToolParams = (
+  toolChoice: CompletionParams['tool_choice'],
+  tools: CompletionParams['tools']
+): {toolChoice: MessageCreateParamsNonStreaming['tool_choice'], tools: MessageCreateParamsNonStreaming['tools']} => {
+  if (tools === undefined || toolChoice === 'none') {
+    return { toolChoice: undefined, tools: undefined }
+  }
+
+  const convertedTools: MessageCreateParamsNonStreaming['tools'] = tools.map(tool => {
+    return {
+      name: tool.function.name,
+      description: tool.function.description,
+      input_schema: { type: 'object', ...tool.function.parameters}
+    }
+  })
+
+  let convertedToolChoice: MessageCreateParamsNonStreaming['tool_choice']
+  if (toolChoice === undefined || toolChoice === 'auto') {
+    convertedToolChoice = {type: 'auto'}
+  } else if (toolChoice === 'required') {
+    convertedToolChoice = { type: 'any' }
+  } else {
+    convertedToolChoice = { type: 'tool', name: toolChoice.function.name }
+  }
+
+  return { toolChoice: convertedToolChoice, tools: convertedTools}
 }
 
 const toFinishReasonStreaming = (stopReason: Message['stop_reason']): CompletionResponseChunk['choices'][0]['finish_reason'] => {
@@ -217,55 +280,70 @@ export const convertMessages = async (
   }
 
   let previousRole: 'user' | 'assistant' = 'user'
-  let currentParams: Array<TextBlockParam | ImageBlockParam> = []
+  let currentParams: Array<TextBlockParam | ImageBlockParam | ToolUseBlockParam | ToolResultBlockParam> = []
   for (const message of clonedMessages) {
-    if (message.role === 'user' || message.role === 'assistant' || message.role === 'system')  {
-      // Anthropic doesn't support the `system` role in their `messages` array, so if the user
-      // defines system messages, we replace it with the `user` role and prepend 'System: ' to its
-      // content. We do this instead of putting every system message in Anthropic's `system` string
-      // parameter so that the order of the user-defined `messages` remains the same, even when the
-      // system messages are interspersed with messages from other roles.
-      const newRole = message.role === 'user' || message.role === 'system' ? 'user' : 'assistant'
+    // Anthropic doesn't support the `system` role in their `messages` array, so if the user
+    // defines system messages, we replace it with the `user` role and prepend 'System: ' to its
+    // content. We do this instead of putting every system message in Anthropic's `system` string
+    // parameter so that the order of the user-defined `messages` remains the same, even when the
+    // system messages are interspersed with messages from other roles.
+    const newRole = message.role === 'user' || message.role === 'system' || message.role === 'tool' ? 'user' : 'assistant'
 
-      if (previousRole !== newRole) {
-        output.push({
-          role: previousRole,
-          content: currentParams
-        })
-        currentParams = []
+    if (previousRole !== newRole) {
+      output.push({
+        role: previousRole,
+        content: currentParams,
+      })
+      currentParams = []
+    }
+
+    if (message.role === 'tool') {
+      const toolResult: ToolResultBlockParam = {
+        tool_use_id: message.tool_call_id,
+        content: message.content,
+        type: 'tool_result',
       }
-
-      if (typeof message.content === 'string') {
-        const text = message.role === 'system' ? `System: ${message.content}` : message.content
-        currentParams.push({
-          type: 'text',
-          text: text
-        })
-      } else if (Array.isArray(message.content)) {
-        const convertedContent: Array<TextBlockParam | ImageBlockParam> = await Promise.all(message.content.map(async e => {
-          if (e.type === 'text') {
-            const text = message.role === 'system' ? `System: ${e.text}` : e.text
-            return {
-              type: 'text',
-              text
-            }
-          } else {
-            const parsedImage = await fetchThenParseImage(e.image_url.url)
-            return {
-              type: 'image',
-              source: {
-                data: parsedImage.content,
-                media_type: parsedImage.mimeType,
-                type: 'base64'
-              }
+      currentParams.push(toolResult)
+    } else if (typeof message.content === 'string') {
+      const text = message.role === 'system' ? `System: ${message.content}` : message.content
+      currentParams.push({
+        type: 'text',
+        text: text
+      })
+    } else if (Array.isArray(message.content)) {
+      const convertedContent: Array<TextBlockParam | ImageBlockParam> = await Promise.all(message.content.map(async e => {
+        if (e.type === 'text') {
+          const text = message.role === 'system' ? `System: ${e.text}` : e.text
+          return {
+            type: 'text',
+            text
+          }
+        } else {
+          const parsedImage = await fetchThenParseImage(e.image_url.url)
+          return {
+            type: 'image',
+            source: {
+              data: parsedImage.content,
+              media_type: parsedImage.mimeType,
+              type: 'base64'
             }
           }
-        }))
-        currentParams.push(...convertedContent)
-      }
-
-      previousRole = newRole
+        }
+      }))
+      currentParams.push(...convertedContent)
+    } else if (message.role === 'assistant' && Array.isArray(message.tool_calls)) {
+      const convertedContent: Array<ToolUseBlockParam> = message.tool_calls.map(toolCall => {
+        return  {
+          id: toolCall.id,
+          input: JSON.parse(toolCall.function.arguments),
+          name: toolCall.function.name,
+          type: 'tool_use'
+        }
+      })
+      currentParams.push(...convertedContent)
     }
+
+    previousRole = newRole
   }
 
   if (currentParams.length > 0) {
@@ -351,6 +429,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
       ? body.temperature / 2
       : undefined
     const {messages, systemMessage} = await convertMessages(body.messages)
+    const {toolChoice, tools } = convertToolParams(body.tool_choice, body.tools)
 
     if (stream === true) {
       const convertedBody: MessageCreateParamsStreaming = {
@@ -361,12 +440,14 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         temperature,
         top_p: topP,
         stream,
-        system: systemMessage
+        system: systemMessage,
+        tools,
+        tool_choice: toolChoice
       }
       const created = getTimestamp()
       const response = client.messages.stream(convertedBody)
 
-      return createCompletionResponseStreaming(response, created)
+      return createCompletionResponseStreaming(response, created, body.tool_choice)
     } else {
       const convertedBody: MessageCreateParamsNonStreaming = {
         max_tokens: maxTokens,
@@ -375,11 +456,14 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
-        system: systemMessage
+        system: systemMessage,
+        tools,
+        tool_choice: toolChoice
       }
+
       const created = getTimestamp()
       const response = await client.messages.create(convertedBody)
-      return createCompletionResponseNonStreaming(response, created)
+      return createCompletionResponseNonStreaming(response, created, body.tool_choice)
     }
   }
 }

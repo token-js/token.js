@@ -7,7 +7,8 @@ import {
   Part,
   GenerativeModel,
   FinishReason,
-  UsageMetadata
+  UsageMetadata,
+  ModelParams
 } from "@google/generative-ai"
 import { consoleWarn, getTimestamp, parseImage } from "./utils";
 import { CompletionParams } from "../chat";

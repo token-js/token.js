@@ -3,6 +3,7 @@ import { Stream } from "openai/streaming.mjs";
 import { CompletionResponse, InputError, LLMChatModel, OpenAIModel, StreamCompletionResponse } from "./types";
 import { CompletionParams } from "../chat";
 import { BaseHandler } from "./base";
+import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
 
 async function* streamOpenAI(
   response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
@@ -28,7 +29,7 @@ export class OpenAIHandler extends BaseHandler<OpenAIModel> {
       ...this.opts,
       apiKey,
     });
-    
+
     if (body.stream) {
       const stream = await openai.chat.completions.create(body)
       return streamOpenAI(stream);
