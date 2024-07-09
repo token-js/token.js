@@ -12,3 +12,5 @@
 
 # vscode
 .vscode
+
+/coverage

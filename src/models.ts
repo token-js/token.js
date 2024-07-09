@@ -55,7 +55,7 @@ export const models = {
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
-    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash']
+    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const
   },
   cohere: {
     models: ['command-r-plus',  'command-r',  'command',  'command-nightly', 'command-light', 'command-light-nightly'] as const,
@@ -119,7 +119,7 @@ export const models = {
       'mistral/mistral-large-2402',
       'mistral/codestral-latest',
       'mistral/codestral-2405'
-    ]
+    ] as const
   },
   groq: {
     models: [
@@ -138,7 +138,7 @@ export const models = {
       'groq/llama3-70b-8192' ,
       'groq/gemma-7b-it',
       'groq/gemma2-9b-it'
-    ]
+    ] as const
   },
   perplexity: {
     models: [
