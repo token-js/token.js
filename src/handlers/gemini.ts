@@ -142,7 +142,11 @@ export const convertMessagesToContents = (messages: OpenAI.Chat.Completions.Chat
   return { contents: clonedMessages.map((message) => convertMessageToContent(message, true)), systemInstruction }
 }
 
-export const convertFinishReason = (finishReason: FinishReason): 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' => {
+export const convertFinishReason = (finishReason: FinishReason, parts: Part[]): 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' => {  
+  if (parts.some((part) => part.functionCall !== undefined)) {
+    return 'tool_calls'
+  }
+  
   switch (finishReason) {
     case FinishReason.STOP:
       return 'stop'
@@ -278,7 +282,7 @@ export const convertResponse = async (
     choices: result.response.candidates?.map((candidate) => {
       return {
         index: candidate.index,
-        finish_reason: candidate.finishReason ? convertFinishReason(candidate.finishReason) : 'stop',
+        finish_reason: candidate.finishReason ? convertFinishReason(candidate.finishReason, candidate.content.parts) : 'stop',
         message: convertResponseMessage(candidate),
         // Google does not support logprobs
         logprobs: null
@@ -304,7 +308,7 @@ async function* convertStreamResponse(
       choices: chunk.candidates?.map((candidate) => {
         return {
           index: candidate.index,
-          finish_reason: candidate.finishReason ? convertFinishReason(candidate.finishReason) : 'stop',
+          finish_reason: candidate.finishReason ? convertFinishReason(candidate.finishReason, candidate.content.parts) : 'stop',
           delta: {
             content: text,
             tool_calls: convertStreamToolCalls(candidate),
@@ -363,10 +367,10 @@ export class GeminiHandler extends BaseHandler<GeminiModel> {
     const timestamp = getTimestamp()
     if (body.stream) {
       const result = await model.generateContentStream(params)
-      return convertStreamResponse(result, model.model, timestamp)
+      return convertStreamResponse(result, body.model, timestamp)
     } else {
       const result = await model.generateContent(params)
-      return convertResponse(result, model.model, timestamp)
+      return convertResponse(result, body.model, timestamp)
     }
   }
 }

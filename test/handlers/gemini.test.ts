@@ -1,9 +1,12 @@
-import { describe, it, expect } from 'vitest';
-import { convertAssistantMessage, convertContentsToParts, convertFinishReason, convertMessageToContent, convertMessagesToContents, convertResponse, convertResponseMessage, convertRole, convertStreamToolCalls, convertToolCalls, convertToolConfig, convertTools, convertUsageData } from '../../src/handlers/gemini';
+import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
+import { GeminiHandler, convertAssistantMessage, convertContentsToParts, convertFinishReason, convertMessageToContent, convertMessagesToContents, convertResponse, convertResponseMessage, convertRole, convertStreamToolCalls, convertToolCalls, convertToolConfig, convertTools, convertUsageData } from '../../src/handlers/gemini';
 import { ChatCompletionContentPart } from 'openai/resources/index.mjs';
-import { InputError } from '../../src/handlers/types';
+import { InputError, StreamCompletionResponse } from '../../src/handlers/types';
 import OpenAI from 'openai';
-import { FinishReason, FunctionCallingMode, GenerateContentCandidate, UsageMetadata } from '@google/generative-ai';
+import { EnhancedGenerateContentResponse, FinishReason, FunctionCallingMode, GenerateContentCandidate, GenerateContentResult, GenerateContentStreamResult, GoogleGenerativeAI, HarmCategory, HarmProbability, UsageMetadata } from '@google/generative-ai';
+import { CompletionParams } from '../../src/chat';
+import { models } from '../../src/models';
+import { getTimestamp } from '../../src/handlers/utils';
 
 // Unit Tests
 describe('convertContentsToParts', () => {
@@ -320,38 +323,45 @@ describe('convertMessageToContent', () => {
 
 describe('convertFinishReason', () => {
   it('should convert STOP to "stop"', () => {
-    const result = convertFinishReason(FinishReason.STOP);
+    const result = convertFinishReason(FinishReason.STOP, []);
     expect(result).toBe('stop');
   });
 
   it('should convert MAX_TOKENS to "length"', () => {
-    const result = convertFinishReason(FinishReason.MAX_TOKENS);
+    const result = convertFinishReason(FinishReason.MAX_TOKENS, []);
     expect(result).toBe('length');
   });
 
   it('should convert SAFETY to "content_filter"', () => {
-    const result = convertFinishReason(FinishReason.SAFETY);
+    const result = convertFinishReason(FinishReason.SAFETY, []);
     expect(result).toBe('content_filter');
   });
 
   it('should convert OTHER to "stop"', () => {
-    const result = convertFinishReason(FinishReason.OTHER);
+    const result = convertFinishReason(FinishReason.OTHER, []);
     expect(result).toBe('stop');
   });
 
   it('should convert FINISH_REASON_UNSPECIFIED to "stop"', () => {
-    const result = convertFinishReason(FinishReason.FINISH_REASON_UNSPECIFIED);
+    const result = convertFinishReason(FinishReason.FINISH_REASON_UNSPECIFIED, []);
     expect(result).toBe('stop');
   });
 
   it('should convert RECITATION to "stop"', () => {
-    const result = convertFinishReason(FinishReason.RECITATION);
+    const result = convertFinishReason(FinishReason.RECITATION, []);
     expect(result).toBe('stop');
   });
 
   it('should return "stop" for an unrecognized finish reason', () => {
-    const result = convertFinishReason('UNKNOWN_REASON' as FinishReason);
+    const result = convertFinishReason('UNKNOWN_REASON' as FinishReason, []);
     expect(result).toBe('stop');
+  });
+
+  it('should return "tool_calls" if any parts contain tool calls', () => {
+    const result = convertFinishReason(FinishReason.STOP, [{
+      functionCall: { name: 'testFunction', args: { key: 'value' } }
+    }]);
+    expect(result).toBe('tool_calls');
   });
 });
 
@@ -972,5 +982,371 @@ describe('convertUsageData', () => {
       prompt_tokens: undefined,
       total_tokens: undefined
     });
+  });
+});
+
+const mockBasicChatResponse: GenerateContentResult = {
+  response: {
+    text: () => '',
+    functionCall: () => undefined,
+    functionCalls: () => undefined,
+    candidates: [
+      {
+        content: {
+          parts: [
+            {
+              text: "Why didn't the sun go to college? \n\nBecause he already has a million degrees! 🌞 😂 \n"
+            }
+          ],
+          role: "model"
+        },
+        finishReason: FinishReason.STOP,
+        index: 0,
+        safetyRatings: [
+          { 
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            probability: HarmProbability.NEGLIGIBLE
+          }
+        ]
+      }
+    ],
+    usageMetadata: {
+      promptTokenCount: 9,
+      candidatesTokenCount: 23,
+      totalTokenCount: 32
+    }
+  }
+};
+
+const mockToolChatResponse: GenerateContentResult = {
+  response: {
+    text: () => '',
+    functionCall: () => undefined,
+    functionCalls: () => undefined,
+    candidates: [
+      {
+        content: {
+          parts: [
+            {
+              functionCall: {
+                name: "getCurrentWeather",
+                args: {
+                  location: "Portland, OR",
+                  unit: "fahrenheit"
+                }
+              }
+            }
+          ],
+          role: "model"
+        },
+        finishReason: FinishReason.STOP,
+        index: 0,
+        safetyRatings: [
+          { 
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            probability: HarmProbability.NEGLIGIBLE
+          }
+        ]
+      }
+    ],
+    usageMetadata: {
+      promptTokenCount: 80,
+      candidatesTokenCount: 22,
+      totalTokenCount: 102
+    }
+  }
+}
+
+const streamFunction: AsyncGenerator<EnhancedGenerateContentResponse, void, unknown> = (async function* () {
+  yield {
+    text: () => '',
+    functionCall: () => undefined,
+    functionCalls: () => undefined,
+    candidates: [
+      {
+        content: {
+          parts: [
+            {
+              functionCall: {
+                name: "getCurrentWeather",
+                args: {
+                  location: "Portland, OR",
+                  unit: "fahrenheit"
+                }
+              }
+            }
+          ],
+          role: "model"
+        },
+        finishReason: FinishReason.STOP,
+        index: 0,
+        safetyRatings: [
+          { 
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            probability: HarmProbability.NEGLIGIBLE
+          },
+          { 
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            probability: HarmProbability.NEGLIGIBLE
+          }
+        ]
+      }
+    ],
+    usageMetadata: {
+      promptTokenCount: 80,
+      candidatesTokenCount: 22,
+      totalTokenCount: 102
+    }
+  }
+})();
+
+const mockChatStreamResponse: GenerateContentStreamResult = {
+  stream: streamFunction,
+  response: {} as any
+}
+
+const model = 'gemini-1.5-pro';
+
+const toolPrompt: CompletionParams = {
+  model,
+  messages: [
+    {
+      role: 'user',
+      content: `What's the weather like in Portland Oregon?`
+    }
+  ],
+  tools: [{
+    type: "function",
+    function: {
+      name: "getCurrentWeather",
+      description: "Get the current weather in a given location",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "The city and state, e.g. San Francisco, CA",
+          },
+          unit: { type: "string", enum: ["celsius", "fahrenheit"] },
+        },
+        required: ["location", "unit"],
+      },
+    },
+  }],
+  tool_choice: 'auto'
+}
+
+describe('GeminiHandler', () => {
+  vi.mock('@google/generative-ai', async (importOriginal) => {
+    const originalModule = await importOriginal<typeof import('@google/generative-ai')>()
+    return {
+      ...originalModule,
+      GoogleGenerativeAI: vi.fn().mockImplementation(() => ({
+        getGenerativeModel: vi.fn().mockReturnValue({
+          generateContent: vi.fn().mockResolvedValue(mockBasicChatResponse),
+          generateContentStream: vi.fn(),
+        }),
+      }))
+    };
+  });
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+
+    const date = new Date(2000, 1, 1, 13)
+    vi.setSystemTime(date)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+  
+  it('should return a completion response', async () => {
+    const handlerOptions = { apiKey: 'test-api-key' };
+    const handler = new GeminiHandler(handlerOptions, models.gemini.models, models.gemini.supportsJSON);
+
+    (GoogleGenerativeAI as any).mockImplementationOnce(() => ({
+      getGenerativeModel: vi.fn().mockReturnValue({
+        generateContent: vi.fn().mockResolvedValue(mockBasicChatResponse),
+        generateContentStream: vi.fn(),
+      }),
+    }));
+
+    const params: CompletionParams = {
+      model,
+      messages: [
+        {
+          role: 'user',
+          content: 'Tell me a joke.'
+        }
+      ],
+      tools: [],
+      temperature: 1,
+      stream: false
+    };
+
+    const response = await handler.create(params);
+
+    expect(response).toEqual({
+      id: null,
+      created: getTimestamp(),
+      object: 'chat.completion',
+      model: params.model,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: mockBasicChatResponse.response.candidates![0].content.parts[0].text,
+            tool_calls: undefined
+          },
+          finish_reason: 'stop',
+          logprobs: null
+        }
+      ],
+      usage: {
+        prompt_tokens: mockBasicChatResponse.response.usageMetadata?.promptTokenCount,
+        completion_tokens: mockBasicChatResponse.response.usageMetadata?.candidatesTokenCount,
+        total_tokens: mockBasicChatResponse.response.usageMetadata?.totalTokenCount
+      }
+    });
+  });
+
+  it('should return a tool completion response', async () => {
+    const handlerOptions = { apiKey: 'test-api-key' };
+    const handler = new GeminiHandler(handlerOptions, models.gemini.models, models.gemini.supportsJSON);
+
+    (GoogleGenerativeAI as any).mockImplementationOnce(() => ({
+      getGenerativeModel: vi.fn().mockReturnValue({
+        generateContent: vi.fn().mockResolvedValue(mockToolChatResponse),
+        generateContentStream: vi.fn(),
+      }),
+    }));
+
+    const response = await handler.create(toolPrompt);
+
+    expect(response).toEqual({
+      id: null,
+      created: getTimestamp(),
+      object: 'chat.completion',
+      model,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: '',
+            tool_calls: [{
+              function: {
+                arguments: "{\"location\":\"Portland, OR\",\"unit\":\"fahrenheit\"}",
+                name: "getCurrentWeather",
+              },
+              id: "getCurrentWeather",
+              type: "function",
+              index: 0
+            }],
+          },
+          finish_reason: 'tool_calls',
+          logprobs: null,
+        },
+      ],
+      usage: {
+        prompt_tokens: mockToolChatResponse.response.usageMetadata?.promptTokenCount,
+        completion_tokens: mockToolChatResponse.response.usageMetadata?.candidatesTokenCount,
+        total_tokens: mockToolChatResponse.response.usageMetadata?.totalTokenCount,
+      },
+    });
+  });
+
+  it('should return a stream completion response', async () => {
+    const handlerOptions = { apiKey: 'test-api-key' };
+    const handler = new GeminiHandler(handlerOptions, models.gemini.models, models.gemini.supportsJSON);
+
+    (GoogleGenerativeAI as any).mockImplementationOnce(() => ({
+      getGenerativeModel: vi.fn().mockReturnValue({
+        generateContent: vi.fn(),
+        generateContentStream: vi.fn().mockResolvedValue(mockChatStreamResponse),
+      }),
+    }));
+
+    const params: CompletionParams = {
+      ...toolPrompt,
+      stream: true,
+    };
+
+    const responseStream = await handler.create(params);
+
+    const chunks: StreamCompletionResponse[] = [];
+    for await (const chunk of responseStream as AsyncGenerator<StreamCompletionResponse, void, unknown>) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual([
+      {
+        id: null,
+        created: 949438800,
+        object: 'chat.completion.chunk',
+        model,
+        choices: [
+          {
+            index: 0,
+            delta: {
+              role: 'assistant',
+              content: '',
+              tool_calls: [
+                {
+                  function: {
+                    arguments: "{\"location\":\"Portland, OR\",\"unit\":\"fahrenheit\"}",
+                    name: "getCurrentWeather",
+                  },
+                  id: "getCurrentWeather",
+                  index: 0,
+                  type: "function",
+                },
+              ],
+            },
+            finish_reason: 'tool_calls',
+            logprobs: null,
+          },
+        ],
+        usage: {
+          prompt_tokens: 80,
+          completion_tokens: 22,
+          total_tokens: 102,
+        },
+      },
+    ]);
   });
 });
