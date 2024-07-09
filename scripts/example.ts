@@ -14,7 +14,7 @@ const callLLM = async () => {
   const llm = new LLM()
   const result = await llm.chat.completions.create({
     // stream: true,
-    model: 'gpt-4o',
+    model: 'bedrock ',
     messages
   })
 

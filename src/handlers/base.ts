@@ -32,6 +32,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
         throw new InputError(`The model ${body.model} does not support the 'response_format' type 'json_object'.`)
       }
 
+      // Check if the user specified the string 'json' somewhere in the prompt. OpenAI throws an
+      // error if the user doesn't include this string in the prompt, so we enforce this for every
+      // provider for consistency.
       let containsJSONString: boolean = false
       for (const message of body.messages) {
         if (typeof message.content === 'string') {

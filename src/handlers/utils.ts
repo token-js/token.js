@@ -133,3 +133,7 @@ export const normalizeTemperature = (temperature: number, model: LLMChatModel): 
 export const isEmptyObject = (variable: any): boolean => {
   return variable && typeof variable === 'object' && variable.constructor === Object && Object.keys(variable).length === 0
 }
+
+export const isObject = (variable: any): boolean => {
+  return variable && typeof variable === 'object' && variable.constructor === Object
+}

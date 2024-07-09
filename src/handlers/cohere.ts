@@ -1,11 +1,12 @@
-import { ApiMetaBilledUnits, ChatRequest, ChatStreamRequest, FinishReason, Message, NonStreamedChatResponse, StreamedChatResponse } from "cohere-ai/api";
+import { ApiMetaBilledUnits, ChatRequest, ChatStreamRequest, FinishReason, Message, NonStreamedChatResponse, StreamedChatResponse, Tool, ToolCallDelta, ToolMessage, ToolResult } from "cohere-ai/api";
 import { CompletionParams } from "../chat";
 import { CohereModel, CompletionResponse, CompletionResponseChunk, InputError, InvariantError, LLMChatModel, MessageRole, StreamCompletionResponse } from "./types";
 import { consoleWarn, getTimestamp } from "./utils";
-import { ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
+import { ChatCompletionAssistantMessageParam, ChatCompletionMessageToolCall, ChatCompletionToolMessageParam, ChatCompletionUserMessageParam, FunctionDefinition, FunctionParameters } from "openai/resources/index.mjs";
 import { CohereClient } from "cohere-ai";
 import { Stream } from "cohere-ai/core";
 import { BaseHandler } from "./base";
+import { ChatCompletionTool } from "openai/src/resources/index.js";
 
 type CohereMessageRole = "CHATBOT" | "SYSTEM" | "USER" | "TOOL"
 
@@ -83,6 +84,51 @@ const convertStopSequences = (
   }
 }
 
+export const toCohereTool = (tool: ChatCompletionTool): Tool => {
+  const convertType = (type: string, properties?: any, additionalProperties?: any): string => {
+    switch (type) {
+      case 'string':
+        return 'str'
+      case 'integer':
+        return 'int'
+      case 'array':
+        return `List${properties ? `[${convertType(properties.type)}]` : ''}`
+      case 'object':
+        if (additionalProperties) {
+          return `Dict[str, ${convertType(additionalProperties.type)}]`
+        }
+        return 'Dict'
+      default:
+        return type
+    }
+  }
+
+  const convertProperties = (properties: Record<string, any>, requiredFields: string[]): Record<string, any> => {
+    const converted: Record<string, any> = {}
+    for (const [key, value] of Object.entries(properties)) {
+      const isRequired = requiredFields.includes(key)
+      converted[key] = {
+        description: value.description,
+        type: convertType(value.type, value.items, value.additionalProperties),
+        required: isRequired,
+      }
+      if (value.type === 'object' && value.properties) {
+        converted[key].properties = convertProperties(value.properties, value.required || [])
+      }
+    }
+    return converted
+  }
+
+  const required: string[] = Array.isArray(tool.function.parameters?.required) ? tool.function.parameters?.required : []
+  const parameterDefinitions = tool.function.parameters?.properties ? convertProperties(tool.function.parameters.properties, required) : undefined
+
+  return {
+    name: tool.function.name,
+    description: tool.function.description ?? '',
+    parameterDefinitions
+  }
+}
+
 const getUsageTokens = (
   billedUnits?: ApiMetaBilledUnits
 ): CompletionResponse['usage'] => {
@@ -98,19 +144,125 @@ const getUsageTokens = (
   }
 }
 
-const convertMessages = (
+const popLastToolMessageParams = (
   messages: CompletionParams['messages']
-): {messages: Array<Message>, lastUserMessage: string } => {
-  const clonedMessages = structuredClone(messages)
-  const lastUserMessage = popLastUserMessageContentString(clonedMessages)
+): Array<ChatCompletionToolMessageParam> | undefined => {
+  const lastMessage = messages.at(messages.length - 1)
+  if (lastMessage === undefined || lastMessage.role !== 'tool') {
+    return undefined
+  }
+
+  const toolMessages: Array<ChatCompletionToolMessageParam> = []
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const message = messages[i]
+    if (message.role === 'tool') {
+      // Put the new element at the beginning of the array to maintain the same order as the
+      // messages array. (This is necessary because we're iterating from the end of the messages
+      // array to the beginning).
+      toolMessages.unshift(message)
+
+      messages.pop()
+    }
+  }
+
+  return toolMessages
+}
+
+/**
+ * @param previousMessages All of the messages before the `toolMessage`.
+ */
+const toToolResult = (
+  toolMessage: ChatCompletionToolMessageParam,
+  previousMessages: CompletionParams['messages']
+): ToolResult => {
+  // Find the most recent assistant message, which contains the function arguments.
+  let lastAssistantMessage: ChatCompletionAssistantMessageParam | null = null
+  for (let i = previousMessages.length - 1; i >= 0; i--) {
+    const message = previousMessages[i]
+    if (message.role === 'assistant') {
+      lastAssistantMessage = message
+      break
+    }
+  }
+
+  // The following errors can occur due to a bug in our code or due to the user incorrectly handling
+  // assistant and/or tool messages.
+  if (lastAssistantMessage === null) {
+    // OpenAI enforces that an assistant message must precede tool messages, and since we need the
+    // assistant message to get the function arguments, we throw an error if we can't find it.
+    throw new Error(`Could not find message from the 'assistant' role, which must precede messages from the 'tool' role.`)
+  }
+  if (lastAssistantMessage.tool_calls === undefined) {
+    throw new Error(`Expected 'assistant' message to contain a 'tool_calls' field because it precedes tool call messages, but no 'tool_calls' field was found.`)
+  }
+  const toolCall = lastAssistantMessage.tool_calls.find(toolCall => toolCall.function.name === toolMessage.tool_call_id)
+  if (!toolCall) {
+    throw new Error(`Could not find the following tool call ID in the 'assistant' message: ${toolMessage.tool_call_id}`)
+  }
+
+  const toolResult: ToolResult = {
+    call: {
+      name: toolCall.function.name,
+      parameters: JSON.parse(toolCall.function.arguments)
+    },
+    outputs: [JSON.parse(toolMessage.content)]
+  }
+  return toolResult
+}
+
+const convertMessages = (
+  unclonedMessages: CompletionParams['messages']
+): {messages: Array<Message>, lastUserMessage: string, toolResults: ChatRequest['toolResults'] } => {
+  const clonedMessages = structuredClone(unclonedMessages)
+
+  // Cohere has a distinct field, `toolResults`, for the most recent tool messages. If the user's
+  // `message` ends with tool messages, we pop them from the array in order to populate this field.
+  const lastToolMessages = popLastToolMessageParams(clonedMessages)
+  const lastToolResults = lastToolMessages?.map(toolMessage => toToolResult(toolMessage, clonedMessages))
+
+  // Cohere throws the following error if the `toolResults` field is defined and the `message` field
+  // is a non-empty string: 'invalid request: cannot specify both message and tool_results in
+  // multistep mode'. To avoid this error, we only populate the user message if the `toolResults`
+  // aren't defined.
+  const lastUserMessage = lastToolResults === undefined ? popLastUserMessageContentString(clonedMessages) : ''
+  
   const chatHistory: ChatRequest['chatHistory'] = []
-  for (const message of clonedMessages) {
-    if (typeof message.content === 'string') {
+  for (let i = 0; i < clonedMessages.length; i++) {
+    const message = clonedMessages[i]
+    if (message.role === 'tool') {
+      const newToolResult = toToolResult(message, clonedMessages.slice(0, i))
+      const lastChatHistoryMessage = chatHistory.at(chatHistory.length - 1)
+      if (lastChatHistoryMessage !== undefined && lastChatHistoryMessage.role === 'TOOL') {
+        if (lastChatHistoryMessage.toolResults === undefined) {
+          // We manually populate the `toolResults` array when creating the `TOOL` message, so it
+          // should always be defined here.
+          throw new InvariantError(`The 'toolResults' field is undefined.`)
+        }
+
+        lastChatHistoryMessage.toolResults.push(newToolResult)
+      } else {
+        chatHistory.push({
+          role: 'TOOL',
+          toolResults: [newToolResult]
+        })
+      }
+    } else if (message.role === 'assistant') {
       chatHistory.push({
         role: convertRole(message.role),
-        message: message.content
+        message: message.content ?? '',
+        toolCalls: message.tool_calls?.map(toolCall => {
+          return {
+            name: toolCall.function.name,
+            parameters: JSON.parse(toolCall.function.arguments)
+          }
+        })
       })
-    } else if (message.content) {
+    } else if (typeof message.content === 'string') {
+      chatHistory.push({
+        role: convertRole(message.role),
+        message: message.content,
+      })
+    } else if (Array.isArray(message.content)) {
       for (const e of message.content) {
         if (e.type === 'text') {
           chatHistory.push({
@@ -124,7 +276,7 @@ const convertMessages = (
     }
   }
 
-  return { messages: chatHistory, lastUserMessage }
+  return { messages: chatHistory, lastUserMessage, toolResults: lastToolResults }
 }
 
 async function* createCompletionResponseStreaming(
@@ -142,7 +294,9 @@ async function* createCompletionResponseStreaming(
           index: 0,
           finish_reason: null,
           logprobs: null,
-          delta: {}
+          delta: {
+            role: "assistant"
+          }
         }],
         created,
         model,
@@ -172,15 +326,53 @@ async function* createCompletionResponseStreaming(
         id,
         object: 'chat.completion.chunk',
       }
-    } else if (chunk.eventType === 'text-generation') {
+    } else if (
+      chunk.eventType === 'text-generation' ||
+      // Cohere's documentation states that a `text` field can exist on 'tool-calls-chunk' chunks if
+      // the chunk does not contain a `toolCallIndex` field. However, Cohere's TypeScript type does
+      // not contain a text field, which appears to be a bug. We must manually cast to the chunk to
+      // `any` in order to determine whether it has a `text` field in this scenario. If the field
+      // exists, we treat the chnk like a 'text-generation' chunk.
+      (chunk.eventType === 'tool-calls-chunk' && typeof (chunk as any).text === 'string')
+    ) {
+      const text = (chunk as any).text
       yield {
         choices: [{
           index: 0,
           finish_reason: null,
           logprobs: null,
           delta: {
-            content: chunk.text,
-            role: 'assistant'
+            content: text
+          }
+        }],
+        created,
+        model,
+        id,
+        object: 'chat.completion.chunk',
+      }
+    } else if (chunk.eventType === 'tool-calls-chunk') {
+      const index = chunk.toolCallDelta.index
+      if (typeof index !== 'number') {
+        throw new InvariantError(`Content block index is undefined.`)
+      }
+      yield {
+        choices: [{
+          index: 0,
+          finish_reason: null,
+          logprobs: null,
+          delta: {
+            content: chunk.toolCallDelta.text,
+            tool_calls: [
+              {
+                index,
+                id: chunk.toolCallDelta.name,
+                "type": "function",
+                "function": {
+                  "name": chunk.toolCallDelta.name,
+                  "arguments": chunk.toolCallDelta.parameters
+                }
+              }
+            ]
           }
         }],
         created,
@@ -219,9 +411,10 @@ export class CohereHandler extends BaseHandler<CohereModel> {
       // range is 0 to 2.
       ? body.temperature / 2
       : undefined
+    const tools = body.tools?.map(toCohereTool)
 
-    const { messages, lastUserMessage } = convertMessages(body.messages)
-
+    const { messages, lastUserMessage, toolResults } = convertMessages(body.messages)
+    
     const input = {
       maxTokens,
       message: lastUserMessage,
@@ -229,12 +422,14 @@ export class CohereHandler extends BaseHandler<CohereModel> {
       model: body.model,
       stopSequences,
       temperature,
-      p
+      p,
+      toolResults,
+      tools
     }
     const cohere = new CohereClient({
       token: apiKey
     });
-
+    
     if (body.stream === true) {
       const created = getTimestamp()
       const response = await cohere.chatStream(input);
@@ -242,6 +437,17 @@ export class CohereHandler extends BaseHandler<CohereModel> {
     } else {
       const created = getTimestamp()
       const response = await cohere.chat(input);
+
+      const toolCalls: Array<ChatCompletionMessageToolCall> | undefined = response.toolCalls?.map(toolCall => {
+        return {
+          type: 'function',
+          id: toolCall.name,
+          function: {
+            name: toolCall.name,
+            arguments: JSON.stringify(toolCall.parameters)
+          }
+        }
+      })
 
       const usage = getUsageTokens(response.meta?.billedUnits)
       const convertedResponse: CompletionResponse = {
@@ -252,7 +458,8 @@ export class CohereHandler extends BaseHandler<CohereModel> {
           logprobs: null,
           message: {
             role: 'assistant',
-            content: response.text
+            content: response.text,
+            tool_calls: toolCalls
           }
         }],
         created,
