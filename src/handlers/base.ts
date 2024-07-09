@@ -20,6 +20,12 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     if (!this.isSupportedModel(body.model)) {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
     }
+
+    for (const message of body.messages) {
+      if (message.role === 'function') {
+        throw new InputError(`The 'function' role is deprecated. Please use the 'tool' role instead.`)
+      }
+    }
   
     if (body.response_format?.type === 'json_object') {
       if (!this.supportsJSONMode(body.model)) {

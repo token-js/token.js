@@ -66,7 +66,7 @@ export class InputError extends Error {
 export class InvariantError extends Error {
   constructor(message: string) {
     super(
-      `${message}.\n` +
+      `${message}\n` +
       `Should never happen. Please report this error to the developers.`
     )
     this.name = 'InvariantError'

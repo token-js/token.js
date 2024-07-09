@@ -1,8 +1,8 @@
-import { BedrockRuntimeClient, ContentBlock, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, InternalServerException, InvokeModelCommand, InvokeModelCommandInput, InvokeModelWithResponseStreamCommand, InvokeModelWithResponseStreamCommandInput, InvokeModelWithResponseStreamCommandOutput, ResponseStream, SystemContentBlock } from "@aws-sdk/client-bedrock-runtime";
+import { BedrockRuntimeClient, ContentBlock, ContentBlockDelta, ConversationRole, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, InternalServerException, InvokeModelCommand, InvokeModelCommandInput, InvokeModelWithResponseStreamCommand, InvokeModelWithResponseStreamCommandInput, InvokeModelWithResponseStreamCommandOutput, ResponseStream, SystemContentBlock, Tool, ToolChoice, ToolConfiguration } from "@aws-sdk/client-bedrock-runtime";
 import { CompletionParams } from "../chat";
 import { BedrockModel, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, InvariantError, LLMChatModel, MessageRole, MIMEType, StreamCompletionResponse } from "./types";
 import { consoleWarn, fetchThenParseImage, getTimestamp, normalizeTemperature } from "./utils";
-import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompletionContentPartText } from "openai/resources/index.mjs";
+import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompletionContentPartText, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { ModelPrefix } from "../constants";
 import { BaseHandler } from "./base";
 import { ResponseFormat } from "@mistralai/mistralai";
@@ -52,6 +52,81 @@ const supportsAssistantMessages = (
   model: LLMChatModel
 ): boolean => {
   return (model !== 'bedrock/cohere.command-light-text-v14' && model !== 'bedrock/cohere.command-text-v14')
+}
+
+const isTextMember = (contentBlock: ContentBlock): contentBlock is ContentBlock.TextMember => {
+  return typeof contentBlock.text === 'string'
+}
+
+const isToolUseBlock = (contentBlock: ContentBlock): contentBlock is ContentBlock.ToolUseMember => {
+  return contentBlock.toolUse !== undefined
+}
+
+const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolChoice: CompletionParams['tool_choice']): CompletionResponse['choices'][0]['message'] => {
+  if (output?.message?.content === undefined) {
+    return {
+      content: '',
+      role: 'assistant'
+    }
+  }
+  if (output.message.role === 'user') {
+    throw new InvariantError(`Detected a user message in Bedrock's response.`)
+  }
+  const role = output.message.role ?? 'assistant'
+  
+  const textBlocks = output.message.content.filter(isTextMember)
+  if (textBlocks.length > 1) {
+    consoleWarn(`Received multiple text blocks from Bedrock, which is unexpected. Concatenating the text blocks into a single string.`)
+  }
+
+  let toolUseBlocks: ContentBlock.ToolUseMember[]
+  if (typeof toolChoice !== 'string' && toolChoice?.type === 'function') {
+    // When the user-defined tool_choice type is 'function', OpenAI always returns a single tool use
+    // block, but Anthropic can return multiple tool use blocks. Since Bedrock supports Anthropic,
+    // we assume Bedrock can also return multiple tool use blocks. We select just one of these
+    // blocks to conform to OpenAI's API.
+    const selected = output.message.content.filter(isToolUseBlock).find(block => block.toolUse.name === toolChoice.function.name)
+    if (!selected) {
+      throw new InvariantError(`Did not receive a tool use block from Bedrock for the function: ${toolChoice.function.name}`)
+    }
+    toolUseBlocks = [selected]
+  } else {
+    toolUseBlocks = output.message.content.filter(isToolUseBlock)
+  }
+
+  let toolCalls: Array<ChatCompletionMessageToolCall> | undefined
+  if (toolUseBlocks.length > 0) {
+    toolCalls = toolUseBlocks.map(block => {
+      if (block.toolUse.name === undefined) {
+        throw new InvariantError(`Function name is undefined.`)
+      }
+
+      return {
+        id: block.toolUse.toolUseId ?? block.toolUse.name,
+        function: {
+          name: block.toolUse.name,
+          arguments: block.toolUse.input !== undefined ? JSON.stringify(block.toolUse.input) : '',
+        },
+        type: 'function'
+      }
+    })
+  }
+  
+  if (textBlocks.length === 0) {
+    const messageContent = output.message.content.every(isToolUseBlock) ? null : ''
+    return {
+      role,
+      content: messageContent,
+      tool_calls: toolCalls
+    }
+  } else {
+    const content = textBlocks.map(textBlock => textBlock.text).join('\n')
+    return {
+      role,
+      content,
+      tool_calls: toolCalls
+    }
+  }
 }
 
 const convertMessages = async (
@@ -104,59 +179,77 @@ const convertMessages = async (
   }
 
   let previousRole: 'user' | 'assistant' = 'user'
-  let currentParams: Array<ContentBlock.ImageMember |ContentBlock.TextMember> = []
+  let currentParams: Array<ContentBlock.ImageMember |ContentBlock.TextMember | ContentBlock.ToolUseMember | ContentBlock.ToolResultMember> = []
   for (const message of clonedMessages) {
-    if (message.role === 'user' || message.role === 'assistant' || message.role === 'system')  {
-      // Bedrock doesn't support the `system` role in their `messages` array, so if the user
-      // defines system messages that are interspersed with user and assistant messages, we
-      // replace the system messages with the `user` role. We'll also prepend 'System: ' to its
-      // content later. We do this instead of putting every system message in Bedrock's `system`
-      // parameter so that the order of the user-defined `messages` remains the same.
-      let newRole: 'user' | 'assistant'
-      if (supportsAssistantMessages(model)) {
-        newRole = message.role === 'user' || message.role === 'system' ? 'user' : 'assistant'
-      } else {
-        // We'll always use the 'user' role if the model also doesn't support assistant messages.
-        newRole = 'user'
-      }
-
-      if (previousRole !== newRole) {
-        output.push({
-          role: previousRole,
-          content: currentParams
-        })
-        currentParams = []
-      }
-
-      if (typeof message.content === 'string') {
-        const text = makeTextContent(message.role, message.content)
-        currentParams.push({
-          text: text
-        })
-      } else if (Array.isArray(message.content)) {
-        const convertedContent: Array<ContentBlock.ImageMember | ContentBlock.TextMember> = await Promise.all(message.content.map(async e => {
-          if (e.type === 'text') {
-            const text = makeTextContent(message.role, e.text)
-            return {
-              text
-            }
-          } else {
-            const parsedImage = await fetchThenParseImage(e.image_url.url)
-            return {
-              image: {
-                format: normalizeMIMEType(parsedImage.mimeType),
-                source: {
-                  bytes: new TextEncoder().encode(parsedImage.content)
-                }
-              },
-            }
-          }
-        }))
-        currentParams.push(...convertedContent)
-      }
-
-      previousRole = newRole
+    // Bedrock doesn't support the `system` role in their `messages` array, so if the user
+    // defines system messages that are interspersed with user and assistant messages, we
+    // replace the system messages with the `user` role. We'll also prepend 'System: ' to its
+    // content later. We do this instead of putting every system message in Bedrock's `system`
+    // parameter so that the order of the user-defined `messages` remains the same.
+    let newRole: 'user' | 'assistant'
+    if (supportsAssistantMessages(model)) {
+      newRole = message.role === 'user' || message.role === 'system' || message.role === 'tool' ? 'user' : 'assistant'
+    } else {
+      // We'll always use the 'user' role if the model also doesn't support assistant messages.
+      newRole = 'user'
     }
+
+    if (previousRole !== newRole) {
+      output.push({
+        role: previousRole,
+        content: currentParams
+      })
+      currentParams = []
+    }
+
+    if (message.role === 'tool') {
+      const toolResult: ContentBlock.ToolResultMember = {
+        toolResult: {
+          toolUseId: message.tool_call_id,
+          content: [{
+            text: message.content
+          }]
+        }
+      }
+      currentParams.push(toolResult)
+    } else if (typeof message.content === 'string') {
+      const text = makeTextContent(message.role, message.content)
+      currentParams.push({
+        text: text
+      })
+    } else if (Array.isArray(message.content)) {
+      const convertedContent: Array<ContentBlock.ImageMember | ContentBlock.TextMember> = await Promise.all(message.content.map(async e => {
+        if (e.type === 'text') {
+          const text = makeTextContent(message.role, e.text)
+          return {
+            text
+          }
+        } else {
+          const parsedImage = await fetchThenParseImage(e.image_url.url)
+          return {
+            image: {
+              format: normalizeMIMEType(parsedImage.mimeType),
+              source: {
+                bytes: new TextEncoder().encode(parsedImage.content)
+              }
+            },
+          }
+        }
+      }))
+      currentParams.push(...convertedContent)
+    } else if (message.role === 'assistant' && Array.isArray(message.tool_calls)) {
+      const convertedContent: Array<ContentBlock.ToolUseMember> = message.tool_calls.map(toolCall => {
+        return {
+          toolUse: {
+            toolUseId: toolCall.id,
+            input: JSON.parse(toolCall.function.arguments),
+            name: toolCall.function.name
+          }
+        }
+      })
+      currentParams.push(...convertedContent)
+    }
+    previousRole = newRole
   }
 
   if (currentParams.length > 0) {
@@ -185,6 +278,59 @@ const convertStopSequences = (
     throw new Error(`Unknown stop sequence type: ${stop}`)
   }
 }
+
+const isContentBlockDeltaTextMember = (
+  delta: ContentBlockDelta
+): delta is ContentBlockDelta.TextMember => {
+  return typeof delta.text === 'string'
+}
+
+const isContentBlockDeltaToolUseMember = (
+  delta: ContentBlockDelta
+): delta is ContentBlockDelta.ToolUseMember => {
+  return delta.toolUse !== undefined
+}
+
+const convertToolParams = (
+  toolChoice: CompletionParams['tool_choice'],
+  tools: CompletionParams['tools']
+): ConverseCommandInput['toolConfig'] => {
+  if (tools === undefined || toolChoice === 'none') {
+    return undefined
+  }
+
+  const convertedTools = tools.length > 0 ? tools.map(tool => {
+    const inputSchema = tool.function.parameters ?
+      {
+        // Bedrock and OpenAI's function parameter types are incompatible even though they both
+        // adhere to the JSON schema, so we set the type to `any` to prevent a TypeScript error.
+        json: tool.function.parameters as any,
+        // TypeScript throws a type error if we don't define this field:
+        $unknown: undefined 
+      }
+      : undefined
+    return {
+      // TypeScript throws a type error if we don't define this field:
+      $unknown: undefined,
+      toolSpec: {
+        name: tool.function.name,
+        description: tool.function.description,
+        inputSchema: inputSchema
+      }
+    }
+  }) : undefined
+
+  let convertedToolChoice: ToolChoice
+  if (toolChoice === undefined || toolChoice === 'auto') {
+    convertedToolChoice = {auto: {}}
+  } else if (toolChoice === 'required') {
+    convertedToolChoice = { any: {} }
+  } else {
+    convertedToolChoice = { tool: {name: toolChoice.function.name} }
+  }
+
+  return { toolChoice: convertedToolChoice, tools: convertedTools }
+ }
 
 const convertStopReason = (
   completionReason: ConverseResponse['stopReason']
@@ -223,6 +369,12 @@ async function* createCompletionResponseStreaming(
     }
     yield convertedResponse
   } else {
+    // We manually keep track of the tool call index because some providers, like Anthropic, start
+    // with a tool call index of 1 because they're preceded by a text block that has an index of 0 in
+    // the `response`. Since OpenAI's tool call index starts with 0, we also enforce that convention
+    // here for consistency.
+    let initialToolCallIndex: number | null = null
+
     for await (const stream of response.stream) {
       if (stream.internalServerException) {
         throw stream.internalServerException
@@ -234,15 +386,70 @@ async function* createCompletionResponseStreaming(
         throw stream.validationException
       }
 
-      if (stream.messageStart?.role === 'user') {
-        throw new InvariantError(`Received a message from the 'user' role.`)
+      let delta: CompletionResponseChunk['choices'][0]['delta'] = {}
+      if (stream.messageStart) {
+        if (stream.messageStart.role === 'user') {
+          throw new InvariantError(`Received a message from the 'user' role.`)
+        }
+        delta = {
+          role: stream.messageStart.role
+        }
+      } else if (stream.contentBlockStart?.start?.toolUse !== undefined) {
+        const index = stream.contentBlockStart.contentBlockIndex
+        if (typeof index !== 'number') {
+          throw new InvariantError(`Content block index is undefined.`)
+        }
+
+        if (initialToolCallIndex === null) {
+          initialToolCallIndex = index
+        }
+
+        const id = stream.contentBlockStart.start.toolUse.toolUseId ?? stream.contentBlockStart.start.toolUse.name
+
+        delta = {
+          tool_calls: [
+            {
+              index: index - initialToolCallIndex,
+              id,
+              "type": "function",
+              "function": {
+                "name": stream.contentBlockStart.start.toolUse.name,
+                "arguments": ''
+              }
+            }
+          ]
+        }
+      } else if (stream.contentBlockDelta?.delta !== undefined) {
+        if (isContentBlockDeltaTextMember(stream.contentBlockDelta.delta)) {
+          delta = {
+            content: stream.contentBlockDelta.delta.text,
+          }
+        } else if (isContentBlockDeltaToolUseMember(stream.contentBlockDelta.delta)){
+          const index = stream.contentBlockDelta.contentBlockIndex
+          if (typeof index !== 'number') {
+            throw new InvariantError(`Content block index is undefined.`)
+          }
+
+          if (initialToolCallIndex === null) {
+            // We assign the initial tool call index in the `content_block_start` event, which should
+            // always come before a `content_block_delta` event, so this variable should never be null.
+            throw new InvariantError(`Content block delta event came before a content block start event.`)
+          }
+
+          delta = {
+            "tool_calls": [
+              {
+                index: index - initialToolCallIndex,
+                "function": {
+                  "arguments": stream.contentBlockDelta.delta.toolUse.input
+                }
+              }
+            ]
+          }
+        }
       }
 
       const finishReason = typeof stream.messageStop?.stopReason === 'string' ? convertStopReason(stream.messageStop.stopReason) : null
-      const delta: CompletionResponseChunk['choices'][0]['delta'] = typeof stream.contentBlockDelta?.delta?.text === 'string' ?  {
-        content: stream.contentBlockDelta.delta.text,
-        role: 'assistant'
-      } : {}
 
       const convertedResponse: CompletionResponseChunk = {
         id,
@@ -326,6 +533,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
     const maxTokens = body.max_tokens ?? undefined
     const stopSequences = convertStopSequences(body.stop)
     const modelId = body.model.startsWith('bedrock/') ? body.model.replace('bedrock/', '') : body.model
+    const toolConfig = convertToolParams(body.tool_choice, body.tools)
 
     const convertedParams: ConverseCommandInput = {
       inferenceConfig: {
@@ -336,7 +544,8 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
       },
       modelId,
       messages,
-      system: systemMessages
+      system: systemMessages,
+      toolConfig
     }
     const client = new BedrockRuntimeClient({  region,   credentials: {
       accessKeyId: accessKeyId!,
@@ -358,7 +567,8 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
         completion_tokens: response.usage.outputTokens,
         total_tokens: response.usage.inputTokens + response.usage.outputTokens
       } : undefined
-      const content = response.output?.message?.content?.map(c => c.text).join('\n\n') ?? ''
+
+      const message = toChatCompletionChoiceMessage(response.output, body.tool_choice)
 
       const convertedResponse: CompletionResponse = {
         id: response.$metadata.requestId ?? null,
@@ -366,10 +576,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
         choices: [{
           index: 0,
           logprobs: null,
-          message: {
-            content,
-            role: 'assistant'
-          },
+          message,
           finish_reason: convertStopReason(response.stopReason)
         }],
         created,

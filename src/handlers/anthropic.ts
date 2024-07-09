@@ -43,16 +43,24 @@ export async function* createCompletionResponseStreaming(
 ): StreamCompletionResponse {
   let message: Message | undefined
 
+  // We manually keep track of the tool call index because some providers, like Anthropic, start
+  // with a tool call index of 1 because they're preceded by a text block that has an index of 0 in
+  // the `response`. Since OpenAI's tool call index starts with 0, we also enforce that convention
+  // here for consistency.
+  let initialToolCallIndex: number | null = null
+
   for await (const chunk of response) {
     if (chunk.type === 'message_start') {
       message = chunk.message
       // Yield the first element
       yield {
-          choices: [{
+        choices: [{
           index: 0,
           finish_reason: toFinishReasonStreaming(chunk.message.stop_reason),
           logprobs: null,
-          delta: {}
+          delta: {
+            role: chunk.message.role
+          }
         }],
         created,
         model: message.model,
@@ -74,10 +82,14 @@ export async function* createCompletionResponseStreaming(
           content: chunk.content_block.text
         }
       } else {
+        if (initialToolCallIndex === null) {
+          initialToolCallIndex = chunk.index
+        }
+
         delta = {
           tool_calls: [
             {
-              "index": chunk.index,
+              "index": chunk.index - initialToolCallIndex,
               "id": chunk.content_block.id,
               "type": "function",
               "function": {
@@ -90,10 +102,16 @@ export async function* createCompletionResponseStreaming(
       }
     } else if (chunk.type === 'content_block_delta') {
       if (chunk.delta.type === 'input_json_delta') {
+        if (initialToolCallIndex === null) {
+          // We assign the initial tool call index in the `content_block_start` event, which should
+          // always come before a `content_block_delta` event, so this variable should never be null.
+          throw new InvariantError(`Content block delta event came before a content block start event.`)
+        }
+
         delta = {
           "tool_calls": [
             {
-              "index": chunk.index,
+              "index": chunk.index - initialToolCallIndex,
               "function": {
                 "arguments": chunk.delta.partial_json
               }
