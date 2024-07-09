@@ -39,7 +39,7 @@ export const models = {
   },
   ai21: {
     models: ["jamba-instruct"] as const,
-    supportsJSON: []
+    supportsJSON: [] as const
   },
   anthropic: {
     models: [
@@ -51,7 +51,7 @@ export const models = {
 'claude-2.0',
 'claude-instant-1.2'
     ] as const,
-    supportsJSON: []
+    supportsJSON: [] as const
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
@@ -59,7 +59,7 @@ export const models = {
   },
   cohere: {
     models: ['command-r-plus',  'command-r',  'command',  'command-nightly', 'command-light', 'command-light-nightly'] as const,
-    supportsJSON: []
+    supportsJSON: [] as const
   },
   bedrock: {
     models: [
@@ -150,6 +150,6 @@ export const models = {
 'perplexity/llama-3-70b-instruct',
 'perplexity/mixtral-8x7b-instruct'
     ] as const,
-    supportsJSON: []
+    supportsJSON: [] as const
   }
 }
