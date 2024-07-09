@@ -1,26 +1,20 @@
 import { ChatCompletionAssistantMessageParam, ChatCompletionCreateParamsBase, ChatCompletionSystemMessageParam, ChatCompletionToolMessageParam, ChatCompletionUserMessageParam } from 'openai/resources/chat/completions.mjs';
-import { ChatCompletion, ChatCompletionChunk } from 'openai/resources/index.mjs';
 import { Stream } from 'openai/streaming.mjs';
 import { getHandler } from '../handlers/utils';
 import { CompletionResponse, ConfigOptions, LLMChatModel, StreamCompletionResponse } from '../handlers/types';
-
-type ChatCompletionMessageParam = ChatCompletionSystemMessageParam
-  | ChatCompletionUserMessageParam
-  | Omit<ChatCompletionAssistantMessageParam, 'function_call'>
-  | ChatCompletionToolMessageParam
 
 type CompletionBase = Pick<ChatCompletionCreateParamsBase, 
   'temperature' | 
   'top_p' | 
   'stop' | 
   'n' | 
+  'messages' |
   'max_tokens' |
   'response_format' |
   'tools' | 
   'tool_choice'
 > & {
   model: LLMChatModel;
-  messages: Array<ChatCompletionMessageParam>
 }
 
 type CompletionStreaming = CompletionBase & {
