@@ -1,26 +1,50 @@
-import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat } from "@mistralai/mistralai";
+import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChoice, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat, ToolCalls } from "@mistralai/mistralai";
 import { CompletionParams } from "../chat";
 import { CompletionResponse, InputError, MistralModel, StreamCompletionResponse } from "./types";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
+import { ChatCompletionChunk, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
 import { BaseHandler } from "./base";
 import { ModelPrefix } from "../constants";
 
-const convertMessages = (messages: ChatCompletionMessageParam[]): Array<Message> => {
-  return messages.map((message) => {
+export const findLinkedToolCallName = (messages: ChatCompletionMessage[], toolCallId: string): string => {
+  for (const message of messages) {
+    for (const toolCall of message?.tool_calls ?? []) {
+      if (toolCall.id === toolCallId) {
+        return toolCall.function.name
+      }
+    }
+  }
 
+  throw new InputError(`Tool call with id ${toolCallId} not found in messages`)
+}
+
+export const convertMessages = (messages: (ChatCompletionMessageParam | ChatCompletionMessage)[]): Array<Message | ChatCompletionResponseChoice['message']> => {
+  return messages.map((message) => {
     if (typeof message.content !== 'string' && message.content?.some((part) => part.type === 'image_url')) {
       throw new Error("Image inputs are not supported by Mistral")
     }
 
     if (message.role === 'tool') {
-      throw new Error("Tools are not currently supported")
+      const name = findLinkedToolCallName(messages as ChatCompletionMessage[], message.tool_call_id)
+
+      return {
+        name,
+        role: 'tool',
+        content: message.content,
+        tool_call_id: message.tool_call_id
+      }
     }
 
-    if (message.role === 'system' || message.role === 'assistant') {
+    if (message.role === 'system') {
       return {
         role: message.role,
         content: message.content ?? ''
+      }
+    } else if (message.role === 'assistant') {
+      return {
+        role: message.role,
+        content: message.content ?? '',
+        tool_calls: message.tool_calls ?? null
       }
     } else if (message.role === 'user') {
       const content = typeof message.content === 'string' ? message.content : message.content?.map((m) => (m as ChatCompletionContentPartText).text)
@@ -29,7 +53,107 @@ const convertMessages = (messages: ChatCompletionMessageParam[]): Array<Message>
         content
       }
     } else {
-      throw new Error("Function responses are not supported.")
+      throw new Error("Function messages are deprecated.")
+    }
+  })
+}
+
+export const convertTools = (tools: CompletionParams['tools'], specificFunctionName?: string): ChatRequest['tools'] => {
+  if (!tools) {
+    return undefined
+  }
+  
+  const specifiedTool = tools.filter((tool) => {
+    if (specificFunctionName === undefined) {
+      return true
+    } else {
+      return tool.function.name === specificFunctionName
+    }
+  })
+
+  if (specificFunctionName !== undefined && specifiedTool.length === 0) {
+    throw new InputError(`Tool with name ${specificFunctionName} not found in tool list`)
+  }
+
+  return specifiedTool.map((tool) => {
+    return {
+      type: 'function',
+      function: {
+        name: tool.function.name,
+        description: tool.function.description ?? '',
+        parameters: tool.function.parameters ?? {},
+      }
+    }
+  })
+}
+
+export const convertToolConfig = (toolChoice: CompletionParams['tool_choice'], tools: CompletionParams['tools']): { 
+  toolChoice: ChatRequest['toolChoice'],
+  tools: ChatRequest['tools']
+} => {
+  // If tool choise is an object, then it is a required specific function
+  if (typeof toolChoice === 'object') {
+    return {
+      // Mistral does not fields that allow for specifying a specific tool out of a list, so instead we
+      // use the toolChoice `any` to force a tool to be used, and then we filter the tool list to only include
+      // the function that was specified.
+      toolChoice: 'any',
+      tools: convertTools(tools, toolChoice.function.name)
+    }
+  }
+  
+  switch (toolChoice) {
+    case 'auto': 
+      return { 
+        toolChoice: 'auto',
+        tools: convertTools(tools)
+      }
+    case 'none':
+      return {
+        toolChoice: 'none',
+        tools: convertTools(tools)
+      }
+    case 'required':
+      return {
+        toolChoice: 'any',
+        tools: convertTools(tools)
+      }
+    case undefined: 
+      return {
+        toolChoice: undefined,
+        tools: convertTools(tools)
+      }
+    default: 
+      throw new InputError(`Invalid tool choice: ${toolChoice}`)
+  }
+}
+
+export const convertToolCalls = (toolResponse: ToolCalls[] | null |undefined): ChatCompletionMessageToolCall[] | undefined => {
+  if (!toolResponse) {
+    return undefined
+  }
+
+  return toolResponse.map((tool) => {
+    return {
+      id: tool.id,
+      type: 'function',
+      function: {
+        name: tool.function.name,
+        arguments: tool.function.arguments,
+      }
+    }
+  })
+}
+
+export const convertStreamToolCalls = (toolResponse: ToolCalls[] | null | undefined): Array<ChatCompletionChunk.Choice.Delta.ToolCall> | undefined => {
+  if (!toolResponse) {
+    return undefined
+  }
+
+  return convertToolCalls(toolResponse)?.map((toolCall, index) => {
+    return {
+      ...toolCall,
+      index,
     }
   })
 }
@@ -47,6 +171,7 @@ async function *toStreamResponse(result: AsyncGenerator<ChatCompletionResponseCh
           delta: {
             role: 'assistant',
             content: choice.delta.content,
+            tool_calls: convertStreamToolCalls(choice.delta.tool_calls)
           },
           finish_reason: choice.finish_reason as any,
           logprobs: null
@@ -69,7 +194,7 @@ const toCompletionResponse = (result: ChatCompletionResponse): CompletionRespons
         message: {
           role: 'assistant',
           content: choice.message.content,
-          tool_calls: undefined,
+          tool_calls: convertToolCalls(choice.message.tool_calls),
         },
         finish_reason: choice.finish_reason as any,
         logprobs: null
@@ -104,13 +229,19 @@ export class MistralHandler extends BaseHandler<MistralModel> {
       ? body.temperature / 2
       : undefined
 
+    const { toolChoice, tools } = convertToolConfig(body.tool_choice, body.tools)
+
+    const messages = convertMessages(body.messages)
+
     const options: ChatRequest = {
       model,
-      messages: convertMessages(body.messages),
+      messages: messages as Message[],
       temperature,
       maxTokens: body.max_tokens ?? undefined,
       topP: body.top_p ?? undefined,
-      responseFormat
+      responseFormat,
+      toolChoice,
+      tools
       // Mistral does not support `stop`
     }
 

@@ -3,7 +3,7 @@ import { convertAssistantMessage, convertContentsToParts, convertFinishReason, c
 import { ChatCompletionContentPart } from 'openai/resources/index.mjs';
 import { InputError } from '../../src/handlers/types';
 import OpenAI from 'openai';
-import { FinishReason, FunctionCallingMode, FunctionDeclarationSchema, GenerateContentCandidate, GenerateContentResult, UsageMetadata } from '@google/generative-ai';
+import { FinishReason, FunctionCallingMode, GenerateContentCandidate, UsageMetadata } from '@google/generative-ai';
 
 // Unit Tests
 describe('convertContentsToParts', () => {
