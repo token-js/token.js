@@ -1,16 +1,13 @@
 # Table of contents
 
 * [LLM.js](README.md)
-
-## Providers
-
-* [Providers](providers/providers/README.md)
-  * [AI21](providers/providers/ai21.md)
-  * [Anthropic](providers/providers/anthropic.md)
-  * [Bedrock](providers/providers/bedrock.md)
-  * [Cohere](providers/providers/cohere.md)
-  * [Gemini](providers/providers/gemini.md)
-  * [Groq](providers/providers/groq.md)
-  * [Mistral](providers/providers/mistral.md)
-  * [OpenAI](providers/providers/openai.md)
-  * [Perplexity](providers/providers/perplexity.md)
+* [Providers](providers/README.md)
+  * [AI21](providers/ai21.md)
+  * [Anthropic](providers/anthropic.md)
+  * [Bedrock](providers/bedrock.md)
+  * [Cohere](providers/cohere.md)
+  * [Gemini](providers/gemini.md)
+  * [Groq](providers/groq.md)
+  * [Mistral](providers/mistral.md)
+  * [OpenAI](providers/openai.md)
+  * [Perplexity](providers/perplexity.md)
