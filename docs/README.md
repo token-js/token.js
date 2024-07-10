@@ -309,7 +309,10 @@ const result = await llm.chat.completions.create({
             type: 'string',
             description: 'The city and state, e.g. San Francisco, CA',
           },
-          unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
+          unit: { 
+            type: 'string',
+            description: 'The temperature unit, e.g. Fahrenheit or Celsius'
+          },
         },
         required: ['location', 'unit'],
       },
@@ -323,42 +326,20 @@ const result = await llm.chat.completions.create({
 
 Not every feature is supported by every provider and model. This table provides a general overview of what features are supported by each provider. For details on which features are supported by individual models from different providers see the [provider documentation](todo\(md\)/).
 
-| provider   | Completion           | Streaming            | Tools                | JSON Output          | Image Input          |
+| Provider   | Completion           | Streaming            | Tools                | JSON Output          | Image Input          |
 | ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
-| openai     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |
-| cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |                      |
+| OpenAI     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| Bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |
+| Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |                      |
 | AI21       | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 | Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are more providers or features you would like to see implemented in LLM.js please let us know by opening an issue!
+If there are providers or features you would like to see implemented in LLM.js please let us know by opening an issue!
 
 ## Contributing
 
-PRs are accepted!
-
-To get started clone the repo:
-
-```
-git clone https://github.com/sphinx-labs/llm.git
-```
-
-Then open the project and install the dependencies:
-
-```
-cd llm && pnpm install
-```
-
-Test your changes:
-
-```
-pnpm test
-```
-
-## License
-
-LLM.js is free and open source under the GPLv3 license.
+LLM.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)
