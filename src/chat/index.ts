@@ -1,7 +1,12 @@
-import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.mjs'
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions'
 
 import { getHandler } from '../handlers/utils'
 import { models } from '../models'
+import {
+  CompletionResponse,
+  ConfigOptions,
+  StreamCompletionResponse,
+} from '../userTypes'
 
 export type OpenAIModel = (typeof models.openai.models)[number]
 export type AI21Model = (typeof models.ai21.models)[number]
@@ -12,11 +17,6 @@ export type BedrockModel = (typeof models.bedrock.models)[number]
 export type MistralModel = (typeof models.mistral.models)[number]
 export type PerplexityModel = (typeof models.perplexity.models)[number]
 export type GroqModel = (typeof models.groq.models)[number]
-import {
-  CompletionResponse,
-  StreamCompletionResponse,
-  ConfigOptions,
-} from '../userTypes'
 
 export type LLMChatModel =
   | OpenAIModel
@@ -92,7 +92,7 @@ export class LLMCompletions {
   create<P extends LLMProvider>(
     body: CompletionBase<P>
   ): Promise<CompletionResponse | StreamCompletionResponse>
-  create<P extends LLMProvider>(
+  create(
     body: CompletionParams
   ): Promise<CompletionResponse | StreamCompletionResponse> {
     const handler = getHandler(body.provider, this.opts)

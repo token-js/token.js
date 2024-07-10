@@ -11,7 +11,7 @@ import {
   UsageMetadata,
 } from '@google/generative-ai'
 import OpenAI from 'openai'
-import { ChatCompletionContentPart } from 'openai/resources/index.mjs'
+import { ChatCompletionContentPart } from 'openai/resources/index'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CompletionParams } from '../../src/chat'

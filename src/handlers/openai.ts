@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { Stream } from 'openai/streaming.mjs'
+import { Stream } from 'openai/streaming'
 
 import { OpenAIModel, ProviderCompletionParams } from '../chat'
 import { CompletionResponse, StreamCompletionResponse } from '../userTypes'

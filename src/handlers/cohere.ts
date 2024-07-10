@@ -13,7 +13,7 @@ import {
   ChatCompletionAssistantMessageParam,
   ChatCompletionMessageToolCall,
   ChatCompletionToolMessageParam,
-} from 'openai/resources/index.mjs'
+} from 'openai/resources/index'
 import { ChatCompletionTool } from 'openai/src/resources/index.js'
 
 import {

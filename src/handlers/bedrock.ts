@@ -11,7 +11,7 @@ import {
   SystemContentBlock,
   ToolChoice,
 } from '@aws-sdk/client-bedrock-runtime'
-import { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
+import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
   BedrockModel,

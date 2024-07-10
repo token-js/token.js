@@ -1,27 +1,25 @@
-import OpenAI from 'openai'
-
 import { LLMChat } from './chat'
 import { ConfigOptions } from './userTypes'
 export * from './userTypes'
 
 // Extract the public interface from OpenAI, including both properties and methods
-type PublicInterface<T> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any ? T[K] : T[K]
-}
+// type PublicInterface<T> = {
+//   [K in keyof T]: T[K] extends (...args: any[]) => any ? T[K] : T[K]
+// }
 
 // Pick the properties we want to expose from OpenAI and use them to construct our own client interface
 // We omit the _client property from the completions object because it is not needed
-type Completions = Omit<
-  Pick<PublicInterface<OpenAI>['chat'], 'completions'>['completions'],
-  '_client'
->
+// type Completions = Omit<
+//   Pick<PublicInterface<OpenAI>['chat'], 'completions'>['completions'],
+//   '_client'
+// >
 
-type Chat = {
-  completions: Completions
-}
+// type Chat = {
+//   completions: Completions
+// }
 
 type LLMInterface = {
-  chat: Chat
+  chat: LLMChat
 }
 
 export class LLM implements LLMInterface {

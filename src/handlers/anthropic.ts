@@ -11,9 +11,9 @@ import {
   ToolResultBlockParam,
   ToolUseBlock,
   ToolUseBlockParam,
-} from '@anthropic-ai/sdk/resources/messages.mjs'
+} from '@anthropic-ai/sdk/resources/messages'
 import * as dotenv from 'dotenv'
-import { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
+import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
   AnthropicModel,
