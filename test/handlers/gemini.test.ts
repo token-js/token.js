@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeAll, beforeEach, afterEach } from 'vitest';
 import { GeminiHandler, convertAssistantMessage, convertContentsToParts, convertFinishReason, convertMessageToContent, convertMessagesToContents, convertResponse, convertResponseMessage, convertRole, convertStreamToolCalls, convertToolCalls, convertToolConfig, convertTools, convertUsageData } from '../../src/handlers/gemini';
 import { ChatCompletionContentPart } from 'openai/resources/index.mjs';
-import { InputError, StreamCompletionResponse } from '../../src/handlers/types';
+import { InputError } from '../../src/handlers/types';
 import OpenAI from 'openai';
 import { EnhancedGenerateContentResponse, FinishReason, FunctionCallingMode, GenerateContentCandidate, GenerateContentResult, GenerateContentStreamResult, GoogleGenerativeAI, HarmCategory, HarmProbability, UsageMetadata } from '@google/generative-ai';
 import { CompletionParams } from '../../src/chat';
 import { models } from '../../src/models';
 import { getTimestamp } from '../../src/handlers/utils';
+import { StreamCompletionResponse } from '../../src/userTypes';
 
 // Unit Tests
 describe('convertContentsToParts', () => {
@@ -1140,6 +1141,7 @@ const mockChatStreamResponse: GenerateContentStreamResult = {
 const model = 'gemini-1.5-pro';
 
 const toolPrompt: CompletionParams = {
+  provider: 'gemini',
   model,
   messages: [
     {
@@ -1205,6 +1207,7 @@ describe('GeminiHandler', () => {
     }));
 
     const params: CompletionParams = {
+      provider: 'gemini',
       model,
       messages: [
         {

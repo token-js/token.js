@@ -1,12 +1,13 @@
-import { ApiMetaBilledUnits, ChatRequest, ChatStreamRequest, FinishReason, Message, NonStreamedChatResponse, StreamedChatResponse, Tool, ToolCallDelta, ToolMessage, ToolResult } from "cohere-ai/api";
-import { CompletionParams } from "../chat";
-import { CohereModel, CompletionResponse, CompletionResponseChunk, InputError, InvariantError, LLMChatModel, MessageRole, StreamCompletionResponse } from "./types";
+import { ApiMetaBilledUnits, ChatRequest, FinishReason, Message, StreamedChatResponse, Tool, ToolResult } from "cohere-ai/api";
+import { CohereModel, CompletionParams, ProviderCompletionParams } from "../chat";
+import { InputError, InvariantError, MessageRole } from "./types";
 import { consoleWarn, getTimestamp } from "./utils";
-import { ChatCompletionAssistantMessageParam, ChatCompletionMessageToolCall, ChatCompletionToolMessageParam, ChatCompletionUserMessageParam, FunctionDefinition, FunctionParameters } from "openai/resources/index.mjs";
+import { ChatCompletionAssistantMessageParam, ChatCompletionMessageToolCall, ChatCompletionToolMessageParam } from "openai/resources/index.mjs";
 import { CohereClient } from "cohere-ai";
 import { Stream } from "cohere-ai/core";
 import { BaseHandler } from "./base";
 import { ChatCompletionTool } from "openai/src/resources/index.js";
+import { CompletionResponse, StreamCompletionResponse } from "../userTypes";
 
 type CohereMessageRole = "CHATBOT" | "SYSTEM" | "USER" | "TOOL"
 
@@ -292,7 +293,7 @@ export const convertTools = (
 
 async function* createCompletionResponseStreaming(
   response: Stream<StreamedChatResponse>,
-  model: LLMChatModel,
+  model: CohereModel,
   created: number
 ): StreamCompletionResponse {
   let id: string | undefined
@@ -397,7 +398,7 @@ async function* createCompletionResponseStreaming(
 
 export class CohereHandler extends BaseHandler<CohereModel> {
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'cohere'>,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     this.validateInputs(body)
 

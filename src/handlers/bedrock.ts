@@ -1,11 +1,10 @@
-import { BedrockRuntimeClient, ContentBlock, ContentBlockDelta, ConversationRole, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, InternalServerException, InvokeModelCommand, InvokeModelCommandInput, InvokeModelWithResponseStreamCommand, InvokeModelWithResponseStreamCommandInput, InvokeModelWithResponseStreamCommandOutput, ResponseStream, SystemContentBlock, Tool, ToolChoice, ToolConfiguration } from "@aws-sdk/client-bedrock-runtime";
-import { CompletionParams } from "../chat";
-import { BedrockModel, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, InvariantError, LLMChatModel, MessageRole, MIMEType, StreamCompletionResponse } from "./types";
+import { BedrockRuntimeClient, ContentBlock, ContentBlockDelta, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, SystemContentBlock, ToolChoice } from "@aws-sdk/client-bedrock-runtime";
+import { BedrockModel, CompletionNonStreaming, CompletionParams, CompletionStreaming, ProviderCompletionParams } from "../chat";
+import { InputError, InvariantError, MIMEType } from "./types";
 import { consoleWarn, fetchThenParseImage, getTimestamp, normalizeTemperature } from "./utils";
-import { ChatCompletionContentPart, ChatCompletionContentPartImage, ChatCompletionContentPartText, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
-import { ModelPrefix } from "../constants";
+import { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
-import { ResponseFormat } from "@mistralai/mistralai";
+import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
 
 
 const normalizeMIMEType = (
@@ -24,34 +23,26 @@ const normalizeMIMEType = (
   }
 }
 
-const isBedrockModel = (model: LLMChatModel): model is BedrockModel => {
-  return model.startsWith(ModelPrefix.Bedrock)
-}
-
 const supportsImages = (
-  model: LLMChatModel
+  model: BedrockModel
 ): boolean => {
-  if (isBedrockModel(model)) {
-    if (model === 'bedrock/anthropic.claude-3-haiku-20240307-v1:0' || model === 'bedrock/anthropic.claude-3-opus-20240229-v1:0' || model === 'bedrock/anthropic.claude-3-sonnet-20240229-v1:0') {
-      return true
-    } else {
-      return false
-    }
+  if (model === 'anthropic.claude-3-haiku-20240307-v1:0' || model === 'anthropic.claude-3-opus-20240229-v1:0' || model === 'anthropic.claude-3-sonnet-20240229-v1:0') {
+    return true
   } else {
-    throw new Error(`Only detects Bedrock models.`)
+    return false
   }
 }
 
 const supportsSystemMessages = (
-  model: LLMChatModel
+  model: BedrockModel
 ): boolean => {
-  return (model !== 'bedrock/cohere.command-light-text-v14' && model !== 'bedrock/cohere.command-text-v14' && model !== 'bedrock/amazon.titan-text-express-v1' && model !== 'bedrock/amazon.titan-text-lite-v1' && model !== "bedrock/mistral.mistral-7b-instruct-v0:2" && model !== "bedrock/mistral.mixtral-8x7b-instruct-v0:1")
+  return (model !== 'cohere.command-light-text-v14' && model !== 'cohere.command-text-v14' && model !== 'amazon.titan-text-express-v1' && model !== 'amazon.titan-text-lite-v1' && model !== "mistral.mistral-7b-instruct-v0:2" && model !== "mistral.mixtral-8x7b-instruct-v0:1")
 }
 
 const supportsAssistantMessages = (
-  model: LLMChatModel
+  model: BedrockModel
 ): boolean => {
-  return (model !== 'bedrock/cohere.command-light-text-v14' && model !== 'bedrock/cohere.command-text-v14')
+  return (model !== 'cohere.command-light-text-v14' && model !== 'cohere.command-text-v14')
 }
 
 const isTextMember = (contentBlock: ContentBlock): contentBlock is ContentBlock.TextMember => {
@@ -131,7 +122,7 @@ const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolC
 
 const convertMessages = async (
   messages: CompletionParams['messages'],
-  model: LLMChatModel
+  model: BedrockModel
 ): Promise<{ systemMessages: Array<SystemContentBlock> | undefined, messages: ConverseCommandInput['messages']}> => {
   const makeTextContent = (
     role: string,
@@ -350,7 +341,7 @@ const convertStopReason = (
 
 async function* createCompletionResponseStreaming(
   response: ConverseStreamCommandOutput,
-  model: LLMChatModel,
+  model: BedrockModel,
   created: number,
 ): StreamCompletionResponse {
   const id = response.$metadata.requestId ?? null
@@ -470,7 +461,7 @@ async function* createCompletionResponseStreaming(
 
 export class BedrockHandler extends BaseHandler<BedrockModel> {
   validateInputs(
-    body: CompletionParams,
+    body: CompletionStreaming<'bedrock'> | CompletionNonStreaming<'bedrock'>,
   ): void {
     super.validateInputs(body)
 
@@ -499,7 +490,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
   }  
 
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'bedrock'>
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     this.validateInputs(body)
 
@@ -528,7 +519,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
     }
 
     const { systemMessages, messages } = await convertMessages(body.messages, body.model)
-    const temperature = typeof body.temperature === 'number' ? normalizeTemperature(body.temperature, body.model) : undefined
+    const temperature = typeof body.temperature === 'number' ? normalizeTemperature(body.temperature, 'bedrock', body.model) : undefined
     const topP = body.top_p ?? undefined
     const maxTokens = body.max_tokens ?? undefined
     const stopSequences = convertStopSequences(body.stop)
