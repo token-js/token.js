@@ -10,7 +10,8 @@
     "lint": "yarn lint:fix && yarn lint:check",
     "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build": "tsc -p ./tsconfig.json"
   },
   "author": "Sam Goldman",
   "keywords": [],

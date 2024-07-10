@@ -1,4 +1,4 @@
-import { ChatCompletionTool } from 'openai/resources/index.mjs'
+import { ChatCompletionTool } from 'openai/resources/index'
 import { describe, expect, it } from 'vitest'
 
 import { toCohereTool } from '../../src/handlers/cohere'

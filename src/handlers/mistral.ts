@@ -12,7 +12,7 @@ import {
   ChatCompletionMessage,
   ChatCompletionMessageParam,
   ChatCompletionMessageToolCall,
-} from 'openai/resources/index.mjs'
+} from 'openai/resources/index'
 import { ChatCompletionContentPartText } from 'openai/src/resources/index.js'
 
 import {

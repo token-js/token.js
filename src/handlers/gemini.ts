@@ -19,7 +19,7 @@ import OpenAI from 'openai'
 import {
   ChatCompletionChunk,
   ChatCompletionContentPart,
-} from 'openai/resources/index.mjs'
+} from 'openai/resources/index'
 import { ChatCompletionMessageToolCall } from 'openai/src/resources/index.js'
 
 import { GeminiModel, ProviderCompletionParams } from '../chat'

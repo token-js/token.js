@@ -4,7 +4,7 @@ module.exports = {
     browser: true,
     es6: true,
   },
-  ignorePatterns: ['dist', 'coverage'],
+  ignorePatterns: ['dist', 'coverage', 'scripts'],
   extends: ['plugin:prettier/recommended'],
   parser: '@babel/eslint-parser',
   parserOptions: {

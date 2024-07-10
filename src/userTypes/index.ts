@@ -8,7 +8,7 @@ import {
   ChatCompletionChunk,
   ChatCompletionTool as OpenAIChatCompletionTool,
   ChatCompletionMessageParam as OpenAICompletionMessageParam,
-} from 'openai/resources/index.mjs'
+} from 'openai/resources/index'
 
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
   bedrock?: {
