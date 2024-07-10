@@ -6,7 +6,7 @@ import MistralClient, {
 import {
   ChatCompletionMessage,
   ChatCompletionToolChoiceOption,
-} from 'openai/resources/index.mjs'; // Adjust this path as needed
+} from 'openai/resources/index.mjs'
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js'
 import { describe, expect, it, vi } from 'vitest'
 
