@@ -1,9 +1,9 @@
-import OpenAI from "openai";
-import { Stream } from "openai/streaming.mjs";
-import { CompletionParams, OpenAIModel, ProviderCompletionParams } from "../chat";
-import { BaseHandler } from "./base";
-import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
-import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
+import OpenAI from 'openai'
+import { Stream } from 'openai/streaming.mjs'
+
+import { OpenAIModel, ProviderCompletionParams } from '../chat'
+import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
+import { BaseHandler } from './base'
 
 async function* streamOpenAI(
   response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
@@ -17,18 +17,18 @@ async function* streamOpenAI(
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
 export class OpenAIHandler extends BaseHandler<OpenAIModel> {
   async create(
-    body: ProviderCompletionParams<'openai'>,
+    body: ProviderCompletionParams<'openai'>
   ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 
     // Uses the OPENAI_API_KEY environment variable, if the apiKey is not provided.
     // This makes the UX better for switching between providers because you can just
     // define all the environment variables and then change the model field without doing anything else.
-    const apiKey = this.opts.apiKey ?? process.env.OPENAI_API_KEY;
+    const apiKey = this.opts.apiKey ?? process.env.OPENAI_API_KEY
     const openai = new OpenAI({
       ...this.opts,
       apiKey,
-    });
+    })
 
     // We have to delete the provider field because it's not a valid parameter for the OpenAI API.
     const params: any = body
@@ -36,9 +36,9 @@ export class OpenAIHandler extends BaseHandler<OpenAIModel> {
 
     if (body.stream) {
       const stream = await openai.chat.completions.create(body)
-      return streamOpenAI(stream);
+      return streamOpenAI(stream)
     } else {
-      return openai.chat.completions.create(body);
+      return openai.chat.completions.create(body)
     }
   }
 }

@@ -1,11 +1,12 @@
-import OpenAI from "openai";
-import { Stream } from "openai/streaming.mjs";
-import { InputError } from "./types";
-import { PerplexityModel, ProviderCompletionParams } from "../chat";
-import { BaseHandler } from "./base";
-import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
+import OpenAI from 'openai'
+import { Stream } from 'openai/streaming.mjs'
 
-export const PERPLEXITY_PREFIX = "perplexity/";
+import { PerplexityModel, ProviderCompletionParams } from '../chat'
+import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
+import { BaseHandler } from './base'
+import { InputError } from './types'
+
+export const PERPLEXITY_PREFIX = 'perplexity/'
 
 async function* streamPerplexity(
   response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
@@ -17,36 +18,40 @@ async function* streamPerplexity(
 
 export class PerplexityHandler extends BaseHandler<PerplexityModel> {
   async create(
-    body: ProviderCompletionParams<'perplexity'>,
+    body: ProviderCompletionParams<'perplexity'>
   ): Promise<CompletionResponse | StreamCompletionResponse> {
-    const apiKey = this.opts.apiKey ?? process.env.PERPLEXITY_API_KEY;
+    const apiKey = this.opts.apiKey ?? process.env.PERPLEXITY_API_KEY
 
     if (apiKey === undefined) {
-      throw new InputError("API key is required for Perplexity, define PERPLEXITY_API_KEY in your environment or specifty the apiKey option.");
+      throw new InputError(
+        'API key is required for Perplexity, define PERPLEXITY_API_KEY in your environment or specifty the apiKey option.'
+      )
     }
 
     if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(`Perplexity does not support setting 'n' greater than 1.`)
+      throw new InputError(
+        `Perplexity does not support setting 'n' greater than 1.`
+      )
     }
 
     const openai = new OpenAI({
       ...this.opts,
-      baseURL: "https://api.perplexity.ai",
+      baseURL: 'https://api.perplexity.ai',
       apiKey,
-    });
-    
-    const model = body.model.replace(PERPLEXITY_PREFIX, '');
+    })
+
+    const model = body.model.replace(PERPLEXITY_PREFIX, '')
 
     const options = {
       ...body,
-      model
+      model,
     }
 
     if (options.stream) {
       const stream = await openai.chat.completions.create(options)
-      return streamPerplexity(stream);
+      return streamPerplexity(stream)
     } else {
-      return openai.chat.completions.create(options);
+      return openai.chat.completions.create(options)
     }
   }
 }

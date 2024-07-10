@@ -1,21 +1,29 @@
-import { CompletionParams, LLMChatModel } from "../chat";
-import { InputError } from "./types";
-import { CompletionResponse, StreamCompletionResponse, ConfigOptions } from "../userTypes";
+import { CompletionParams, LLMChatModel } from '../chat'
+import {
+  CompletionResponse,
+  ConfigOptions,
+  StreamCompletionResponse,
+} from '../userTypes'
+import { InputError } from './types'
 
 export abstract class BaseHandler<T extends LLMChatModel> {
-  opts: ConfigOptions;
+  opts: ConfigOptions
   protected models: readonly T[]
   protected supportsJSON: readonly T[]
 
-  constructor(opts: ConfigOptions, models: readonly T[], supportsJSON: readonly T[]) {
+  constructor(
+    opts: ConfigOptions,
+    models: readonly T[],
+    supportsJSON: readonly T[]
+  ) {
     this.opts = opts
     this.models = models
     this.supportsJSON = supportsJSON
   }
 
   abstract create(
-    body: CompletionParams,
-  ): Promise<CompletionResponse | StreamCompletionResponse>;
+    body: CompletionParams
+  ): Promise<CompletionResponse | StreamCompletionResponse>
 
   protected validateInputs(body: CompletionParams): void {
     if (!this.isSupportedModel(body.model)) {
@@ -24,13 +32,17 @@ export abstract class BaseHandler<T extends LLMChatModel> {
 
     for (const message of body.messages) {
       if (message.role === 'function') {
-        throw new InputError(`The 'function' role is deprecated. Please use the 'tool' role instead.`)
+        throw new InputError(
+          `The 'function' role is deprecated. Please use the 'tool' role instead.`
+        )
       }
     }
-  
+
     if (body.response_format?.type === 'json_object') {
       if (!this.supportsJSONMode(body.model)) {
-        throw new InputError(`The model ${body.model} does not support the 'response_format' type 'json_object'.`)
+        throw new InputError(
+          `The model ${body.model} does not support the 'response_format' type 'json_object'.`
+        )
       }
 
       // Check if the user specified the string 'json' somewhere in the prompt. OpenAI throws an
@@ -56,7 +68,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
       }
 
       if (!containsJSONString) {
-        throw new InputError(`You must include the string 'JSON' somewhere in your prompt when the 'response_format' type is 'json_object'.`)
+        throw new InputError(
+          `You must include the string 'JSON' somewhere in your prompt when the 'response_format' type is 'json_object'.`
+        )
       }
     }
   }
@@ -65,9 +79,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     return this.models.includes(model as T)
   }
 
-  protected supportsJSONMode(
-    model: T
-  ): boolean {
+  protected supportsJSONMode(model: T): boolean {
     return this.supportsJSON.includes(model)
   }
 }

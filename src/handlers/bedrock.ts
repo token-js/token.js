@@ -1,15 +1,40 @@
-import { BedrockRuntimeClient, ContentBlock, ContentBlockDelta, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, SystemContentBlock, ToolChoice } from "@aws-sdk/client-bedrock-runtime";
-import { BedrockModel, CompletionNonStreaming, CompletionParams, CompletionStreaming, ProviderCompletionParams } from "../chat";
-import { InputError, InvariantError, MIMEType } from "./types";
-import { consoleWarn, fetchThenParseImage, getTimestamp, normalizeTemperature } from "./utils";
-import { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
-import { BaseHandler } from "./base";
-import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
+import {
+  BedrockRuntimeClient,
+  ContentBlock,
+  ContentBlockDelta,
+  ConverseCommand,
+  ConverseCommandInput,
+  ConverseResponse,
+  ConverseStreamCommand,
+  ConverseStreamCommandOutput,
+  ImageFormat,
+  SystemContentBlock,
+  ToolChoice,
+} from '@aws-sdk/client-bedrock-runtime'
+import { ChatCompletionMessageToolCall } from 'openai/resources/index.mjs'
 
+import {
+  BedrockModel,
+  CompletionNonStreaming,
+  CompletionParams,
+  CompletionStreaming,
+  ProviderCompletionParams,
+} from '../chat'
+import {
+  CompletionResponse,
+  CompletionResponseChunk,
+  StreamCompletionResponse,
+} from '../userTypes'
+import { BaseHandler } from './base'
+import { InputError, InvariantError, MIMEType } from './types'
+import {
+  consoleWarn,
+  fetchThenParseImage,
+  getTimestamp,
+  normalizeTemperature,
+} from './utils'
 
-const normalizeMIMEType = (
-  mimeType: MIMEType
-): ImageFormat => {
+const normalizeMIMEType = (mimeType: MIMEType): ImageFormat => {
   if (mimeType === 'image/gif') {
     return 'gif'
   } else if (mimeType === 'image/jpeg') {
@@ -23,51 +48,68 @@ const normalizeMIMEType = (
   }
 }
 
-const supportsImages = (
-  model: BedrockModel
-): boolean => {
-  if (model === 'anthropic.claude-3-haiku-20240307-v1:0' || model === 'anthropic.claude-3-opus-20240229-v1:0' || model === 'anthropic.claude-3-sonnet-20240229-v1:0') {
+const supportsImages = (model: BedrockModel): boolean => {
+  if (
+    model === 'anthropic.claude-3-haiku-20240307-v1:0' ||
+    model === 'anthropic.claude-3-opus-20240229-v1:0' ||
+    model === 'anthropic.claude-3-sonnet-20240229-v1:0'
+  ) {
     return true
   } else {
     return false
   }
 }
 
-const supportsSystemMessages = (
-  model: BedrockModel
-): boolean => {
-  return (model !== 'cohere.command-light-text-v14' && model !== 'cohere.command-text-v14' && model !== 'amazon.titan-text-express-v1' && model !== 'amazon.titan-text-lite-v1' && model !== "mistral.mistral-7b-instruct-v0:2" && model !== "mistral.mixtral-8x7b-instruct-v0:1")
+const supportsSystemMessages = (model: BedrockModel): boolean => {
+  return (
+    model !== 'cohere.command-light-text-v14' &&
+    model !== 'cohere.command-text-v14' &&
+    model !== 'amazon.titan-text-express-v1' &&
+    model !== 'amazon.titan-text-lite-v1' &&
+    model !== 'mistral.mistral-7b-instruct-v0:2' &&
+    model !== 'mistral.mixtral-8x7b-instruct-v0:1'
+  )
 }
 
-const supportsAssistantMessages = (
-  model: BedrockModel
-): boolean => {
-  return (model !== 'cohere.command-light-text-v14' && model !== 'cohere.command-text-v14')
+const supportsAssistantMessages = (model: BedrockModel): boolean => {
+  return (
+    model !== 'cohere.command-light-text-v14' &&
+    model !== 'cohere.command-text-v14'
+  )
 }
 
-const isTextMember = (contentBlock: ContentBlock): contentBlock is ContentBlock.TextMember => {
+const isTextMember = (
+  contentBlock: ContentBlock
+): contentBlock is ContentBlock.TextMember => {
   return typeof contentBlock.text === 'string'
 }
 
-const isToolUseBlock = (contentBlock: ContentBlock): contentBlock is ContentBlock.ToolUseMember => {
+const isToolUseBlock = (
+  contentBlock: ContentBlock
+): contentBlock is ContentBlock.ToolUseMember => {
   return contentBlock.toolUse !== undefined
 }
 
-const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolChoice: CompletionParams['tool_choice']): CompletionResponse['choices'][0]['message'] => {
+const toChatCompletionChoiceMessage = (
+  output: ConverseResponse['output'],
+  toolChoice: CompletionParams['tool_choice']
+): CompletionResponse['choices'][0]['message'] => {
   if (output?.message?.content === undefined) {
     return {
       content: '',
-      role: 'assistant'
+      role: 'assistant',
     }
   }
   if (output.message.role === 'user') {
     throw new InvariantError(`Detected a user message in Bedrock's response.`)
   }
   const role = output.message.role ?? 'assistant'
-  
+
   const textBlocks = output.message.content.filter(isTextMember)
   if (textBlocks.length > 1) {
-    consoleWarn(`Received multiple text blocks from Bedrock, which is unexpected. Concatenating the text blocks into a single string.`)
+    consoleWarn(
+      `Received multiple text blocks from Bedrock, which is unexpected. Concatenating the text blocks into a single string.`
+    )
   }
 
   let toolUseBlocks: ContentBlock.ToolUseMember[]
@@ -76,9 +118,13 @@ const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolC
     // block, but Anthropic can return multiple tool use blocks. Since Bedrock supports Anthropic,
     // we assume Bedrock can also return multiple tool use blocks. We select just one of these
     // blocks to conform to OpenAI's API.
-    const selected = output.message.content.filter(isToolUseBlock).find(block => block.toolUse.name === toolChoice.function.name)
+    const selected = output.message.content
+      .filter(isToolUseBlock)
+      .find((block) => block.toolUse.name === toolChoice.function.name)
     if (!selected) {
-      throw new InvariantError(`Did not receive a tool use block from Bedrock for the function: ${toolChoice.function.name}`)
+      throw new InvariantError(
+        `Did not receive a tool use block from Bedrock for the function: ${toolChoice.function.name}`
+      )
     }
     toolUseBlocks = [selected]
   } else {
@@ -87,7 +133,7 @@ const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolC
 
   let toolCalls: Array<ChatCompletionMessageToolCall> | undefined
   if (toolUseBlocks.length > 0) {
-    toolCalls = toolUseBlocks.map(block => {
+    toolCalls = toolUseBlocks.map((block) => {
       if (block.toolUse.name === undefined) {
         throw new InvariantError(`Function name is undefined.`)
       }
@@ -96,26 +142,31 @@ const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolC
         id: block.toolUse.toolUseId ?? block.toolUse.name,
         function: {
           name: block.toolUse.name,
-          arguments: block.toolUse.input !== undefined ? JSON.stringify(block.toolUse.input) : '',
+          arguments:
+            block.toolUse.input !== undefined
+              ? JSON.stringify(block.toolUse.input)
+              : '',
         },
-        type: 'function'
+        type: 'function',
       }
     })
   }
-  
+
   if (textBlocks.length === 0) {
-    const messageContent = output.message.content.every(isToolUseBlock) ? null : ''
+    const messageContent = output.message.content.every(isToolUseBlock)
+      ? null
+      : ''
     return {
       role,
       content: messageContent,
-      tool_calls: toolCalls
+      tool_calls: toolCalls,
     }
   } else {
-    const content = textBlocks.map(textBlock => textBlock.text).join('\n')
+    const content = textBlocks.map((textBlock) => textBlock.text).join('\n')
     return {
       role,
       content,
-      tool_calls: toolCalls
+      tool_calls: toolCalls,
     }
   }
 }
@@ -123,17 +174,18 @@ const toChatCompletionChoiceMessage = (output: ConverseResponse['output'], toolC
 const convertMessages = async (
   messages: CompletionParams['messages'],
   model: BedrockModel
-): Promise<{ systemMessages: Array<SystemContentBlock> | undefined, messages: ConverseCommandInput['messages']}> => {
-  const makeTextContent = (
-    role: string,
-    content: string
-  ): string => {
+): Promise<{
+  systemMessages: Array<SystemContentBlock> | undefined
+  messages: ConverseCommandInput['messages']
+}> => {
+  const makeTextContent = (role: string, content: string): string => {
     if (role === 'system') {
       return `System: ${content}`
     } else if (
       // We prepend 'Assistant: ' if the model doesn't support messages from the 'assistant' role in
       // order to differentiate it from user messages in this situation.
-      !supportsAssistantMessages(model) && role === 'assistant'
+      !supportsAssistantMessages(model) &&
+      role === 'assistant'
     ) {
       return `Assistant: ${content}`
     } else {
@@ -141,8 +193,7 @@ const convertMessages = async (
     }
   }
 
-
-  const output: ConverseCommandInput['messages'] = [];
+  const output: ConverseCommandInput['messages'] = []
   const clonedMessages = structuredClone(messages)
 
   const systemMessages: Array<SystemContentBlock> = []
@@ -150,7 +201,7 @@ const convertMessages = async (
     for (const message of clonedMessages) {
       if (message.role === 'system') {
         systemMessages.push({ text: message.content })
-        clonedMessages.shift();
+        clonedMessages.shift()
       } else {
         break
       }
@@ -162,15 +213,23 @@ const convertMessages = async (
   // message from a 'user' or 'system' role. (The 'system' messages will be converted into user
   // messages later, which is why we don't include this placeholder if the array begins with a
   // system message).
-  if (clonedMessages[0].role !== 'user' && clonedMessages[0].role !== 'system') {
+  if (
+    clonedMessages[0].role !== 'user' &&
+    clonedMessages[0].role !== 'system'
+  ) {
     clonedMessages.unshift({
       role: 'user',
-      content: 'Empty'
+      content: 'Empty',
     })
   }
 
   let previousRole: 'user' | 'assistant' = 'user'
-  let currentParams: Array<ContentBlock.ImageMember |ContentBlock.TextMember | ContentBlock.ToolUseMember | ContentBlock.ToolResultMember> = []
+  let currentParams: Array<
+    | ContentBlock.ImageMember
+    | ContentBlock.TextMember
+    | ContentBlock.ToolUseMember
+    | ContentBlock.ToolResultMember
+  > = []
   for (const message of clonedMessages) {
     // Bedrock doesn't support the `system` role in their `messages` array, so if the user
     // defines system messages that are interspersed with user and assistant messages, we
@@ -179,7 +238,12 @@ const convertMessages = async (
     // parameter so that the order of the user-defined `messages` remains the same.
     let newRole: 'user' | 'assistant'
     if (supportsAssistantMessages(model)) {
-      newRole = message.role === 'user' || message.role === 'system' || message.role === 'tool' ? 'user' : 'assistant'
+      newRole =
+        message.role === 'user' ||
+        message.role === 'system' ||
+        message.role === 'tool'
+          ? 'user'
+          : 'assistant'
     } else {
       // We'll always use the 'user' role if the model also doesn't support assistant messages.
       newRole = 'user'
@@ -188,7 +252,7 @@ const convertMessages = async (
     if (previousRole !== newRole) {
       output.push({
         role: previousRole,
-        content: currentParams
+        content: currentParams,
       })
       currentParams = []
     }
@@ -197,47 +261,57 @@ const convertMessages = async (
       const toolResult: ContentBlock.ToolResultMember = {
         toolResult: {
           toolUseId: message.tool_call_id,
-          content: [{
-            text: message.content
-          }]
-        }
+          content: [
+            {
+              text: message.content,
+            },
+          ],
+        },
       }
       currentParams.push(toolResult)
     } else if (typeof message.content === 'string') {
       const text = makeTextContent(message.role, message.content)
       currentParams.push({
-        text: text
+        text,
       })
     } else if (Array.isArray(message.content)) {
-      const convertedContent: Array<ContentBlock.ImageMember | ContentBlock.TextMember> = await Promise.all(message.content.map(async e => {
-        if (e.type === 'text') {
-          const text = makeTextContent(message.role, e.text)
-          return {
-            text
+      const convertedContent: Array<
+        ContentBlock.ImageMember | ContentBlock.TextMember
+      > = await Promise.all(
+        message.content.map(async (e) => {
+          if (e.type === 'text') {
+            const text = makeTextContent(message.role, e.text)
+            return {
+              text,
+            }
+          } else {
+            const parsedImage = await fetchThenParseImage(e.image_url.url)
+            return {
+              image: {
+                format: normalizeMIMEType(parsedImage.mimeType),
+                source: {
+                  bytes: new TextEncoder().encode(parsedImage.content),
+                },
+              },
+            }
           }
-        } else {
-          const parsedImage = await fetchThenParseImage(e.image_url.url)
+        })
+      )
+      currentParams.push(...convertedContent)
+    } else if (
+      message.role === 'assistant' &&
+      Array.isArray(message.tool_calls)
+    ) {
+      const convertedContent: Array<ContentBlock.ToolUseMember> =
+        message.tool_calls.map((toolCall) => {
           return {
-            image: {
-              format: normalizeMIMEType(parsedImage.mimeType),
-              source: {
-                bytes: new TextEncoder().encode(parsedImage.content)
-              }
+            toolUse: {
+              toolUseId: toolCall.id,
+              input: JSON.parse(toolCall.function.arguments),
+              name: toolCall.function.name,
             },
           }
-        }
-      }))
-      currentParams.push(...convertedContent)
-    } else if (message.role === 'assistant' && Array.isArray(message.tool_calls)) {
-      const convertedContent: Array<ContentBlock.ToolUseMember> = message.tool_calls.map(toolCall => {
-        return {
-          toolUse: {
-            toolUseId: toolCall.id,
-            input: JSON.parse(toolCall.function.arguments),
-            name: toolCall.function.name
-          }
-        }
-      })
+        })
       currentParams.push(...convertedContent)
     }
     previousRole = newRole
@@ -246,15 +320,15 @@ const convertMessages = async (
   if (currentParams.length > 0) {
     output.push({
       role: previousRole,
-      content: currentParams
+      content: currentParams,
     })
   }
 
   return {
     systemMessages: systemMessages.length > 0 ? systemMessages : undefined,
-    messages: output
+    messages: output,
   }
-};
+}
 
 const convertStopSequences = (
   stop?: CompletionParams['stop']
@@ -263,7 +337,7 @@ const convertStopSequences = (
     return undefined
   } else if (typeof stop === 'string') {
     return [stop]
-  } else if (Array.isArray(stop) && stop.every(e => typeof e === 'string')) {
+  } else if (Array.isArray(stop) && stop.every((e) => typeof e === 'string')) {
     return stop
   } else {
     throw new Error(`Unknown stop sequence type: ${stop}`)
@@ -290,45 +364,54 @@ export const convertToolParams = (
     return undefined
   }
 
-  const convertedTools = tools.length > 0 ? tools.map(tool => {
-    const inputSchema = tool.function.parameters ?
-      {
-        // Bedrock and OpenAI's function parameter types are incompatible even though they both
-        // adhere to the JSON schema, so we set the type to `any` to prevent a TypeScript error.
-        json: tool.function.parameters as any,
-        // TypeScript throws a type error if we don't define this field:
-        $unknown: undefined 
-      }
+  const convertedTools =
+    tools.length > 0
+      ? tools.map((tool) => {
+          const inputSchema = tool.function.parameters
+            ? {
+                // Bedrock and OpenAI's function parameter types are incompatible even though they both
+                // adhere to the JSON schema, so we set the type to `any` to prevent a TypeScript error.
+                json: tool.function.parameters as any,
+                // TypeScript throws a type error if we don't define this field:
+                $unknown: undefined,
+              }
+            : undefined
+          return {
+            // TypeScript throws a type error if we don't define this field:
+            $unknown: undefined,
+            toolSpec: {
+              name: tool.function.name,
+              description: tool.function.description,
+              inputSchema,
+            },
+          }
+        })
       : undefined
-    return {
-      // TypeScript throws a type error if we don't define this field:
-      $unknown: undefined,
-      toolSpec: {
-        name: tool.function.name,
-        description: tool.function.description,
-        inputSchema: inputSchema
-      }
-    }
-  }) : undefined
 
   let convertedToolChoice: ToolChoice
   if (toolChoice === undefined || toolChoice === 'auto') {
-    convertedToolChoice = {auto: {}}
+    convertedToolChoice = { auto: {} }
   } else if (toolChoice === 'required') {
     convertedToolChoice = { any: {} }
   } else {
-    convertedToolChoice = { tool: {name: toolChoice.function.name} }
+    convertedToolChoice = { tool: { name: toolChoice.function.name } }
   }
 
   return { toolChoice: convertedToolChoice, tools: convertedTools }
- }
+}
 
 const convertStopReason = (
   completionReason: ConverseResponse['stopReason']
 ): CompletionResponse['choices'][0]['finish_reason'] => {
-  if (completionReason === 'content_filtered' || completionReason === 'guardrail_intervened') {
+  if (
+    completionReason === 'content_filtered' ||
+    completionReason === 'guardrail_intervened'
+  ) {
     return 'content_filter'
-  } else if (completionReason === 'end_turn' || completionReason === 'stop_sequence') {
+  } else if (
+    completionReason === 'end_turn' ||
+    completionReason === 'stop_sequence'
+  ) {
     return 'stop'
   } else if (completionReason === 'max_tokens') {
     return 'length'
@@ -342,21 +425,23 @@ const convertStopReason = (
 async function* createCompletionResponseStreaming(
   response: ConverseStreamCommandOutput,
   model: BedrockModel,
-  created: number,
+  created: number
 ): StreamCompletionResponse {
   const id = response.$metadata.requestId ?? null
   if (response.stream === undefined) {
     const convertedResponse: CompletionResponseChunk = {
       id,
-      choices: [{
-        index: 0,
-        finish_reason: null,
-        logprobs: null,
-        delta: {}
-      }],
+      choices: [
+        {
+          index: 0,
+          finish_reason: null,
+          logprobs: null,
+          delta: {},
+        },
+      ],
       created,
       model,
-      object: 'chat.completion.chunk'
+      object: 'chat.completion.chunk',
     }
     yield convertedResponse
   } else {
@@ -383,7 +468,7 @@ async function* createCompletionResponseStreaming(
           throw new InvariantError(`Received a message from the 'user' role.`)
         }
         delta = {
-          role: stream.messageStart.role
+          role: stream.messageStart.role,
         }
       } else if (stream.contentBlockStart?.start?.toolUse !== undefined) {
         const index = stream.contentBlockStart.contentBlockIndex
@@ -395,27 +480,31 @@ async function* createCompletionResponseStreaming(
           initialToolCallIndex = index
         }
 
-        const id = stream.contentBlockStart.start.toolUse.toolUseId ?? stream.contentBlockStart.start.toolUse.name
+        const toolId =
+          stream.contentBlockStart.start.toolUse.toolUseId ??
+          stream.contentBlockStart.start.toolUse.name
 
         delta = {
           tool_calls: [
             {
               index: index - initialToolCallIndex,
-              id,
-              "type": "function",
-              "function": {
-                "name": stream.contentBlockStart.start.toolUse.name,
-                "arguments": ''
-              }
-            }
-          ]
+              id: toolId,
+              type: 'function',
+              function: {
+                name: stream.contentBlockStart.start.toolUse.name,
+                arguments: '',
+              },
+            },
+          ],
         }
       } else if (stream.contentBlockDelta?.delta !== undefined) {
         if (isContentBlockDeltaTextMember(stream.contentBlockDelta.delta)) {
           delta = {
             content: stream.contentBlockDelta.delta.text,
           }
-        } else if (isContentBlockDeltaToolUseMember(stream.contentBlockDelta.delta)){
+        } else if (
+          isContentBlockDeltaToolUseMember(stream.contentBlockDelta.delta)
+        ) {
           const index = stream.contentBlockDelta.contentBlockIndex
           if (typeof index !== 'number') {
             throw new InvariantError(`Content block index is undefined.`)
@@ -424,35 +513,42 @@ async function* createCompletionResponseStreaming(
           if (initialToolCallIndex === null) {
             // We assign the initial tool call index in the `content_block_start` event, which should
             // always come before a `content_block_delta` event, so this variable should never be null.
-            throw new InvariantError(`Content block delta event came before a content block start event.`)
+            throw new InvariantError(
+              `Content block delta event came before a content block start event.`
+            )
           }
 
           delta = {
-            "tool_calls": [
+            tool_calls: [
               {
                 index: index - initialToolCallIndex,
-                "function": {
-                  "arguments": stream.contentBlockDelta.delta.toolUse.input
-                }
-              }
-            ]
+                function: {
+                  arguments: stream.contentBlockDelta.delta.toolUse.input,
+                },
+              },
+            ],
           }
         }
       }
 
-      const finishReason = typeof stream.messageStop?.stopReason === 'string' ? convertStopReason(stream.messageStop.stopReason) : null
+      const finishReason =
+        typeof stream.messageStop?.stopReason === 'string'
+          ? convertStopReason(stream.messageStop.stopReason)
+          : null
 
       const convertedResponse: CompletionResponseChunk = {
         id,
-        choices: [{
-          index: 0,
-          finish_reason: finishReason,
-          logprobs: null,
-          delta
-        }],
+        choices: [
+          {
+            index: 0,
+            finish_reason: finishReason,
+            logprobs: null,
+            delta,
+          },
+        ],
         created,
         model,
-        object: 'chat.completion.chunk'
+        object: 'chat.completion.chunk',
       }
       yield convertedResponse
     }
@@ -461,7 +557,7 @@ async function* createCompletionResponseStreaming(
 
 export class BedrockHandler extends BaseHandler<BedrockModel> {
   validateInputs(
-    body: CompletionStreaming<'bedrock'> | CompletionNonStreaming<'bedrock'>,
+    body: CompletionStreaming<'bedrock'> | CompletionNonStreaming<'bedrock'>
   ): void {
     super.validateInputs(body)
 
@@ -471,59 +567,98 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
         for (const e of message.content) {
           if (e.type === 'image_url') {
             if (!supportsImages(body.model)) {
-              throw new InputError(`Model '${body.model}' does not support images. Remove any images from the prompt or use a model that supports images.`)
-            } else if (e.image_url.detail !== undefined && e.image_url.detail !== 'auto') {
+              throw new InputError(
+                `Model '${body.model}' does not support images. Remove any images from the prompt or use a model that supports images.`
+              )
+            } else if (
+              e.image_url.detail !== undefined &&
+              e.image_url.detail !== 'auto'
+            ) {
               logImageDetailWarning = true
             }
           }
         }
       }
     }
-  
+
     if (logImageDetailWarning) {
-      consoleWarn(`Bedrock does not support the 'detail' field for images. The default image quality will be used.`)
+      consoleWarn(
+        `Bedrock does not support the 'detail' field for images. The default image quality will be used.`
+      )
     }
-  
+
     if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(`Bedrock does not support setting 'n' greater than 1.`)
+      throw new InputError(
+        `Bedrock does not support setting 'n' greater than 1.`
+      )
     }
-  }  
+  }
 
   async create(
     body: ProviderCompletionParams<'bedrock'>
-  ): Promise<CompletionResponse | StreamCompletionResponse>  {
+  ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 
     if (this.opts.baseURL) {
-      consoleWarn(`The 'baseUrl' parameter will be ignored by Bedrock because it does not support this field.`)
+      consoleWarn(
+        `The 'baseUrl' parameter will be ignored by Bedrock because it does not support this field.`
+      )
     }
     if (typeof this.opts.apiKey === 'string') {
-      consoleWarn(`The 'apiKey' parameter will be ignored by Bedrock, which uses the 'accessKeyId' and 'secretAccessKey' fields on the 'bedrock' object instead.`)
+      consoleWarn(
+        `The 'apiKey' parameter will be ignored by Bedrock, which uses the 'accessKeyId' and 'secretAccessKey' fields on the 'bedrock' object instead.`
+      )
     }
 
     const region = this.opts.bedrock?.region ?? process.env.AWS_REGION_NAME
     if (!region) {
-      throw new InputError("No AWS region detected. Please define a region using either the 'region' parameter on the 'bedrock' object or the 'AWS_REGION_NAME' environment variable.");
+      throw new InputError(
+        "No AWS region detected. Please define a region using either the 'region' parameter on the 'bedrock' object or the 'AWS_REGION_NAME' environment variable."
+      )
     }
-    const accessKeyId = this.opts.bedrock?.accessKeyId ?? process.env.AWS_ACCESS_KEY_ID;
-    const secretAccessKey = this.opts.bedrock?.secretAccessKey ?? process.env.AWS_SECRET_ACCESS_KEY;
-    const missingCredentials: Array<{ envVar: string, param: string }> = [];
+    const accessKeyId =
+      this.opts.bedrock?.accessKeyId ?? process.env.AWS_ACCESS_KEY_ID
+    const secretAccessKey =
+      this.opts.bedrock?.secretAccessKey ?? process.env.AWS_SECRET_ACCESS_KEY
+    const missingCredentials: Array<{ envVar: string; param: string }> = []
     if (!accessKeyId) {
-      missingCredentials.push({envVar: 'AWS_ACCESS_KEY_ID', param: 'accessKeyId'});
+      missingCredentials.push({
+        envVar: 'AWS_ACCESS_KEY_ID',
+        param: 'accessKeyId',
+      })
     }
     if (!secretAccessKey) {
-      missingCredentials.push({envVar: 'AWS_SECRET_ACCESS_KEY', param: 'secretAccessKey'});
+      missingCredentials.push({
+        envVar: 'AWS_SECRET_ACCESS_KEY',
+        param: 'secretAccessKey',
+      })
     }
     if (missingCredentials.length > 0) {
-      throw new InputError(`Missing AWS credentials: ${missingCredentials.map(c => c.envVar).join(', ')}. Please define these environment variables or supply them using the following parameters on the 'bedrock' object: ${missingCredentials.map(c => c.param).join(', ')}.`);
+      throw new InputError(
+        `Missing AWS credentials: ${missingCredentials
+          .map((c) => c.envVar)
+          .join(
+            ', '
+          )}. Please define these environment variables or supply them using the following parameters on the 'bedrock' object: ${missingCredentials
+          .map((c) => c.param)
+          .join(', ')}.`
+      )
     }
 
-    const { systemMessages, messages } = await convertMessages(body.messages, body.model)
-    const temperature = typeof body.temperature === 'number' ? normalizeTemperature(body.temperature, 'bedrock', body.model) : undefined
+    const { systemMessages, messages } = await convertMessages(
+      body.messages,
+      body.model
+    )
+    const temperature =
+      typeof body.temperature === 'number'
+        ? normalizeTemperature(body.temperature, 'bedrock', body.model)
+        : undefined
     const topP = body.top_p ?? undefined
     const maxTokens = body.max_tokens ?? undefined
     const stopSequences = convertStopSequences(body.stop)
-    const modelId = body.model.startsWith('bedrock/') ? body.model.replace('bedrock/', '') : body.model
+    const modelId = body.model.startsWith('bedrock/')
+      ? body.model.replace('bedrock/', '')
+      : body.model
     const toolConfig = convertToolParams(body.tool_choice, body.tools)
 
     const convertedParams: ConverseCommandInput = {
@@ -531,17 +666,20 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
         maxTokens,
         stopSequences,
         temperature,
-        topP
+        topP,
       },
       modelId,
       messages,
       system: systemMessages,
-      toolConfig
+      toolConfig,
     }
-    const client = new BedrockRuntimeClient({  region,   credentials: {
-      accessKeyId: accessKeyId!,
-      secretAccessKey: secretAccessKey!,
-    }, });
+    const client = new BedrockRuntimeClient({
+      region,
+      credentials: {
+        accessKeyId: accessKeyId!,
+        secretAccessKey: secretAccessKey!,
+      },
+    })
 
     if (body.stream === true) {
       const command = new ConverseStreamCommand(convertedParams)
@@ -551,31 +689,42 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
     } else {
       const command = new ConverseCommand(convertedParams)
       const created = getTimestamp()
-      const response = await client.send(command);
+      const response = await client.send(command)
 
-      const usage = response.usage && typeof response.usage.inputTokens === 'number' && typeof response.usage.outputTokens === 'number' && typeof response.usage.totalTokens === 'number' ? {
-        prompt_tokens: response.usage.inputTokens,
-        completion_tokens: response.usage.outputTokens,
-        total_tokens: response.usage.inputTokens + response.usage.outputTokens
-      } : undefined
+      const usage =
+        response.usage &&
+        typeof response.usage.inputTokens === 'number' &&
+        typeof response.usage.outputTokens === 'number' &&
+        typeof response.usage.totalTokens === 'number'
+          ? {
+              prompt_tokens: response.usage.inputTokens,
+              completion_tokens: response.usage.outputTokens,
+              total_tokens:
+                response.usage.inputTokens + response.usage.outputTokens,
+            }
+          : undefined
 
-      const message = toChatCompletionChoiceMessage(response.output, body.tool_choice)
+      const message = toChatCompletionChoiceMessage(
+        response.output,
+        body.tool_choice
+      )
 
       const convertedResponse: CompletionResponse = {
         id: response.$metadata.requestId ?? null,
         usage,
-        choices: [{
-          index: 0,
-          logprobs: null,
-          message,
-          finish_reason: convertStopReason(response.stopReason)
-        }],
+        choices: [
+          {
+            index: 0,
+            logprobs: null,
+            message,
+            finish_reason: convertStopReason(response.stopReason),
+          },
+        ],
         created,
         model: body.model,
-        object: 'chat.completion'
+        object: 'chat.completion',
       }
       return convertedResponse
     }
   }
 }
-
