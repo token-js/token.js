@@ -1,10 +1,9 @@
 import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChoice, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat, ToolCalls } from "@mistralai/mistralai";
-import { CompletionParams } from "../chat";
-import { CompletionResponse, InputError, MistralModel, StreamCompletionResponse } from "./types";
+import { CompletionParams, MistralModel, ProviderCompletionParams } from "../chat";
+import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { ChatCompletionChunk, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
 import { BaseHandler } from "./base";
-import { ModelPrefix } from "../constants";
 
 export const findLinkedToolCallName = (messages: ChatCompletionMessage[], toolCallId: string): string => {
   for (const message of messages) {
@@ -206,7 +205,7 @@ const toCompletionResponse = (result: ChatCompletionResponse): CompletionRespons
 
 export class MistralHandler extends BaseHandler<MistralModel> {
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'mistral'>,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     this.validateInputs(body)
 
@@ -218,7 +217,6 @@ export class MistralHandler extends BaseHandler<MistralModel> {
 
     const endpoint = this.opts.baseURL ?? undefined
     const client = new MistralClient(apiKey, endpoint);
-    const model = body.model.replace(ModelPrefix.Mistral, '')
     const responseFormat: ResponseFormat | undefined = body.response_format?.type === 'json_object' ? {
       type: "json_object"
     } : undefined
@@ -234,7 +232,7 @@ export class MistralHandler extends BaseHandler<MistralModel> {
     const messages = convertMessages(body.messages)
 
     const options: ChatRequest = {
-      model,
+      model: body.model,
       messages: messages as Message[],
       temperature,
       maxTokens: body.max_tokens ?? undefined,

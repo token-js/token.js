@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { Stream } from "openai/streaming.mjs";
-import { CompletionResponse, InputError, LLMChatModel, OpenAIModel, StreamCompletionResponse } from "./types";
-import { CompletionParams } from "../chat";
+import { CompletionResponse, StreamCompletionResponse } from "./types";
+import { CompletionParams, OpenAIModel, ProviderCompletionParams } from "../chat";
 import { BaseHandler } from "./base";
 import { ChatCompletionCreateParams } from "openai/resources/index.mjs";
 
@@ -17,7 +17,7 @@ async function* streamOpenAI(
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
 export class OpenAIHandler extends BaseHandler<OpenAIModel> {
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'openai'>,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 
@@ -29,6 +29,10 @@ export class OpenAIHandler extends BaseHandler<OpenAIModel> {
       ...this.opts,
       apiKey,
     });
+
+    // We have to delete the provider field because it's not a valid parameter for the OpenAI API.
+    const params: any = body
+    delete params.provider
 
     if (body.stream) {
       const stream = await openai.chat.completions.create(body)

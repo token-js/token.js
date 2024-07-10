@@ -1,52 +1,83 @@
-import { ChatCompletionAssistantMessageParam, ChatCompletionCreateParamsBase, ChatCompletionSystemMessageParam, ChatCompletionToolMessageParam, ChatCompletionUserMessageParam } from 'openai/resources/chat/completions.mjs';
-import { Stream } from 'openai/streaming.mjs';
+import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.mjs';
 import { getHandler } from '../handlers/utils';
-import { CompletionResponse, ConfigOptions, LLMChatModel, StreamCompletionResponse } from '../handlers/types';
+import { CompletionResponse, ConfigOptions, StreamCompletionResponse } from '../handlers/types';
+import { models } from '../models';
 
-type CompletionBase = Pick<ChatCompletionCreateParamsBase, 
-  'temperature' | 
-  'top_p' | 
-  'stop' | 
-  'n' | 
+export type OpenAIModel = (typeof models.openai.models)[number];
+export type AI21Model = (typeof models.ai21.models)[number];
+export type AnthropicModel = (typeof models.anthropic.models)[number];
+export type GeminiModel = (typeof models.gemini.models)[number];
+export type CohereModel = (typeof models.cohere.models)[number];
+export type BedrockModel = (typeof models.bedrock.models)[number];
+export type MistralModel = (typeof models.mistral.models)[number];
+export type PerplexityModel = (typeof models.perplexity.models)[number];
+export type GroqModel = (typeof models.groq.models)[number];
+
+export type LLMChatModel = OpenAIModel | AI21Model | AnthropicModel | GeminiModel | CohereModel | BedrockModel | MistralModel | PerplexityModel | GroqModel;
+
+export type LLMProvider = keyof typeof models;
+
+type ProviderModelMap = {
+  openai: OpenAIModel;
+  ai21: AI21Model;
+  anthropic: AnthropicModel;
+  gemini: GeminiModel;
+  cohere: CohereModel;
+  bedrock: BedrockModel;
+  mistral: MistralModel;
+  perplexity: PerplexityModel;
+  groq: GroqModel;
+};
+
+type CompletionBase<P extends LLMProvider> = Pick<ChatCompletionCreateParamsBase,
+  'temperature' |
+  'top_p' |
+  'stop' |
+  'n' |
   'messages' |
   'max_tokens' |
   'response_format' |
-  'tools' | 
+  'tools' |
   'tool_choice'
 > & {
-  model: LLMChatModel;
+  provider: P;
+  model: ProviderModelMap[P];
 }
 
-type CompletionStreaming = CompletionBase & {
+export type CompletionStreaming<P extends LLMProvider> = CompletionBase<P> & {
   stream: true;
 }
 
-type CompletionNonStreaming = CompletionBase & {
+export type CompletionNonStreaming<P extends LLMProvider> = CompletionBase<P> & {
   stream?: false | null;
 }
 
-export type CompletionParams = CompletionStreaming | CompletionNonStreaming;
+export type ProviderCompletionParams<P extends LLMProvider> = CompletionStreaming<P> | CompletionNonStreaming<P>;
+
+export type CompletionParams = {
+  [P in LLMProvider]: CompletionStreaming<P> | CompletionNonStreaming<P>
+}[LLMProvider];
 
 export class LLMCompletions {
   private opts: ConfigOptions;
 
-  constructor (opts: ConfigOptions) {
+  constructor(opts: ConfigOptions) {
     this.opts = opts;
   }
 
-  create(
-    body: CompletionNonStreaming,
+  create<P extends LLMProvider>(
+    body: CompletionNonStreaming<P>,
   ): Promise<CompletionResponse>;
-  create(
-    body: CompletionStreaming,
+  create<P extends LLMProvider>(
+    body: CompletionStreaming<P>,
   ): Promise<StreamCompletionResponse>;
-  create(
-    body: CompletionBase,
+  create<P extends LLMProvider>(
+    body: CompletionBase<P>,
   ): Promise<CompletionResponse | StreamCompletionResponse>;
-  create(
+  create<P extends LLMProvider>(
     body: CompletionParams,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
-    const handler = getHandler(body.model, this.opts);
+    const handler = getHandler(body.provider, this.opts);
     return handler.create(body);
   }
 }

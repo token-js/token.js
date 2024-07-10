@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { ChatCompletionChunk, ChatCompletionContentPart } from "openai/resources/index.mjs";
-import { CompletionResponse, GeminiModel, InputError, StreamCompletionResponse } from "./types";
+import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { 
   GoogleGenerativeAI, 
   Content,
@@ -19,7 +19,7 @@ import {
   TextPart
 } from "@google/generative-ai"
 import { consoleWarn, getTimestamp, parseImage } from "./utils";
-import { CompletionParams } from "../chat";
+import { CompletionParams, GeminiModel, ProviderCompletionParams } from "../chat";
 import { BaseHandler } from "./base";
 import { ChatCompletionMessageToolCall } from "openai/src/resources/index.js";
 
@@ -326,7 +326,7 @@ async function* convertStreamResponse(
 // Then we update the Handlers object in src/handlers/utils.ts to include the new handler.
 export class GeminiHandler extends BaseHandler<GeminiModel> {
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'gemini'>,
   ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 

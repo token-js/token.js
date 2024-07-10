@@ -1,13 +1,11 @@
-import { CompletionResponse, InputError, StreamCompletionResponse, AnthropicModel, CompletionResponseChunk, InvariantError, ConfigOptions } from "./types";
+import { CompletionResponse, InputError, StreamCompletionResponse, CompletionResponseChunk, InvariantError } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam, ToolUseBlockParam, ToolResultBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { consoleWarn, fetchThenParseImage, getTimestamp, isEmptyObject } from "./utils";
-import { CompletionParams } from "../chat"
+import { AnthropicModel, CompletionParams, ProviderCompletionParams } from "../chat"
 import * as dotenv from 'dotenv'
-import { ChatCompletionMessageToolCall, ChatCompletionSystemMessageParam } from "openai/resources/index.mjs";
+import { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
-import { ChatCompletionAssistantMessageParam } from "openai/src/resources/index.js";
-import { ToolResultBlock } from "@aws-sdk/client-bedrock-runtime";
 
 dotenv.config()
 
@@ -410,7 +408,7 @@ const getApiKey = (
 
 export class AnthropicHandler extends BaseHandler<AnthropicModel> {
   validateInputs(
-    body: CompletionParams
+    body: ProviderCompletionParams<'anthropic'>,
   ): void {
     super.validateInputs(body)
 
@@ -441,7 +439,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
   }  
 
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'anthropic'>,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     this.validateInputs(body)
 
