@@ -236,7 +236,7 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ```
 
-## Streaming
+### Streaming
 
 LLM.js supports streaming for all providers that support it.
 
@@ -261,7 +261,7 @@ for await (const part of result) {
 }
 ```
 
-## Tools
+### Tools
 
 LLM.js supports tools for all providers and models that support it.
 
