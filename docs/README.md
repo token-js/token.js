@@ -89,8 +89,9 @@ ANTHROPIC_API_KEY=<anthropic api key>
 {% endtab %}
 
 {% tab title="Gemini" %}
-<pre class="language-typescript"><code class="lang-typescript"><strong>import { LLM, ChatCompletionMessageParam } from 'llmjs'
-</strong>
+```typescript
+import { LLM, ChatCompletionMessageParam } from 'llmjs'
+
 const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'gemini',
@@ -100,7 +101,7 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
     content: `How are you?`,
   }],
 })
-</code></pre>
+```
 
 {% code title=".env" %}
 ```bash
@@ -110,8 +111,6 @@ GEMINI_API_KEY=<gemini api key>
 {% endtab %}
 
 {% tab title="AI21" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -134,8 +133,6 @@ AI21_API_KEY=<ai21 api key>
 {% endtab %}
 
 {% tab title="Bedrock" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -160,8 +157,6 @@ AWS_SECRET_ACCESS_KEY=<aws secret access key>
 {% endtab %}
 
 {% tab title="Cohere" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -184,8 +179,6 @@ COHERE_API_KEY=<cohere api key>
 {% endtab %}
 
 {% tab title="Groq" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -208,8 +201,6 @@ GROQ_API_KEY=<groq api key>
 {% endtab %}
 
 {% tab title="Mistral" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -232,8 +223,6 @@ MISTRAL_API_KEY=<mistral api key>
 {% endtab %}
 
 {% tab title="Perplexity" %}
-
-
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
