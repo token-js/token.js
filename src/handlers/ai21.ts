@@ -1,9 +1,8 @@
 import axios from "axios";
-import { CompletionParams } from "../chat";
-import { AI21Model, CompletionResponse, CompletionResponseChunk, ConfigOptions, InputError, LLMChatModel, StreamCompletionResponse } from "./types";
+import { AI21Model, CompletionParams, LLMChatModel, ProviderCompletionParams } from "../chat";
+import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
 import { getTimestamp } from "./utils";
 import { IncomingMessage } from 'http';
-import { ChatCompletionAssistantMessageParam, ChatCompletionContentPart, ChatCompletionSystemMessageParam, ChatCompletionUserMessageParam } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
 
 type AI21ChatCompletionParams = {
@@ -187,7 +186,7 @@ export class AI21Handler extends BaseHandler<AI21Model> {
 
 
   async create(
-    body: CompletionParams,
+    body: ProviderCompletionParams<'ai21'>,
   ): Promise<CompletionResponse | StreamCompletionResponse>  {
     this.validateInputs(body)
 

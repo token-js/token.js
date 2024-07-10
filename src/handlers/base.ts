@@ -1,5 +1,5 @@
-import { CompletionParams } from "../chat";
-import { CompletionResponse, ConfigOptions, InputError, LLMChatModel, StreamCompletionResponse } from "./types";
+import { CompletionParams, LLMChatModel } from "../chat";
+import { CompletionResponse, ConfigOptions, InputError, StreamCompletionResponse } from "./types";
 
 export abstract class BaseHandler<T extends LLMChatModel> {
   opts: ConfigOptions;
