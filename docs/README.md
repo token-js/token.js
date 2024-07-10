@@ -39,13 +39,6 @@ bun add llmjs
 {% endtab %}
 {% endtabs %}
 
-### Environment Variables
-
-<pre class="language-env"><code class="lang-env"><strong>OPENAI_API_KEY=&#x3C;your openai api key>
-</strong>GEMINI_API_KEY=&#x3C;your gemini api key>
-ANTHROPIC_API_KEY=&#x3C;your api>
-</code></pre>
-
 ### Usage
 
 {% tabs %}
@@ -77,7 +70,7 @@ OPENAI_API_KEY=<openai api key>
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
-const llm = new LLM({ apiKey: '<anthropic api key>' })
+const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'anthropic',
   model: 'claude-2.0',
@@ -90,16 +83,15 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 
 {% code title=".env" %}
 ```bash
-ANTHROPIC_API_KEY=<openai api key>
+ANTHROPIC_API_KEY=<anthropic api key>
 ```
 {% endcode %}
 {% endtab %}
 
 {% tab title="Gemini" %}
-```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
-
-const llm = new LLM({ apiKey: '<gemini api key>' })
+<pre class="language-typescript"><code class="lang-typescript"><strong>import { LLM, ChatCompletionMessageParam } from 'llmjs'
+</strong>
+const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -108,20 +100,22 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
     content: `How are you?`,
   }],
 })
-```
+</code></pre>
 
 {% code title=".env" %}
 ```bash
-ANTHROPIC_API_KEY=<openai api key>
+GEMINI_API_KEY=<gemini api key>
 ```
 {% endcode %}
 {% endtab %}
 
 {% tab title="AI21" %}
+
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
-const llm = new LLM({ apiKey: '<ai21 api key>' })
+const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'ai21',
   model: 'jamba-instruct',
@@ -131,13 +125,21 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   }],
 })
 ```
+
+{% code title=".env" %}
+```bash
+AI21_API_KEY=<ai21 api key>
+```
+{% endcode %}
 {% endtab %}
 
 {% tab title="Bedrock" %}
+
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
-const llm = new LLM({ apiKey: '<ai21 api key>' })
+const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'bedrock',
   model: 'amazon.titan-text-express-v1',
@@ -147,13 +149,23 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   }],
 })
 ```
+
+{% code title=".env" %}
+```bash
+AWS_REGION_NAME=<aws region>
+AWS_ACCESS_KEY_ID=<aws access key id>
+AWS_SECRET_ACCESS_KEY=<aws secret access key>
+```
+{% endcode %}
 {% endtab %}
 
 {% tab title="Cohere" %}
+
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
-const llm = new LLM({ apiKey: '<ai21 api key>' })
+const llm = new LLM()
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'cohere',
   model: 'command-r',
@@ -163,10 +175,88 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   }],
 })
 ```
+
+{% code title=".env" %}
+```bash
+COHERE_API_KEY=<cohere api key>
+```
+{% endcode %}
 {% endtab %}
 
 {% tab title="Groq" %}
 
+
+```typescript
+import { LLM, ChatCompletionMessageParam } from 'llmjs'
+
+const llm = new LLM()
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+  provider: 'groq',
+  model: 'llama3-70b-8192',
+  messages: [{
+    role: 'user',
+    content: `How are you?`,
+  }],
+})
+```
+
+{% code title=".env" %}
+```bash
+GROQ_API_KEY=<groq api key>
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Mistral" %}
+
+
+```typescript
+import { LLM, ChatCompletionMessageParam } from 'llmjs'
+
+const llm = new LLM()
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+  provider: 'mistral',
+  model: 'mistral-large-2402',
+  messages: [{
+    role: 'user',
+    content: `How are you?`,
+  }],
+})
+```
+
+{% code title=".env" %}
+```bash
+MISTRAL_API_KEY=<mistral api key>
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Perplexity" %}
+
+
+```typescript
+import { LLM, ChatCompletionMessageParam } from 'llmjs'
+
+const llm = new LLM()
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+  provider: 'perplexity',
+  model: 'llama-3-70b-instruct',
+  messages: [{
+    role: 'user',
+    content: `How are you?`,
+  }],
+})
+```
+
+{% code title=".env" %}
+```bash
+PERPLEXITY_API_KEY=<perplexity api key>
+```
+{% endcode %}
+{% endtab %}
+
+{% tab title="Azure" %}
+TODO
 {% endtab %}
 {% endtabs %}
 
