@@ -1,12 +1,33 @@
-import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChoice, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat, ToolCalls } from "@mistralai/mistralai";
-import { CompletionParams, MistralModel, ProviderCompletionParams } from "../chat";
-import { InputError } from "./types";
-import { ChatCompletionChunk, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
-import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
-import { BaseHandler } from "./base";
-import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
+import MistralClient, {
+  ChatCompletionResponse,
+  ChatCompletionResponseChoice,
+  ChatCompletionResponseChunk,
+  ChatRequest,
+  Message,
+  ResponseFormat,
+  ToolCalls,
+} from '@mistralai/mistralai'
+import {
+  ChatCompletionChunk,
+  ChatCompletionMessage,
+  ChatCompletionMessageParam,
+  ChatCompletionMessageToolCall,
+} from 'openai/resources/index.mjs'
+import { ChatCompletionContentPartText } from 'openai/src/resources/index.js'
 
-export const findLinkedToolCallName = (messages: ChatCompletionMessage[], toolCallId: string): string => {
+import {
+  CompletionParams,
+  MistralModel,
+  ProviderCompletionParams,
+} from '../chat'
+import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
+import { BaseHandler } from './base'
+import { InputError } from './types'
+
+export const findLinkedToolCallName = (
+  messages: ChatCompletionMessage[],
+  toolCallId: string
+): string => {
   for (const message of messages) {
     for (const toolCall of message?.tool_calls ?? []) {
       if (toolCall.id === toolCallId) {
@@ -18,51 +39,67 @@ export const findLinkedToolCallName = (messages: ChatCompletionMessage[], toolCa
   throw new InputError(`Tool call with id ${toolCallId} not found in messages`)
 }
 
-export const convertMessages = (messages: (ChatCompletionMessageParam | ChatCompletionMessage)[]): Array<Message | ChatCompletionResponseChoice['message']> => {
+export const convertMessages = (
+  messages: (ChatCompletionMessageParam | ChatCompletionMessage)[]
+): Array<Message | ChatCompletionResponseChoice['message']> => {
   return messages.map((message) => {
-    if (typeof message.content !== 'string' && message.content?.some((part) => part.type === 'image_url')) {
-      throw new Error("Image inputs are not supported by Mistral")
+    if (
+      typeof message.content !== 'string' &&
+      message.content?.some((part) => part.type === 'image_url')
+    ) {
+      throw new Error('Image inputs are not supported by Mistral')
     }
 
     if (message.role === 'tool') {
-      const name = findLinkedToolCallName(messages as ChatCompletionMessage[], message.tool_call_id)
+      const name = findLinkedToolCallName(
+        messages as ChatCompletionMessage[],
+        message.tool_call_id
+      )
 
       return {
         name,
         role: 'tool',
         content: message.content,
-        tool_call_id: message.tool_call_id
+        tool_call_id: message.tool_call_id,
       }
     }
 
     if (message.role === 'system') {
       return {
         role: message.role,
-        content: message.content ?? ''
+        content: message.content ?? '',
       }
     } else if (message.role === 'assistant') {
       return {
         role: message.role,
         content: message.content ?? '',
-        tool_calls: message.tool_calls ?? null
+        tool_calls: message.tool_calls ?? null,
       }
     } else if (message.role === 'user') {
-      const content = typeof message.content === 'string' ? message.content : message.content?.map((m) => (m as ChatCompletionContentPartText).text)
+      const content =
+        typeof message.content === 'string'
+          ? message.content
+          : message.content?.map(
+              (m) => (m as ChatCompletionContentPartText).text
+            )
       return {
         role: message.role,
-        content
+        content,
       }
     } else {
-      throw new Error("Function messages are deprecated.")
+      throw new Error('Function messages are deprecated.')
     }
   })
 }
 
-export const convertTools = (tools: CompletionParams['tools'], specificFunctionName?: string): ChatRequest['tools'] => {
+export const convertTools = (
+  tools: CompletionParams['tools'],
+  specificFunctionName?: string
+): ChatRequest['tools'] => {
   if (!tools) {
     return undefined
   }
-  
+
   const specifiedTool = tools.filter((tool) => {
     if (specificFunctionName === undefined) {
       return true
@@ -72,7 +109,9 @@ export const convertTools = (tools: CompletionParams['tools'], specificFunctionN
   })
 
   if (specificFunctionName !== undefined && specifiedTool.length === 0) {
-    throw new InputError(`Tool with name ${specificFunctionName} not found in tool list`)
+    throw new InputError(
+      `Tool with name ${specificFunctionName} not found in tool list`
+    )
   }
 
   return specifiedTool.map((tool) => {
@@ -82,13 +121,16 @@ export const convertTools = (tools: CompletionParams['tools'], specificFunctionN
         name: tool.function.name,
         description: tool.function.description ?? '',
         parameters: tool.function.parameters ?? {},
-      }
+      },
     }
   })
 }
 
-export const convertToolConfig = (toolChoice: CompletionParams['tool_choice'], tools: CompletionParams['tools']): { 
-  toolChoice: ChatRequest['toolChoice'],
+export const convertToolConfig = (
+  toolChoice: CompletionParams['tool_choice'],
+  tools: CompletionParams['tools']
+): {
+  toolChoice: ChatRequest['toolChoice']
   tools: ChatRequest['tools']
 } => {
   // If tool choise is an object, then it is a required specific function
@@ -98,37 +140,39 @@ export const convertToolConfig = (toolChoice: CompletionParams['tool_choice'], t
       // use the toolChoice `any` to force a tool to be used, and then we filter the tool list to only include
       // the function that was specified.
       toolChoice: 'any',
-      tools: convertTools(tools, toolChoice.function.name)
+      tools: convertTools(tools, toolChoice.function.name),
     }
   }
-  
+
   switch (toolChoice) {
-    case 'auto': 
-      return { 
+    case 'auto':
+      return {
         toolChoice: 'auto',
-        tools: convertTools(tools)
+        tools: convertTools(tools),
       }
     case 'none':
       return {
         toolChoice: 'none',
-        tools: convertTools(tools)
+        tools: convertTools(tools),
       }
     case 'required':
       return {
         toolChoice: 'any',
-        tools: convertTools(tools)
+        tools: convertTools(tools),
       }
-    case undefined: 
+    case undefined:
       return {
         toolChoice: undefined,
-        tools: convertTools(tools)
+        tools: convertTools(tools),
       }
-    default: 
+    default:
       throw new InputError(`Invalid tool choice: ${toolChoice}`)
   }
 }
 
-export const convertToolCalls = (toolResponse: ToolCalls[] | null |undefined): ChatCompletionMessageToolCall[] | undefined => {
+export const convertToolCalls = (
+  toolResponse: ToolCalls[] | null | undefined
+): ChatCompletionMessageToolCall[] | undefined => {
   if (!toolResponse) {
     return undefined
   }
@@ -140,12 +184,14 @@ export const convertToolCalls = (toolResponse: ToolCalls[] | null |undefined): C
       function: {
         name: tool.function.name,
         arguments: tool.function.arguments,
-      }
+      },
     }
   })
 }
 
-export const convertStreamToolCalls = (toolResponse: ToolCalls[] | null | undefined): Array<ChatCompletionChunk.Choice.Delta.ToolCall> | undefined => {
+export const convertStreamToolCalls = (
+  toolResponse: ToolCalls[] | null | undefined
+): Array<ChatCompletionChunk.Choice.Delta.ToolCall> | undefined => {
   if (!toolResponse) {
     return undefined
   }
@@ -158,9 +204,11 @@ export const convertStreamToolCalls = (toolResponse: ToolCalls[] | null | undefi
   })
 }
 
-async function *toStreamResponse(result: AsyncGenerator<ChatCompletionResponseChunk, void, unknown>): StreamCompletionResponse {
+async function* toStreamResponse(
+  result: AsyncGenerator<ChatCompletionResponseChunk, void, unknown>
+): StreamCompletionResponse {
   for await (const chunk of result) {
-    yield { 
+    yield {
       id: chunk.id,
       created: chunk.created,
       object: chunk.object,
@@ -171,19 +219,21 @@ async function *toStreamResponse(result: AsyncGenerator<ChatCompletionResponseCh
           delta: {
             role: 'assistant',
             content: choice.delta.content,
-            tool_calls: convertStreamToolCalls(choice.delta.tool_calls)
+            tool_calls: convertStreamToolCalls(choice.delta.tool_calls),
           },
           finish_reason: choice.finish_reason as any,
-          logprobs: null
+          logprobs: null,
         }
       }),
-      usage: chunk.usage ?? undefined
+      usage: chunk.usage ?? undefined,
     }
   }
 }
 
-const toCompletionResponse = (result: ChatCompletionResponse): CompletionResponse => {
-  return { 
+const toCompletionResponse = (
+  result: ChatCompletionResponse
+): CompletionResponse => {
+  return {
     id: result.id,
     created: result.created,
     object: result.object,
@@ -197,38 +247,47 @@ const toCompletionResponse = (result: ChatCompletionResponse): CompletionRespons
           tool_calls: convertToolCalls(choice.message.tool_calls),
         },
         finish_reason: choice.finish_reason as any,
-        logprobs: null
+        logprobs: null,
       }
     }),
-    usage: result.usage
+    usage: result.usage,
   }
 }
 
 export class MistralHandler extends BaseHandler<MistralModel> {
   async create(
-    body: ProviderCompletionParams<'mistral'>,
-  ): Promise<CompletionResponse | StreamCompletionResponse>  {
+    body: ProviderCompletionParams<'mistral'>
+  ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 
-    const apiKey = this.opts.apiKey ?? process.env.MISTRAL_API_KEY;
+    const apiKey = this.opts.apiKey ?? process.env.MISTRAL_API_KEY
 
     if (apiKey === undefined) {
-      throw new InputError("API key is required for Mistral, define MISTRAL_API_KEY in your environment or specifty the apiKey option.");
+      throw new InputError(
+        'API key is required for Mistral, define MISTRAL_API_KEY in your environment or specifty the apiKey option.'
+      )
     }
 
     const endpoint = this.opts.baseURL ?? undefined
-    const client = new MistralClient(apiKey, endpoint);
-    const responseFormat: ResponseFormat | undefined = body.response_format?.type === 'json_object' ? {
-      type: "json_object"
-    } : undefined
+    const client = new MistralClient(apiKey, endpoint)
+    const responseFormat: ResponseFormat | undefined =
+      body.response_format?.type === 'json_object'
+        ? {
+            type: 'json_object',
+          }
+        : undefined
 
-    const temperature = typeof body.temperature === 'number'
-      // We divide by two because Mistral's temperature range is 0 to 1 and the input temperature
-      // range is 0 to 2.
-      ? body.temperature / 2
-      : undefined
+    const temperature =
+      typeof body.temperature === 'number'
+        ? // We divide by two because Mistral's temperature range is 0 to 1 and the input temperature
+          // range is 0 to 2.
+          body.temperature / 2
+        : undefined
 
-    const { toolChoice, tools } = convertToolConfig(body.tool_choice, body.tools)
+    const { toolChoice, tools } = convertToolConfig(
+      body.tool_choice,
+      body.tools
+    )
 
     const messages = convertMessages(body.messages)
 
@@ -240,15 +299,15 @@ export class MistralHandler extends BaseHandler<MistralModel> {
       topP: body.top_p ?? undefined,
       responseFormat,
       toolChoice,
-      tools
+      tools,
       // Mistral does not support `stop`
     }
 
     if (body.stream) {
-      const chatResponseStream = client.chatStream(options);
+      const chatResponseStream = client.chatStream(options)
       return toStreamResponse(chatResponseStream)
     } else {
-      const chatResponse = await client.chat(options);
+      const chatResponse = await client.chat(options)
       return toCompletionResponse(chatResponse)
     }
   }

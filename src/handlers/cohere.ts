@@ -1,19 +1,34 @@
-import { ApiMetaBilledUnits, ChatRequest, FinishReason, Message, StreamedChatResponse, Tool, ToolResult } from "cohere-ai/api";
-import { CohereModel, CompletionParams, ProviderCompletionParams } from "../chat";
-import { InputError, InvariantError, MessageRole } from "./types";
-import { consoleWarn, getTimestamp } from "./utils";
-import { ChatCompletionAssistantMessageParam, ChatCompletionMessageToolCall, ChatCompletionToolMessageParam } from "openai/resources/index.mjs";
-import { CohereClient } from "cohere-ai";
-import { Stream } from "cohere-ai/core";
-import { BaseHandler } from "./base";
-import { ChatCompletionTool } from "openai/src/resources/index.js";
-import { CompletionResponse, StreamCompletionResponse } from "../userTypes";
+import { CohereClient } from 'cohere-ai'
+import {
+  ApiMetaBilledUnits,
+  ChatRequest,
+  FinishReason,
+  Message,
+  StreamedChatResponse,
+  Tool,
+  ToolResult,
+} from 'cohere-ai/api'
+import { Stream } from 'cohere-ai/core'
+import {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionMessageToolCall,
+  ChatCompletionToolMessageParam,
+} from 'openai/resources/index.mjs'
+import { ChatCompletionTool } from 'openai/src/resources/index.js'
 
-type CohereMessageRole = "CHATBOT" | "SYSTEM" | "USER" | "TOOL"
+import {
+  CohereModel,
+  CompletionParams,
+  ProviderCompletionParams,
+} from '../chat'
+import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
+import { BaseHandler } from './base'
+import { InputError, InvariantError, MessageRole } from './types'
+import { consoleWarn, getTimestamp } from './utils'
 
-const convertRole = (
-  role: MessageRole
-): CohereMessageRole => {
+type CohereMessageRole = 'CHATBOT' | 'SYSTEM' | 'USER' | 'TOOL'
+
+const convertRole = (role: MessageRole): CohereMessageRole => {
   if (role === 'assistant') {
     return 'CHATBOT'
   } else if (role === 'system') {
@@ -30,7 +45,11 @@ const convertRole = (
 const convertFinishReason = (
   finishReason?: FinishReason
 ): CompletionResponse['choices'][0]['finish_reason'] => {
-  if (finishReason === 'COMPLETE' || finishReason === 'USER_CANCEL' || finishReason === 'STOP_SEQUENCE') {
+  if (
+    finishReason === 'COMPLETE' ||
+    finishReason === 'USER_CANCEL' ||
+    finishReason === 'STOP_SEQUENCE'
+  ) {
     return 'stop'
   } else if (finishReason === 'MAX_TOKENS') {
     return 'length'
@@ -38,7 +57,9 @@ const convertFinishReason = (
     return 'content_filter'
   } else if (finishReason === 'ERROR_LIMIT') {
     // OpenAI throws an error in when the model's context limit is reached, so we do too for consistency.
-    throw new Error(`The generation could not be completed because the model’s context limit was reached.`)
+    throw new Error(
+      `The generation could not be completed because the model’s context limit was reached.`
+    )
   } else if (finishReason === 'ERROR') {
     throw new Error(`The generation could not be completed due to an error.`)
   } else {
@@ -68,7 +89,7 @@ const popLastUserMessageContentString = (
 
   // Return a placeholder string if the user didn't include a text message. We include a whitespace
   // in the string because Cohere throws an error if the user's message contains zero tokens.
-  return "Empty"
+  return 'Empty'
 }
 
 const convertStopSequences = (
@@ -78,7 +99,7 @@ const convertStopSequences = (
     return undefined
   } else if (typeof stop === 'string') {
     return [stop]
-  } else if (Array.isArray(stop) && stop.every(e => typeof e === 'string')) {
+  } else if (Array.isArray(stop) && stop.every((e) => typeof e === 'string')) {
     return stop
   } else {
     throw new Error(`Unknown stop sequence type: ${stop}`)
@@ -86,7 +107,11 @@ const convertStopSequences = (
 }
 
 export const toCohereTool = (tool: ChatCompletionTool): Tool => {
-  const convertType = (type: string, properties?: any, additionalProperties?: any): string => {
+  const convertType = (
+    type: string,
+    properties?: any,
+    additionalProperties?: any
+  ): string => {
     switch (type) {
       case 'string':
         return 'str'
@@ -104,7 +129,10 @@ export const toCohereTool = (tool: ChatCompletionTool): Tool => {
     }
   }
 
-  const convertProperties = (properties: Record<string, any>, requiredFields: string[]): Record<string, any> => {
+  const convertProperties = (
+    properties: Record<string, any>,
+    requiredFields: string[]
+  ): Record<string, any> => {
     const converted: Record<string, any> = {}
     for (const [key, value] of Object.entries(properties)) {
       const isRequired = requiredFields.includes(key)
@@ -114,31 +142,42 @@ export const toCohereTool = (tool: ChatCompletionTool): Tool => {
         required: isRequired,
       }
       if (value.type === 'object' && value.properties) {
-        converted[key].properties = convertProperties(value.properties, value.required || [])
+        converted[key].properties = convertProperties(
+          value.properties,
+          value.required || []
+        )
       }
     }
     return converted
   }
 
-  const required: string[] = Array.isArray(tool.function.parameters?.required) ? tool.function.parameters?.required : []
-  const parameterDefinitions = tool.function.parameters?.properties ? convertProperties(tool.function.parameters.properties, required) : undefined
+  const required: string[] = Array.isArray(tool.function.parameters?.required)
+    ? tool.function.parameters?.required
+    : []
+  const parameterDefinitions = tool.function.parameters?.properties
+    ? convertProperties(tool.function.parameters.properties, required)
+    : undefined
 
   return {
     name: tool.function.name,
     description: tool.function.description ?? '',
-    parameterDefinitions
+    parameterDefinitions,
   }
 }
 
 const getUsageTokens = (
   billedUnits?: ApiMetaBilledUnits
 ): CompletionResponse['usage'] => {
-  if (billedUnits && typeof billedUnits.inputTokens === 'number' && typeof billedUnits.outputTokens === 'number') {
+  if (
+    billedUnits &&
+    typeof billedUnits.inputTokens === 'number' &&
+    typeof billedUnits.outputTokens === 'number'
+  ) {
     const { inputTokens, outputTokens } = billedUnits
     return {
       completion_tokens: outputTokens,
       prompt_tokens: inputTokens,
-      total_tokens: outputTokens + inputTokens
+      total_tokens: outputTokens + inputTokens,
     }
   } else {
     return undefined
@@ -191,49 +230,69 @@ const toToolResult = (
   if (lastAssistantMessage === null) {
     // OpenAI enforces that an assistant message must precede tool messages, and since we need the
     // assistant message to get the function arguments, we throw an error if we can't find it.
-    throw new Error(`Could not find message from the 'assistant' role, which must precede messages from the 'tool' role.`)
+    throw new Error(
+      `Could not find message from the 'assistant' role, which must precede messages from the 'tool' role.`
+    )
   }
   if (lastAssistantMessage.tool_calls === undefined) {
-    throw new Error(`Expected 'assistant' message to contain a 'tool_calls' field because it precedes tool call messages, but no 'tool_calls' field was found.`)
+    throw new Error(
+      `Expected 'assistant' message to contain a 'tool_calls' field because it precedes tool call messages, but no 'tool_calls' field was found.`
+    )
   }
-  const toolCall = lastAssistantMessage.tool_calls.find(toolCall => toolCall.function.name === toolMessage.tool_call_id)
+  const toolCall = lastAssistantMessage.tool_calls.find(
+    (t) => t.function.name === toolMessage.tool_call_id
+  )
   if (!toolCall) {
-    throw new Error(`Could not find the following tool call ID in the 'assistant' message: ${toolMessage.tool_call_id}`)
+    throw new Error(
+      `Could not find the following tool call ID in the 'assistant' message: ${toolMessage.tool_call_id}`
+    )
   }
 
   const toolResult: ToolResult = {
     call: {
       name: toolCall.function.name,
-      parameters: JSON.parse(toolCall.function.arguments)
+      parameters: JSON.parse(toolCall.function.arguments),
     },
-    outputs: [JSON.parse(toolMessage.content)]
+    outputs: [JSON.parse(toolMessage.content)],
   }
   return toolResult
 }
 
 const convertMessages = (
   unclonedMessages: CompletionParams['messages']
-): {messages: Array<Message>, lastUserMessage: string, toolResults: ChatRequest['toolResults'] } => {
+): {
+  messages: Array<Message>
+  lastUserMessage: string
+  toolResults: ChatRequest['toolResults']
+} => {
   const clonedMessages = structuredClone(unclonedMessages)
 
   // Cohere has a distinct field, `toolResults`, for the most recent tool messages. If the user's
   // `message` ends with tool messages, we pop them from the array in order to populate this field.
   const lastToolMessages = popLastToolMessageParams(clonedMessages)
-  const lastToolResults = lastToolMessages?.map(toolMessage => toToolResult(toolMessage, clonedMessages))
+  const lastToolResults = lastToolMessages?.map((toolMessage) =>
+    toToolResult(toolMessage, clonedMessages)
+  )
 
   // Cohere throws the following error if the `toolResults` field is defined and the `message` field
   // is a non-empty string: 'invalid request: cannot specify both message and tool_results in
   // multistep mode'. To avoid this error, we only populate the user message if the `toolResults`
   // aren't defined.
-  const lastUserMessage = lastToolResults === undefined ? popLastUserMessageContentString(clonedMessages) : ''
-  
+  const lastUserMessage =
+    lastToolResults === undefined
+      ? popLastUserMessageContentString(clonedMessages)
+      : ''
+
   const chatHistory: ChatRequest['chatHistory'] = []
   for (let i = 0; i < clonedMessages.length; i++) {
     const message = clonedMessages[i]
     if (message.role === 'tool') {
       const newToolResult = toToolResult(message, clonedMessages.slice(0, i))
       const lastChatHistoryMessage = chatHistory.at(chatHistory.length - 1)
-      if (lastChatHistoryMessage !== undefined && lastChatHistoryMessage.role === 'TOOL') {
+      if (
+        lastChatHistoryMessage !== undefined &&
+        lastChatHistoryMessage.role === 'TOOL'
+      ) {
         if (lastChatHistoryMessage.toolResults === undefined) {
           // We manually populate the `toolResults` array when creating the `TOOL` message, so it
           // should always be defined here.
@@ -244,19 +303,19 @@ const convertMessages = (
       } else {
         chatHistory.push({
           role: 'TOOL',
-          toolResults: [newToolResult]
+          toolResults: [newToolResult],
         })
       }
     } else if (message.role === 'assistant') {
       chatHistory.push({
         role: convertRole(message.role),
         message: message.content ?? '',
-        toolCalls: message.tool_calls?.map(toolCall => {
+        toolCalls: message.tool_calls?.map((toolCall) => {
           return {
             name: toolCall.function.name,
-            parameters: JSON.parse(toolCall.function.arguments)
+            parameters: JSON.parse(toolCall.function.arguments),
           }
-        })
+        }),
       })
     } else if (typeof message.content === 'string') {
       chatHistory.push({
@@ -268,16 +327,22 @@ const convertMessages = (
         if (e.type === 'text') {
           chatHistory.push({
             role: convertRole(message.role),
-            message: e.text
+            message: e.text,
           })
         } else {
-          throw new InputError(`Cohere does not support images. Please remove them from your prompt message.`)
+          throw new InputError(
+            `Cohere does not support images. Please remove them from your prompt message.`
+          )
         }
       }
     }
   }
 
-  return { messages: chatHistory, lastUserMessage, toolResults: lastToolResults }
+  return {
+    messages: chatHistory,
+    lastUserMessage,
+    toolResults: lastToolResults,
+  }
 }
 
 async function* createCompletionResponseStreaming(
@@ -291,37 +356,41 @@ async function* createCompletionResponseStreaming(
     if (chunk.eventType === 'stream-start') {
       id = chunk.generationId
       yield {
-        choices: [{
-          index: 0,
-          finish_reason: null,
-          logprobs: null,
-          delta: {
-            role: "assistant"
-          }
-        }],
+        choices: [
+          {
+            index: 0,
+            finish_reason: null,
+            logprobs: null,
+            delta: {
+              role: 'assistant',
+            },
+          },
+        ],
         created,
         model,
         id: chunk.generationId,
         object: 'chat.completion.chunk',
       }
     }
-    
+
     if (id === undefined) {
       // Should never happen because the 'stream-start' event, where the `id` field is assigned,
       // occurs first.
       throw new InvariantError(`The generated ID is undefined.`)
     }
-    
+
     if (chunk.eventType === 'stream-end') {
       yield {
-        choices: [{
-          index: 0,
-          finish_reason: convertFinishReason(chunk.finishReason),
-          logprobs: null,
-          // We return an empty delta because the returned text in the 'stream-end' event contains
-          // the aggregated response.
-          delta: {}
-        }],
+        choices: [
+          {
+            index: 0,
+            finish_reason: convertFinishReason(chunk.finishReason),
+            logprobs: null,
+            // We return an empty delta because the returned text in the 'stream-end' event contains
+            // the aggregated response.
+            delta: {},
+          },
+        ],
         created,
         model,
         id,
@@ -334,18 +403,21 @@ async function* createCompletionResponseStreaming(
       // not contain a text field, which appears to be a bug. We must manually cast to the chunk to
       // `any` in order to determine whether it has a `text` field in this scenario. If the field
       // exists, we treat the chnk like a 'text-generation' chunk.
-      (chunk.eventType === 'tool-calls-chunk' && typeof (chunk as any).text === 'string')
+      (chunk.eventType === 'tool-calls-chunk' &&
+        typeof (chunk as any).text === 'string')
     ) {
       const text = (chunk as any).text
       yield {
-        choices: [{
-          index: 0,
-          finish_reason: null,
-          logprobs: null,
-          delta: {
-            content: text
-          }
-        }],
+        choices: [
+          {
+            index: 0,
+            finish_reason: null,
+            logprobs: null,
+            delta: {
+              content: text,
+            },
+          },
+        ],
         created,
         model,
         id,
@@ -357,25 +429,27 @@ async function* createCompletionResponseStreaming(
         throw new InvariantError(`Content block index is undefined.`)
       }
       yield {
-        choices: [{
-          index: 0,
-          finish_reason: null,
-          logprobs: null,
-          delta: {
-            content: chunk.toolCallDelta.text,
-            tool_calls: [
-              {
-                index,
-                id: chunk.toolCallDelta.name,
-                "type": "function",
-                "function": {
-                  "name": chunk.toolCallDelta.name,
-                  "arguments": chunk.toolCallDelta.parameters
-                }
-              }
-            ]
-          }
-        }],
+        choices: [
+          {
+            index: 0,
+            finish_reason: null,
+            logprobs: null,
+            delta: {
+              content: chunk.toolCallDelta.text,
+              tool_calls: [
+                {
+                  index,
+                  id: chunk.toolCallDelta.name,
+                  type: 'function',
+                  function: {
+                    name: chunk.toolCallDelta.name,
+                    arguments: chunk.toolCallDelta.parameters,
+                  },
+                },
+              ],
+            },
+          },
+        ],
         created,
         model,
         id,
@@ -387,35 +461,44 @@ async function* createCompletionResponseStreaming(
 
 export class CohereHandler extends BaseHandler<CohereModel> {
   async create(
-    body: ProviderCompletionParams<'cohere'>,
-  ): Promise<CompletionResponse | StreamCompletionResponse>  {
+    body: ProviderCompletionParams<'cohere'>
+  ): Promise<CompletionResponse | StreamCompletionResponse> {
     this.validateInputs(body)
 
     if (this.opts.baseURL) {
-      consoleWarn(`The 'baseUrl' will be ignored by Cohere because it does not support this field.`)
+      consoleWarn(
+        `The 'baseUrl' will be ignored by Cohere because it does not support this field.`
+      )
     }
 
     if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(`Cohere does not support setting 'n' greater than 1.`)
+      throw new InputError(
+        `Cohere does not support setting 'n' greater than 1.`
+      )
     }
 
-    const apiKey = this.opts.apiKey ?? process.env.COHERE_API_KEY;
+    const apiKey = this.opts.apiKey ?? process.env.COHERE_API_KEY
     if (apiKey === undefined) {
-      throw new InputError("No Cohere API key detected. Please define an 'COHERE_API_KEY' environment variable or supply the API key using the 'apiKey' parameter.");
+      throw new InputError(
+        "No Cohere API key detected. Please define an 'COHERE_API_KEY' environment variable or supply the API key using the 'apiKey' parameter."
+      )
     }
 
     const maxTokens = body.max_tokens ?? undefined
     const p = body.top_p ?? undefined
     const stopSequences = convertStopSequences(body.stop)
-    const temperature = typeof body.temperature === 'number'
-      // We divide by two because Cohere's temperature range is 0 to 1 and the input temperature
-      // range is 0 to 2.
-      ? body.temperature / 2
-      : undefined
+    const temperature =
+      typeof body.temperature === 'number'
+        ? // We divide by two because Cohere's temperature range is 0 to 1 and the input temperature
+          // range is 0 to 2.
+          body.temperature / 2
+        : undefined
     const tools = body.tools?.map(toCohereTool)
 
-    const { messages, lastUserMessage, toolResults } = convertMessages(body.messages)
-    
+    const { messages, lastUserMessage, toolResults } = convertMessages(
+      body.messages
+    )
+
     const input = {
       maxTokens,
       message: lastUserMessage,
@@ -425,52 +508,54 @@ export class CohereHandler extends BaseHandler<CohereModel> {
       temperature,
       p,
       toolResults,
-      tools
+      tools,
     }
     const cohere = new CohereClient({
-      token: apiKey
-    });
-    
+      token: apiKey,
+    })
+
     if (body.stream === true) {
       const created = getTimestamp()
-      const response = await cohere.chatStream(input);
+      const response = await cohere.chatStream(input)
       return createCompletionResponseStreaming(response, body.model, created)
     } else {
       const created = getTimestamp()
-      const response = await cohere.chat(input);
+      const response = await cohere.chat(input)
 
-      const toolCalls: Array<ChatCompletionMessageToolCall> | undefined = response.toolCalls?.map(toolCall => {
-        return {
-          type: 'function',
-          id: toolCall.name,
-          function: {
-            name: toolCall.name,
-            arguments: JSON.stringify(toolCall.parameters)
+      const toolCalls: Array<ChatCompletionMessageToolCall> | undefined =
+        response.toolCalls?.map((toolCall) => {
+          return {
+            type: 'function',
+            id: toolCall.name,
+            function: {
+              name: toolCall.name,
+              arguments: JSON.stringify(toolCall.parameters),
+            },
           }
-        }
-      })
+        })
 
       const usage = getUsageTokens(response.meta?.billedUnits)
       const convertedResponse: CompletionResponse = {
         object: 'chat.completion',
-        choices: [{
-          finish_reason: convertFinishReason(response.finishReason),
-          index: 0,
-          logprobs: null,
-          message: {
-            role: 'assistant',
-            content: response.text,
-            tool_calls: toolCalls
-          }
-        }],
+        choices: [
+          {
+            finish_reason: convertFinishReason(response.finishReason),
+            index: 0,
+            logprobs: null,
+            message: {
+              role: 'assistant',
+              content: response.text,
+              tool_calls: toolCalls,
+            },
+          },
+        ],
         created,
         id: response.generationId ?? null,
         model: body.model,
-        usage
+        usage,
       }
 
       return convertedResponse
     }
-
   }
 }

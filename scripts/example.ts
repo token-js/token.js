@@ -1,13 +1,14 @@
-import { OpenAI } from 'openai';
-import { LLM } from '../src';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import { OpenAI } from 'openai'
+import * as dotenv from 'dotenv'
+
+import { LLM } from '../src'
+dotenv.config()
 
 const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
   {
     role: 'user',
-    content: `Tell me a joke about the moon.`
-  }
+    content: `Tell me a joke about the moon.`,
+  },
 ]
 
 const callLLM = async () => {
@@ -16,11 +17,11 @@ const callLLM = async () => {
     // stream: true,
     provider: 'openai',
     model: 'gpt-4o',
-    messages
+    messages,
   })
 
   console.log(result.choices)
-  
+
   // for await (const part of result) {
   //   process.stdout.write(part.choices[0]?.delta?.content || "");
   // }
@@ -28,17 +29,17 @@ const callLLM = async () => {
 
 const callOpenAI = async () => {
   const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY,
   })
 
   const result = await openai.chat.completions.create({
     messages,
     model: 'gpt-4o',
-    stream: true
+    stream: true,
   })
 
   for await (const part of result) {
-    console.log(part.choices[0].finish_reason);
+    console.log(part.choices[0].finish_reason)
   }
 
   // console.log(result.choices[0].message.content)

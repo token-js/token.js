@@ -6,7 +6,11 @@
   "scripts": {
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "lint": "yarn lint:fix && yarn lint:check",
+    "lint:fix": "yarn lint:check --fix",
+    "lint:check": "eslint . --max-warnings=0",
+    "format": "prettier --write ."
   },
   "author": "Sam Goldman",
   "keywords": [],
@@ -28,6 +32,22 @@
     "dotenv": "^16.4.5",
     "typescript": "^5.5.3",
     "vite-node": "^1.6.0",
-    "vitest": "^2.0.1"
+    "vitest": "^2.0.1",
+    "prettier": "^2.3.1",
+    "eslint": "^8.16.0",
+    "@babel/eslint-parser": "^7.18.2",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^4.26.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsdoc": "^35.1.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prefer-arrow": "^1.2.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-unicorn": "^42.0.0"
   }
 }
