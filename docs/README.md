@@ -10,7 +10,7 @@ description: >-
 
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
-* Support for 10 popular LLM providers: A21, Anthropic, Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
+* Support for 10 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
 * Completely free with no proxy server required.
 
 ## Setup
@@ -56,15 +56,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'openai',
   model: 'gpt-4o',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 {% endcode %}
@@ -83,15 +86,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'anthropic',
   model: 'claude-2.0',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 
@@ -109,15 +115,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'gemini',
   model: 'gemini-1.5-pro',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 
@@ -135,15 +144,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'bedrock',
   model: 'amazon.titan-text-express-v1',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 
@@ -163,15 +175,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'cohere',
   model: 'command-r',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 
@@ -189,15 +204,18 @@ import { LLM, ChatCompletionMessageParam } from 'llmjs'
 // Import and create the LLM.js client
 const llm = new LLM()
 
+// Specify OpenAI compatible messages
+const messages: ChatCompletionMessageParam = [{
+  role: 'user',
+  content: `How are you?`,
+}]
+
 // Call the create function
 const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   // Specify the target model and provider
   provider: 'mistral',
   model: 'mistral-large-2402',
-  messages: [{
-    role: 'user',
-    content: `How are you?`,
-  }],
+  messages,
 })
 ```
 
