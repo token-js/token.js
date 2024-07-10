@@ -279,6 +279,17 @@ const convertMessages = (
   return { messages: chatHistory, lastUserMessage, toolResults: lastToolResults }
 }
 
+export const convertTools = (
+  tools: CompletionParams['tools'],
+  toolChoice: CompletionParams['tool_choice']
+): ChatRequest['tools'] => {
+  if (toolChoice === 'none' || tools === undefined) {
+    return undefined
+  } else {
+    return tools.map(toCohereTool)
+  }
+}
+
 async function* createCompletionResponseStreaming(
   response: Stream<StreamedChatResponse>,
   model: LLMChatModel,
@@ -411,7 +422,7 @@ export class CohereHandler extends BaseHandler<CohereModel> {
       // range is 0 to 2.
       ? body.temperature / 2
       : undefined
-    const tools = body.tools?.map(toCohereTool)
+    const tools = convertTools(body.tools, body.tool_choice)
 
     const { messages, lastUserMessage, toolResults } = convertMessages(body.messages)
     

@@ -5,7 +5,6 @@ import { MistralHandler, convertMessages, convertStreamToolCalls, convertToolCal
 import { InputError, StreamCompletionResponse } from '../../src/handlers/types';
 import { CompletionParams } from '../../src/chat';
 import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ToolCalls } from '@mistralai/mistralai';
-import * as mistral from '@mistralai/mistralai';
 import { models } from '../../src/models';
 
 describe('findLinkedToolCallName', () => {

@@ -218,3 +218,7 @@ describe('toCohereTool', () => {
     expect(toCohereTool(input)).toEqual(expected)
   })
 })
+
+describe('Cohere Integration tests', () => {
+  it(`returns zero tool calls when 'tool_choice' is 'none`)
+})
