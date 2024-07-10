@@ -230,7 +230,7 @@ const toFinishReasonNonStreaming = (stopReason: Message['stop_reason']): Complet
   }
 }
 
-const convertToolParams = (
+export const convertToolParams = (
   toolChoice: CompletionParams['tool_choice'],
   tools: CompletionParams['tools']
 ): {toolChoice: MessageCreateParamsNonStreaming['tool_choice'], tools: MessageCreateParamsNonStreaming['tools']} => {

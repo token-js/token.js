@@ -1,6 +1,7 @@
 import { ChatCompletionTool } from 'openai/resources/index.mjs';
 import { describe, it, expect } from 'vitest';
-import { toCohereTool } from '../../src/handlers/cohere';
+import { convertTools, toCohereTool } from '../../src/handlers/cohere';
+import { getDummyTool } from '../dummy';
 
 describe('toCohereTool', () => {
   it('converts simple type', () => {
@@ -219,6 +220,8 @@ describe('toCohereTool', () => {
   })
 })
 
-describe('Cohere Integration tests', () => {
-  it(`returns zero tool calls when 'tool_choice' is 'none`)
+describe('convertTools', () => {
+  it(`returns undefined when 'tool_choice' is 'none'`, () => {
+    expect(convertTools([getDummyTool()], 'none')).equals(undefined)
+  })
 })

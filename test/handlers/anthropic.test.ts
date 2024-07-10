@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { convertMessages } from '../../src/handlers/anthropic';
+import { convertMessages, convertToolParams } from '../../src/handlers/anthropic';
 import { CompletionParams } from '../../src/chat';
+import { getDummyTool } from '../dummy';
 
 describe('convertMessages', () => {
   it('converts user and system messages into a block with system messages prefixed', () => {
@@ -64,3 +65,9 @@ describe('convertMessages', () => {
     expect(convertMessages(input)).toEqual(output);
   });
 });
+
+describe('convertToolParams', () => {
+  it(`returns undefined when 'tool_choice' is 'none'`, () => {
+    expect(convertToolParams('none', [getDummyTool()])).equals(undefined)
+  })
+})
