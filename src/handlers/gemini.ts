@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { ChatCompletionChunk, ChatCompletionContentPart } from "openai/resources/index.mjs";
-import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { InputError } from "./types";
 import { 
   GoogleGenerativeAI, 
   Content,
@@ -22,6 +22,7 @@ import { consoleWarn, getTimestamp, parseImage } from "./utils";
 import { CompletionParams, GeminiModel, ProviderCompletionParams } from "../chat";
 import { BaseHandler } from "./base";
 import { ChatCompletionMessageToolCall } from "openai/src/resources/index.js";
+import { CompletionResponse, StreamCompletionResponse } from "../userTypes";
 
 export const convertContentsToParts = (
   contents: Array<ChatCompletionContentPart> | string | null | undefined,

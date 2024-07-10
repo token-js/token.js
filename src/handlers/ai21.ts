@@ -1,9 +1,10 @@
 import axios from "axios";
 import { AI21Model, CompletionParams, LLMChatModel, ProviderCompletionParams } from "../chat";
-import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { InputError } from "./types";
 import { getTimestamp } from "./utils";
 import { IncomingMessage } from 'http';
 import { BaseHandler } from "./base";
+import { CompletionResponse, StreamCompletionResponse } from "../userTypes";
 
 type AI21ChatCompletionParams = {
   model: string;

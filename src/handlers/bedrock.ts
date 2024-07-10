@@ -1,9 +1,10 @@
 import { BedrockRuntimeClient, ContentBlock, ContentBlockDelta, ConverseCommand, ConverseCommandInput, ConverseResponse, ConverseStreamCommand, ConverseStreamCommandOutput, ImageFormat, SystemContentBlock, ToolChoice } from "@aws-sdk/client-bedrock-runtime";
 import { BedrockModel, CompletionNonStreaming, CompletionParams, CompletionStreaming, ProviderCompletionParams } from "../chat";
-import {  CompletionResponse, CompletionResponseChunk, InputError, InvariantError, MIMEType, StreamCompletionResponse } from "./types";
+import { InputError, InvariantError, MIMEType } from "./types";
 import { consoleWarn, fetchThenParseImage, getTimestamp, normalizeTemperature } from "./utils";
 import { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
+import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
 
 
 const normalizeMIMEType = (

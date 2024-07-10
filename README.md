@@ -23,31 +23,31 @@ ANTHROPIC_API_KEY=<your api>
 
 ### Usage
 ```ts
-import { LLM } from 'llmjs';
+import { LLM, ChatCompletionMessageParam } from 'llmjs';
 
 const llm = new LLM()
 
-const messages = [{
+const messages: ChatCompletionMessageParam[] = [{
   role: 'user',
   content: `How are you?`
 }]
 
 // Call OpenAI
-const result = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'openai',
   model: 'gpt-4o',
   messages,
 })
 
 // Call Gemini
-const result = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
   messages,
 })
 
 // Call Anthropic
-const result = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   provider: 'anthropic',
   model: 'claude-2.0',
   messages,
@@ -93,6 +93,8 @@ Then you can select the `provider` and `model` you would like to use when callin
 LLM.js supports streaming for all providers that support it. 
 
 ```ts
+import { LLM } from 'llmjs';
+
 const llm = new LLM()
 const result = await llm.chat.completions.create({
   stream: true,
@@ -113,9 +115,11 @@ for await (const part of result) {
 LLM.js supports tools for all providers and models that support it.
 
 ```ts
+import { LLM, ChatCompletionTool } from 'llmjs';
+
 const llm = new LLM()
 
-const tools = [{
+const tools: ChatCompletionTool[] = [{
   type: "function",
   function: {
     name: "getCurrentWeather",

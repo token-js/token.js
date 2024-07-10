@@ -1,8 +1,9 @@
 import OpenAI from "openai";
 import { Stream } from "openai/streaming.mjs";
-import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { InputError } from "./types";
 import { PerplexityModel, ProviderCompletionParams } from "../chat";
 import { BaseHandler } from "./base";
+import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
 
 export const PERPLEXITY_PREFIX = "perplexity/";
 

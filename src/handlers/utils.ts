@@ -2,7 +2,7 @@ import { AnthropicHandler } from "./anthropic";
 import { GeminiHandler } from "./gemini";
 import { MistralHandler } from "./mistral";
 import { OpenAIHandler } from "./openai";
-import { ConfigOptions, InputError, MIMEType } from "./types";
+import { InputError, MIMEType } from "./types";
 import { BaseHandler } from "./base";
 import chalk from 'chalk'
 import { CohereHandler } from "./cohere";
@@ -13,6 +13,7 @@ import { AI21Handler } from "./ai21";
 import { PerplexityHandler } from "./perplexity";
 import { models } from "../models";
 import { LLMChatModel, LLMProvider } from "../chat";
+import { ConfigOptions } from "../userTypes";
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   ['openai']: (opts: ConfigOptions) => new OpenAIHandler(opts, models.openai.models, models.openai.supportsJSON),

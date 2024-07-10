@@ -1,9 +1,10 @@
 import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChoice, ChatCompletionResponseChunk, ChatRequest, Message, ResponseFormat, ToolCalls } from "@mistralai/mistralai";
 import { CompletionParams, MistralModel, ProviderCompletionParams } from "../chat";
-import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { InputError } from "./types";
 import { ChatCompletionChunk, ChatCompletionMessage, ChatCompletionMessageParam, ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { ChatCompletionContentPartText } from "openai/src/resources/index.js";
 import { BaseHandler } from "./base";
+import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
 
 export const findLinkedToolCallName = (messages: ChatCompletionMessage[], toolCallId: string): string => {
   for (const message of messages) {

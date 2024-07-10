@@ -2,11 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ChatCompletionMessage, ChatCompletionToolChoiceOption } from 'openai/resources/index.mjs'; // Adjust this path as needed
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js';
 import { MistralHandler, convertMessages, convertStreamToolCalls, convertToolCalls, convertToolConfig, convertTools, findLinkedToolCallName } from '../../src/handlers/mistral';
-import { InputError, StreamCompletionResponse } from '../../src/handlers/types';
+import { InputError } from '../../src/handlers/types';
 import { CompletionParams } from '../../src/chat';
 import MistralClient, { ChatCompletionResponse, ChatCompletionResponseChunk, ToolCalls } from '@mistralai/mistralai';
 import * as mistral from '@mistralai/mistralai';
 import { models } from '../../src/models';
+import { StreamCompletionResponse } from '../../src/userTypes';
 
 describe('findLinkedToolCallName', () => {
   it('should return the correct function name for a given tool call ID', () => {
@@ -664,7 +665,8 @@ describe('MistralHandler', () => {
   }));
 
   const toolPrompt: CompletionParams = {
-    model: 'mistral/mistral-large-2402',
+    provider: 'mistral',
+    model: 'mistral-large-2402',
     messages: [
       {
         role: 'user',
@@ -702,7 +704,8 @@ describe('MistralHandler', () => {
     }));
 
     const params: CompletionParams = {
-      model: 'mistral/open-mistral-7b',
+      provider: 'mistral',
+      model: 'open-mistral-7b',
       messages: [
         {
           role: 'user',

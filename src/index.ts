@@ -1,6 +1,7 @@
 import OpenAI, { ClientOptions } from 'openai';
 import { LLMChat } from './chat';
-import { ConfigOptions } from './handlers/types';
+import { ConfigOptions } from "./userTypes";
+export * from './userTypes'
 
 // Extract the public interface from OpenAI, including both properties and methods
 type PublicInterface<T> = {
