@@ -27,6 +27,8 @@ ANTHROPIC_API_KEY=<your api>
 
 ### Usage
 
+{% tabs %}
+{% tab title="First Tab" %}
 ```ts
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -60,6 +62,12 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
+{% endtab %}
+
+{% tab title="Second Tab" %}
+
+{% endtab %}
+{% endtabs %}
 
 ## Access Credential Configuration
 
