@@ -4,10 +4,10 @@ Integrate all LLM providers with a single Typescript SDK using OpenAIs format.
 
 ## Features
 
-- Define prompts in OpenAIs format and have them translated automatially for each provider.
-- Support for tools, JSON output, image inputs, streaming, and more.
-- Support for 9 popular LLM providers: A21, Anthropic, Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
-- Completely free with no proxy server.
+* Define prompts in OpenAIs format and have them translated automatially for each provider.
+* Support for tools, JSON output, image inputs, streaming, and more.
+* Support for 9 popular LLM providers: A21, Anthropic, Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
+* Completely free with no proxy server.
 
 ## Setup
 
@@ -169,20 +169,19 @@ const result = await llm.chat.completions.create({
 
 ## Providers
 
-Not every feature is supported by every provider and model. This table provides a general overview of what features are supported
-by each provider. For details on which features are supported by individual models from different providers see the [provider documentation](<todo(md)>).
+Not every feature is supported by every provider and model. This table provides a general overview of what features are supported by each provider. For details on which features are supported by individual models from different providers see the [provider documentation](todo\(md\)/).
 
-| provider   | Completion         | Streaming          | Tools              | JSON Output        | Image Input        |
-| ---------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| openai     | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| anthropic  | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| bedrock    | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| mistral    | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
-| cohere     | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |                    |
-| AI21       | :white_check_mark: | :white_check_mark: |                    |                    |                    |
-| Gemini     | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Groq       | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |                    |
-| Perplexity | :white_check_mark: | :white_check_mark: |                    |                    |                    |
+| Provider   | Completion           | Streaming            | Tools                | JSON Output          | Image Input          |
+| ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
+| openai     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |
+| cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |                      |
+| AI21       | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
+| Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
+| Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
 If there are more providers or features you would like to see implemented in LLM.js please let us know by opening an issue!
 
@@ -192,20 +191,26 @@ PRs are accepted!
 
 To get started clone the repo:
 
-```
+```bash
 git clone https://github.com/sphinx-labs/llm.git
 ```
 
 Then open the project and install the dependencies:
 
-```
+```bash
 cd llm && pnpm install
 ```
 
 Test your changes:
 
-```
+```bash
 pnpm test
+```
+
+Run the linter and fix any issues:
+
+```bash
+pnpm lint
 ```
 
 ## License
