@@ -1,12 +1,13 @@
 import { ApiMetaBilledUnits, ChatRequest, FinishReason, Message, StreamedChatResponse, Tool, ToolResult } from "cohere-ai/api";
 import { CohereModel, CompletionParams, ProviderCompletionParams } from "../chat";
-import { CompletionResponse, InputError, InvariantError, MessageRole, StreamCompletionResponse } from "./types";
+import { InputError, InvariantError, MessageRole } from "./types";
 import { consoleWarn, getTimestamp } from "./utils";
 import { ChatCompletionAssistantMessageParam, ChatCompletionMessageToolCall, ChatCompletionToolMessageParam } from "openai/resources/index.mjs";
 import { CohereClient } from "cohere-ai";
 import { Stream } from "cohere-ai/core";
 import { BaseHandler } from "./base";
 import { ChatCompletionTool } from "openai/src/resources/index.js";
+import { CompletionResponse, StreamCompletionResponse } from "../userTypes";
 
 type CohereMessageRole = "CHATBOT" | "SYSTEM" | "USER" | "TOOL"
 

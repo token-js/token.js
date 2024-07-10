@@ -1,8 +1,9 @@
 import Groq from "groq-sdk";
-import { CompletionResponse, InputError, StreamCompletionResponse } from "./types";
+import { InputError } from "./types";
 import { CompletionParams, GroqModel, ProviderCompletionParams } from "../chat";
 import { assertNIsOne } from "./utils";
 import { BaseHandler } from "./base";
+import { CompletionResponse, CompletionResponseChunk, StreamCompletionResponse } from "../userTypes";
 
 // Groq is very compatible with OpenAI's API, so we could likely reuse the OpenAI SDK for this handler
 // to reducee the bundle size.

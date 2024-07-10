@@ -1,6 +1,5 @@
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions.mjs';
 import { getHandler } from '../handlers/utils';
-import { CompletionResponse, ConfigOptions, StreamCompletionResponse } from '../handlers/types';
 import { models } from '../models';
 
 export type OpenAIModel = (typeof models.openai.models)[number];
@@ -12,6 +11,7 @@ export type BedrockModel = (typeof models.bedrock.models)[number];
 export type MistralModel = (typeof models.mistral.models)[number];
 export type PerplexityModel = (typeof models.perplexity.models)[number];
 export type GroqModel = (typeof models.groq.models)[number];
+import { CompletionResponse, StreamCompletionResponse, ConfigOptions } from "../userTypes";
 
 export type LLMChatModel = OpenAIModel | AI21Model | AnthropicModel | GeminiModel | CohereModel | BedrockModel | MistralModel | PerplexityModel | GroqModel;
 

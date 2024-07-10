@@ -1,4 +1,4 @@
-import { CompletionResponse, InputError, StreamCompletionResponse, CompletionResponseChunk, InvariantError } from "./types";
+import { InputError, InvariantError } from "./types";
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageCreateParamsNonStreaming, MessageCreateParamsStreaming, ContentBlock, Message, MessageStream, TextBlock, ToolUseBlock, TextBlockParam, ImageBlockParam, ToolUseBlockParam, ToolResultBlockParam } from "@anthropic-ai/sdk/resources/messages.mjs";
 import { consoleWarn, fetchThenParseImage, getTimestamp, isEmptyObject } from "./utils";
@@ -6,6 +6,7 @@ import { AnthropicModel, CompletionParams, ProviderCompletionParams } from "../c
 import * as dotenv from 'dotenv'
 import { ChatCompletionMessageToolCall } from "openai/resources/index.mjs";
 import { BaseHandler } from "./base";
+import { CompletionResponse, StreamCompletionResponse, CompletionResponseChunk } from "../userTypes";
 
 dotenv.config()
 
