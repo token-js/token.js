@@ -230,7 +230,7 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 
 ### Access Credentials
 
-We recommend using environment variables to configure the credentials for each LLM provider.&#x20;
+We recommend using environment variables to configure the credentials for each LLM provider.
 
 ```bash
 # OpenAI
@@ -340,8 +340,8 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are providers or features you would like to see implemented in token.js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
+If there are providers or features you would like to see implemented in token.js please let us know by opening an issue on [Github](https://github.com/token-js/token.js?tab=readme-ov-file#contributing)!
 
 ## Contributing
 
-token.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)
+token.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/token-js/token.js?tab=readme-ov-file#contributing)
