@@ -9,6 +9,7 @@ import {
   ToolResult,
 } from 'cohere-ai/api'
 import { Stream } from 'cohere-ai/core'
+import { nanoid } from 'nanoid'
 import {
   ChatCompletionAssistantMessageParam,
   ChatCompletionMessageToolCall,
@@ -240,7 +241,7 @@ const toToolResult = (
     )
   }
   const toolCall = lastAssistantMessage.tool_calls.find(
-    (t) => t.function.name === toolMessage.tool_call_id
+    (t) => t.id === toolMessage.tool_call_id
   )
   if (!toolCall) {
     throw new Error(
@@ -258,7 +259,7 @@ const toToolResult = (
   return toolResult
 }
 
-const convertMessages = (
+export const convertMessages = (
   unclonedMessages: CompletionParams['messages']
 ): {
   messages: Array<Message>
@@ -345,12 +346,27 @@ const convertMessages = (
   }
 }
 
+export const convertTools = (
+  tools: CompletionParams['tools'],
+  toolChoice: CompletionParams['tool_choice']
+): ChatRequest['tools'] => {
+  if (toolChoice === 'none' || tools === undefined) {
+    return undefined
+  } else {
+    return tools.map(toCohereTool)
+  }
+}
+
 async function* createCompletionResponseStreaming(
   response: Stream<StreamedChatResponse>,
   model: CohereModel,
   created: number
 ): StreamCompletionResponse {
   let id: string | undefined
+  // Mapping from tool call index to tool call ID. We need to maintain a mapping because we create
+  // our own tool call IDs and because we only want to assign a tool call index to a single ID, even
+  // when its content is streamed across many chunks.
+  const toolCallIdMap: Map<number, string> = new Map()
 
   for await (const chunk of response) {
     if (chunk.eventType === 'stream-start') {
@@ -428,6 +444,13 @@ async function* createCompletionResponseStreaming(
       if (typeof index !== 'number') {
         throw new InvariantError(`Content block index is undefined.`)
       }
+
+      let toolCallId = toolCallIdMap.get(index)
+      if (toolCallId === undefined) {
+        toolCallId = nanoid()
+        toolCallIdMap.set(index, toolCallId)
+      }
+
       yield {
         choices: [
           {
@@ -439,7 +462,7 @@ async function* createCompletionResponseStreaming(
               tool_calls: [
                 {
                   index,
-                  id: chunk.toolCallDelta.name,
+                  id: toolCallId,
                   type: 'function',
                   function: {
                     name: chunk.toolCallDelta.name,
@@ -493,7 +516,7 @@ export class CohereHandler extends BaseHandler<CohereModel> {
           // range is 0 to 2.
           body.temperature / 2
         : undefined
-    const tools = body.tools?.map(toCohereTool)
+    const tools = convertTools(body.tools, body.tool_choice)
 
     const { messages, lastUserMessage, toolResults } = convertMessages(
       body.messages
@@ -526,7 +549,7 @@ export class CohereHandler extends BaseHandler<CohereModel> {
         response.toolCalls?.map((toolCall) => {
           return {
             type: 'function',
-            id: toolCall.name,
+            id: nanoid(),
             function: {
               name: toolCall.name,
               arguments: JSON.stringify(toolCall.parameters),

@@ -1,7 +1,13 @@
 import { ChatCompletionTool } from 'openai/resources/index'
 import { describe, expect, it } from 'vitest'
 
-import { toCohereTool } from '../../src/handlers/cohere'
+import { CompletionParams } from '../../src/chat'
+import {
+  convertMessages,
+  convertTools,
+  toCohereTool,
+} from '../../src/handlers/cohere'
+import { getDummyTool } from '../dummy'
 
 describe('toCohereTool', () => {
   it('converts simple type', () => {
@@ -231,5 +237,148 @@ describe('toCohereTool', () => {
       },
     }
     expect(toCohereTool(input)).toEqual(expected)
+  })
+})
+
+describe('convertTools', () => {
+  it(`returns undefined when 'tool_choice' is 'none'`, () => {
+    expect(convertTools([getDummyTool()], 'none')).equals(undefined)
+  })
+})
+
+describe('convertMessages', () => {
+  it(`converts assistant message with tool calls followed by tool results`, async () => {
+    const inputMessages: CompletionParams['messages'] = [
+      {
+        role: 'user',
+        content: "What's the weather in San Francisco, Tokyo, and Paris?",
+      },
+      {
+        role: 'assistant',
+        content:
+          'I will use the get_current_weather tool to find the weather in San Francisco, Tokyo and Paris.',
+        tool_calls: [
+          {
+            id: 'call_bpTZd0ZYSfftrQiQGTPXBwNk',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "San Francisco, CA"}',
+            },
+          },
+          {
+            id: 'call_VWSHWXKfxHfyAbLy6K6vfFM9',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "Tokyo, Japan"}',
+            },
+          },
+          {
+            id: 'call_lhMKBlOSnwwq5BZDCGo5SVTJ',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "Paris, France"}',
+            },
+          },
+        ],
+      },
+      {
+        tool_call_id: 'call_bpTZd0ZYSfftrQiQGTPXBwNk',
+        role: 'tool',
+        content: '{"temperature":"72","unit":"fahrenheit"}',
+      },
+      {
+        tool_call_id: 'call_VWSHWXKfxHfyAbLy6K6vfFM9',
+        role: 'tool',
+        content: '{"temperature":"10","unit":"celsius"}',
+      },
+      {
+        tool_call_id: 'call_lhMKBlOSnwwq5BZDCGo5SVTJ',
+        role: 'tool',
+        content: '{"temperature":"22","unit":"fahrenheit"}',
+      },
+    ]
+
+    const { messages, lastUserMessage, toolResults } =
+      convertMessages(inputMessages)
+
+    expect(lastUserMessage).toEqual('')
+    expect(messages).toEqual([
+      {
+        role: 'USER',
+        message: "What's the weather in San Francisco, Tokyo, and Paris?",
+      },
+      {
+        role: 'CHATBOT',
+        message:
+          'I will use the get_current_weather tool to find the weather in San Francisco, Tokyo and Paris.',
+        toolCalls: [
+          {
+            name: 'get_current_weather',
+            parameters: {
+              location: 'San Francisco, CA',
+            },
+          },
+          {
+            name: 'get_current_weather',
+            parameters: {
+              location: 'Tokyo, Japan',
+            },
+          },
+          {
+            name: 'get_current_weather',
+            parameters: {
+              location: 'Paris, France',
+            },
+          },
+        ],
+      },
+    ])
+    expect(toolResults).toEqual([
+      {
+        call: {
+          name: 'get_current_weather',
+          parameters: {
+            location: 'San Francisco, CA',
+          },
+        },
+        outputs: [
+          {
+            temperature: '72',
+            unit: 'fahrenheit',
+          },
+        ],
+      },
+      {
+        call: {
+          name: 'get_current_weather',
+          parameters: {
+            location: 'Tokyo, Japan',
+          },
+        },
+        outputs: [
+          {
+            temperature: '10',
+            unit: 'celsius',
+          },
+        ],
+      },
+      {
+        call: {
+          name: 'get_current_weather',
+          parameters: {
+            location: 'Paris, France',
+          },
+        },
+        outputs: [
+          {
+            temperature: '22',
+            unit: 'fahrenheit',
+          },
+        ],
+      },
+    ])
   })
 })
