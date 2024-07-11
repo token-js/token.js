@@ -18,7 +18,6 @@ async function runConversation() {
   const provider: CompletionParams['provider'] = 'gemini'
   const model: CompletionParams['model'] = 'gemini-1.5-pro'
 
-  console.log('MODEL', model)
   const messages: CompletionParams['messages'] = [
     {
       role: 'user',
@@ -60,7 +59,6 @@ async function runConversation() {
     // },
   })
   const responseMessage = response.choices[0].message
-  // console.log(responseMessage)
 
   const toolCalls = responseMessage.tool_calls
   if (responseMessage.tool_calls) {
@@ -90,15 +88,12 @@ async function runConversation() {
       }
       messages.push(message)
     }
-    console.log('USER INPUT')
-    console.log(JSON.stringify(messages, null, 2))
     const secondResponse = await llm.chat.completions.create({
       provider,
       model,
       messages,
     })
 
-    console.log('FINAL RESPONSE')
     console.log(secondResponse.choices[0].message.content)
   }
 }
