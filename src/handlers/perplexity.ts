@@ -41,10 +41,15 @@ export class PerplexityHandler extends BaseHandler<PerplexityModel> {
     })
 
     const model = body.model.replace(PERPLEXITY_PREFIX, '')
+    // Perplexity throws an error if the temperature equals two, so if the user sets it to 2, we
+    // assign it to a marginally lower value.
+    const temperature =
+      body.temperature === 2 ? 2 - Number.EPSILON : body.temperature
 
     const options = {
       ...body,
       model,
+      temperature,
     }
 
     if (options.stream) {

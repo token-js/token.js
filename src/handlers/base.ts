@@ -30,6 +30,12 @@ export abstract class BaseHandler<T extends LLMChatModel> {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
     }
 
+    if (typeof body.temperature === 'number' && body.temperature > 2) {
+      throw new InputError(
+        `Expected a temperature less than or equal to 2, but got: ${body.temperature}`
+      )
+    }
+
     for (const message of body.messages) {
       if (message.role === 'function') {
         throw new InputError(
