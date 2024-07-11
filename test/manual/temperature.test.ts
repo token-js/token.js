@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { LLM } from '../../src'
+import { TokenJS } from '../../src'
 import { models } from '../../src/models'
 import { getDummyMessages } from '../dummy'
 import { SELECTED_TEST_MODELS } from './constants'
@@ -8,14 +8,14 @@ import { SELECTED_TEST_MODELS } from './constants'
 describe('Max Temperature', () => {
   // Ensures that our max temperature isn't too high.
   it('succeeds for the max temperature', async () => {
-    const llm = new LLM()
+    const tokenjs = new TokenJS()
     const promises: Array<Promise<void>> = []
 
     for (const [provider, modelArray] of Object.entries(SELECTED_TEST_MODELS)) {
       for (const modelName of modelArray) {
         const promise = (async () => {
           try {
-            const result = await llm.chat.completions.create({
+            const result = await tokenjs.chat.completions.create({
               provider: provider as keyof typeof models,
               model: modelName as any,
               messages: getDummyMessages(),

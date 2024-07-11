@@ -1,7 +1,7 @@
-import { OpenAI } from 'openai'
 import * as dotenv from 'dotenv'
+import { OpenAI } from 'openai'
 
-import { LLM } from '../src'
+import { TokenJS } from '../src'
 dotenv.config()
 
 const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -12,8 +12,8 @@ const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
 ]
 
 const callLLM = async () => {
-  const llm = new LLM()
-  const result = await llm.chat.completions.create({
+  const tokenjs = new TokenJS()
+  const result = await tokenjs.chat.completions.create({
     // stream: true,
     provider: 'openai',
     model: 'gpt-4o',

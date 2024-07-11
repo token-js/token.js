@@ -18,11 +18,11 @@ export * from './userTypes'
 //   completions: Completions
 // }
 
-type LLMInterface = {
+type TokenJSInterface = {
   chat: LLMChat
 }
 
-export class LLM implements LLMInterface {
+export class TokenJS implements TokenJSInterface {
   private opts: ConfigOptions
   chat: LLMChat
 

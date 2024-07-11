@@ -1,13 +1,12 @@
 import * as dotenv from 'dotenv'
 import { ChatCompletionToolMessageParam } from 'openai/resources/index.mjs'
 
-import { LLM } from '../../src'
 import { CompletionParams } from '../../src/chat'
 import { getCurrentWeather } from './utils'
 
 dotenv.config()
 
-const llm = new LLM()
+const tokenjs = new TokenJS()
 
 async function runConversation() {
   const provider: CompletionParams['provider'] = 'openai'
@@ -16,8 +15,7 @@ async function runConversation() {
   const messages: CompletionParams['messages'] = [
     {
       role: 'user',
-      content:
-        "What's the weather in San Francisco, Tokyo, and Paris?",
+      content: "What's the weather in San Francisco, Tokyo, and Paris?",
     },
   ]
   const response = await llm.chat.completions.create({
