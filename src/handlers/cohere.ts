@@ -216,13 +216,20 @@ const toToolResult = (
   toolMessage: ChatCompletionToolMessageParam,
   previousMessages: CompletionParams['messages']
 ): ToolResult => {
-  // Find the most recent assistant message, which contains the function arguments.
+  // Find the most recent assistant message, which contains the function arguments. The assistant
+  // message must immediately precede the tool messages in order to adhere to OpenAI's API.
   let lastAssistantMessage: ChatCompletionAssistantMessageParam | null = null
   for (let i = previousMessages.length - 1; i >= 0; i--) {
     const message = previousMessages[i]
-    if (message.role === 'assistant') {
+    if (message.role === 'tool') {
+      continue
+    } else if (message.role === 'assistant') {
       lastAssistantMessage = message
       break
+    } else {
+      throw new Error(
+        `Expected an assistant message to precede tool messages, but detected a message from the ${message.role} role instead.`
+      )
     }
   }
 
