@@ -4,7 +4,7 @@ description: >-
   Free and opensource with no proxy server required.
 ---
 
-# LLM.js
+# token-js
 
 ## Features
 
@@ -46,13 +46,19 @@ bun add llmjs
 
 ### Usage
 
-Import the LLM.js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
+Import the token-js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
 
 {% tabs %}
 {% tab title="OpenAI" %}
+{% code title=".env" %}
+```bash
+OPENAI_API_KEY=<openai api key>
+```
+{% endcode %}
+
 {% code fullWidth="false" %}
 ```ts
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { LLM, ChatCompletionMessageParam } from 'token-js'
 
 // Import and create the LLM.js client
 const llm = new LLM()
@@ -72,15 +78,15 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 })
 ```
 {% endcode %}
-
-{% code title=".env" %}
-```bash
-OPENAI_API_KEY=<openai api key>
-```
-{% endcode %}
 {% endtab %}
 
 {% tab title="Anthropic" %}
+{% code title=".env" %}
+```bash
+ANTHROPIC_API_KEY=<anthropic api key>
+```
+{% endcode %}
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -101,15 +107,15 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
-
-{% code title=".env" %}
-```bash
-ANTHROPIC_API_KEY=<anthropic api key>
-```
-{% endcode %}
 {% endtab %}
 
 {% tab title="Gemini" %}
+{% code title=".env" %}
+```bash
+GEMINI_API_KEY=<gemini api key>
+```
+{% endcode %}
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -130,15 +136,17 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
-
-{% code title=".env" %}
-```bash
-GEMINI_API_KEY=<gemini api key>
-```
-{% endcode %}
 {% endtab %}
 
 {% tab title="Bedrock" %}
+{% code title=".env" %}
+```bash
+AWS_REGION_NAME=<aws region>
+AWS_ACCESS_KEY_ID=<aws access key id>
+AWS_SECRET_ACCESS_KEY=<aws secret access key>
+```
+{% endcode %}
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -159,17 +167,15 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
-
-{% code title=".env" %}
-```bash
-AWS_REGION_NAME=<aws region>
-AWS_ACCESS_KEY_ID=<aws access key id>
-AWS_SECRET_ACCESS_KEY=<aws secret access key>
-```
-{% endcode %}
 {% endtab %}
 
 {% tab title="Cohere" %}
+{% code title=".env" %}
+```bash
+COHERE_API_KEY=<cohere api key>
+```
+{% endcode %}
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -190,15 +196,15 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
-
-{% code title=".env" %}
-```bash
-COHERE_API_KEY=<cohere api key>
-```
-{% endcode %}
 {% endtab %}
 
 {% tab title="Mistral" %}
+{% code title=".env" %}
+```bash
+MISTRAL_API_KEY=<mistral api key>
+```
+{% endcode %}
+
 ```typescript
 import { LLM, ChatCompletionMessageParam } from 'llmjs'
 
@@ -219,12 +225,6 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
   messages,
 })
 ```
-
-{% code title=".env" %}
-```bash
-MISTRAL_API_KEY=<mistral api key>
-```
-{% endcode %}
 {% endtab %}
 {% endtabs %}
 
@@ -257,7 +257,7 @@ AWS_SECRET_ACCESS_KEY=
 
 ### Streaming
 
-LLM.js supports streaming for all providers that support it.
+token-js supports streaming for all providers that support it.
 
 ```ts
 import { LLM } from 'llmjs'
@@ -282,7 +282,7 @@ for await (const part of result) {
 
 ### Tools
 
-LLM.js supports tools for all providers and models that support it.
+token-js supports tools for all providers and models that support it.
 
 <pre class="language-ts"><code class="lang-ts">import { LLM, ChatCompletionTool } from 'llmjs'
 
@@ -344,4 +344,4 @@ If there are providers or features you would like to see implemented in LLM.js p
 
 ## Contributing
 
-LLM.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)
+token-js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)
