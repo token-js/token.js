@@ -2,6 +2,8 @@
 
 Integrate all LLM providers with a single Typescript SDK using OpenAIs format. Free and opensource with no proxy server required.
 
+### [Documentation](http://tokenjs.ai)
+
 ## Features
 
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
