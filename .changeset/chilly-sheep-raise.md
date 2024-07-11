@@ -1,5 +1,5 @@
 ---
-'tokenjs': patch
+'token.js': patch
 ---
 
 Prerelease
