@@ -1,6 +1,6 @@
 # Table of contents
 
-* [token-js](README.md)
+* [token.js](README.md)
 * [Providers](providers/README.md)
   * [AI21](providers/ai21.md)
   * [Anthropic](providers/anthropic.md)
