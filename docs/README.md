@@ -4,7 +4,7 @@ description: >-
   Free and opensource with no proxy server required.
 ---
 
-# token-js
+# token.js
 
 ## Features
 
@@ -21,32 +21,32 @@ description: >-
 {% tabs %}
 {% tab title="npm" %}
 ```bash
-npm install token-js
+npm install token.js
 ```
 {% endtab %}
 
 {% tab title="pnpm" %}
 ```bash
-pnpm install token-js
+pnpm install token.js
 ```
 {% endtab %}
 
 {% tab title="yarn" %}
 ```bash
-yarn add token-js
+yarn add token.js
 ```
 {% endtab %}
 
 {% tab title="bun" %}
 ```bash
-bun add token-js
+bun add token.js
 ```
 {% endtab %}
 {% endtabs %}
 
 ### Usage
 
-Import the token-js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
+Import the token.js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
 
 {% tabs %}
 {% tab title="OpenAI" %}
@@ -58,9 +58,9 @@ OPENAI_API_KEY=<openai api key>
 
 {% code fullWidth="false" %}
 ```ts
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -88,9 +88,9 @@ ANTHROPIC_API_KEY=<anthropic api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -117,9 +117,9 @@ GEMINI_API_KEY=<gemini api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -148,9 +148,9 @@ AWS_SECRET_ACCESS_KEY=<aws secret access key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -177,9 +177,9 @@ COHERE_API_KEY=<cohere api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -206,9 +206,9 @@ MISTRAL_API_KEY=<mistral api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the token-js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -257,10 +257,10 @@ AWS_SECRET_ACCESS_KEY=
 
 ### Streaming
 
-token-js supports streaming for all providers that support it.
+token.js supports streaming for all providers that support it.
 
 ```ts
-import { TokenJS } from 'token-js'
+import { TokenJS } from 'token.js'
 
 const tokenjs = new TokenJS()
 const result = await tokenjs.chat.completions.create({
@@ -282,9 +282,9 @@ for await (const part of result) {
 
 ### Tools
 
-token-js supports tools for all providers and models that support it.
+token.js supports tools for all providers and models that support it.
 
-<pre class="language-ts"><code class="lang-ts">import { TokenJS, ChatCompletionTool } from 'token-js'
+<pre class="language-ts"><code class="lang-ts">import { TokenJS, ChatCompletionTool } from 'token.js'
 
 const tokenjs = new TokenJS()
 
@@ -340,8 +340,8 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are providers or features you would like to see implemented in token-js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
+If there are providers or features you would like to see implemented in token.js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
 
 ## Contributing
 
-token-js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)
+token.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/sphinx-labs/llm?tab=readme-ov-file#contributing)

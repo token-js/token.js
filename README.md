@@ -1,4 +1,4 @@
-# token-js
+# token.js
 
 Integrate all LLM providers with a single Typescript SDK using OpenAIs format. Free and opensource with no proxy server required.
 
@@ -17,7 +17,7 @@ Integrate all LLM providers with a single Typescript SDK using OpenAIs format. F
 ### Installation
 
 ```bash
-npm install token-js
+npm install token.js
 ```
 
 ### Environment Variables
@@ -31,7 +31,7 @@ ANTHROPIC_API_KEY=<your api>
 ### Usage
 
 ```ts
-import { TokenJS, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
 const tokenjs = new TokenJS()
 
@@ -66,7 +66,7 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 
 ## Access Credential Configuration
 
-token-js uses environment variables to configure access to different LLM providers. Configure your api keys using the following environment variables:
+token.js uses environment variables to configure access to different LLM providers. Configure your api keys using the following environment variables:
 
 ```
 # OpenAI
@@ -99,14 +99,14 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ```
 
-Then you can select the `provider` and `model` you would like to use when calling the `create` function, and token-js will use the correct access credentials for the provider.
+Then you can select the `provider` and `model` you would like to use when calling the `create` function, and token.js will use the correct access credentials for the provider.
 
 ## Streaming
 
-token-js supports streaming for all providers that support it.
+token.js supports streaming for all providers that support it.
 
 ```ts
-import { TokenJS } from 'token-js'
+import { TokenJS } from 'token.js'
 
 const tokenjs = new TokenJS()
 const result = await tokenjs.chat.completions.create({
@@ -128,10 +128,10 @@ for await (const part of result) {
 
 ## Tools
 
-token-js supports tools for all providers and models that support it.
+token.js supports tools for all providers and models that support it.
 
 ```ts
-import { TokenJS, ChatCompletionTool } from 'token-js'
+import { TokenJS, ChatCompletionTool } from 'token.js'
 
 const tokenjs = new TokenJS()
 
@@ -186,7 +186,7 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are more providers or features you would like to see implemented in token-js please let us know by opening an issue!
+If there are more providers or features you would like to see implemented in token.js please let us know by opening an issue!
 
 ## Contributing
 
@@ -218,4 +218,4 @@ pnpm lint
 
 ## License
 
-token-js is free and open source under the GPLv3 license.
+token.js is free and open source under the GPLv3 license.
