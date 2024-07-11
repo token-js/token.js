@@ -322,9 +322,9 @@ const result = await llm.chat.completions.create({
 })
 ```
 
-## Providers
+## Feature Compatibility
 
-Not every feature is supported by every provider and model. This table provides a general overview of what features are supported by each provider. For details on which features are supported by individual models from different providers see the [provider documentation](todo\(md\)/).
+Not every feature is supported by every provider and model. This table provides a general overview of what features are supported by each provider. For details on which features are supported by individual models from different providers see the provider documentation.
 
 | Provider   | Completion           | Streaming            | Tools                | JSON Output          | Image Input          |
 | ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
