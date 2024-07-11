@@ -284,7 +284,7 @@ const toFinishReasonNonStreaming = (
   }
 }
 
-const convertToolParams = (
+export const convertToolParams = (
   toolChoice: CompletionParams['tool_choice'],
   tools: CompletionParams['tools']
 ): {
