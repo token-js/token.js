@@ -21,25 +21,25 @@ description: >-
 {% tabs %}
 {% tab title="npm" %}
 ```bash
-npm install llmjs
+npm install token-js
 ```
 {% endtab %}
 
 {% tab title="pnpm" %}
 ```bash
-pnpm install llmjs
+pnpm install token-js
 ```
 {% endtab %}
 
 {% tab title="yarn" %}
 ```bash
-yarn add llmjs
+yarn add token-js
 ```
 {% endtab %}
 
 {% tab title="bun" %}
 ```bash
-bun add llmjs
+bun add token-js
 ```
 {% endtab %}
 {% endtabs %}
@@ -58,10 +58,10 @@ OPENAI_API_KEY=<openai api key>
 
 {% code fullWidth="false" %}
 ```ts
-import { LLM, ChatCompletionMessageParam } from 'token-js'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -70,7 +70,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'openai',
   model: 'gpt-4o',
@@ -88,10 +88,10 @@ ANTHROPIC_API_KEY=<anthropic api key>
 {% endcode %}
 
 ```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -100,7 +100,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'anthropic',
   model: 'claude-2.0',
@@ -117,10 +117,10 @@ GEMINI_API_KEY=<gemini api key>
 {% endcode %}
 
 ```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -129,7 +129,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -148,10 +148,10 @@ AWS_SECRET_ACCESS_KEY=<aws secret access key>
 {% endcode %}
 
 ```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -160,7 +160,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'bedrock',
   model: 'amazon.titan-text-express-v1',
@@ -177,10 +177,10 @@ COHERE_API_KEY=<cohere api key>
 {% endcode %}
 
 ```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -189,7 +189,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'cohere',
   model: 'command-r',
@@ -206,10 +206,10 @@ MISTRAL_API_KEY=<mistral api key>
 {% endcode %}
 
 ```typescript
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-// Import and create the LLM.js client
-const llm = new LLM()
+// Import and create the token-js client
+const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
 const messages: ChatCompletionMessageParam = [{
@@ -218,7 +218,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'mistral',
   model: 'mistral-large-2402',
@@ -260,10 +260,10 @@ AWS_SECRET_ACCESS_KEY=
 token-js supports streaming for all providers that support it.
 
 ```ts
-import { LLM } from 'llmjs'
+import { TokenJS } from 'token-js'
 
-const llm = new LLM()
-const result = await llm.chat.completions.create({
+const tokenjs = new TokenJS()
+const result = await tokenjs.chat.completions.create({
   stream: true,
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -284,9 +284,9 @@ for await (const part of result) {
 
 token-js supports tools for all providers and models that support it.
 
-<pre class="language-ts"><code class="lang-ts">import { LLM, ChatCompletionTool } from 'llmjs'
+<pre class="language-ts"><code class="lang-ts">import { TokenJS, ChatCompletionTool } from 'token-js'
 
-const llm = new LLM()
+const tokenjs = new TokenJS()
 
 const tools: ChatCompletionTool[] = [{
 <strong>  type: 'function',
@@ -300,7 +300,7 @@ const tools: ChatCompletionTool[] = [{
           type: 'string',
           description: 'The city and state, e.g. San Francisco, CA',
         },
-        unit: { 
+        unit: {
           type: 'string',
           description: 'The temperature unit, e.g. Fahrenheit or Celsius'
         },
@@ -310,7 +310,7 @@ const tools: ChatCompletionTool[] = [{
   },
 }]
 
-const result = await llm.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
   messages: [
@@ -340,7 +340,7 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are providers or features you would like to see implemented in LLM.js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
+If there are providers or features you would like to see implemented in token-js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
 
 ## Contributing
 

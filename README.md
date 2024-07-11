@@ -1,20 +1,21 @@
-# LLM.js
+# token-js
 
-Integrate all LLM providers with a single Typescript SDK using OpenAIs format.
+Integrate all LLM providers with a single Typescript SDK using OpenAIs format. Free and opensource with no proxy server required.
 
 ## Features
 
-* Define prompts in OpenAIs format and have them translated automatially for each provider.
+* Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
-* Support for 9 popular LLM providers: A21, Anthropic, Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
-* Completely free with no proxy server.
+* Support for 10 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
+* Completely free and opensource.
+* No proxy server required.
 
 ## Setup
 
 ### Installation
 
 ```bash
-npm install llmjs
+npm install token-js
 ```
 
 ### Environment Variables
@@ -28,9 +29,9 @@ ANTHROPIC_API_KEY=<your api>
 ### Usage
 
 ```ts
-import { LLM, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token-js'
 
-const llm = new LLM()
+const tokenjs = new TokenJS()
 
 const messages: ChatCompletionMessageParam[] = [
   {
@@ -40,21 +41,21 @@ const messages: ChatCompletionMessageParam[] = [
 ]
 
 // Call OpenAI
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   provider: 'openai',
   model: 'gpt-4o',
   messages,
 })
 
 // Call Gemini
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
   messages,
 })
 
 // Call Anthropic
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   provider: 'anthropic',
   model: 'claude-2.0',
   messages,
@@ -63,7 +64,7 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 
 ## Access Credential Configuration
 
-LLM.js uses environment variables to configure access to different LLM providers. Configure your api keys using the following environment variables:
+token-js uses environment variables to configure access to different LLM providers. Configure your api keys using the following environment variables:
 
 ```
 # OpenAI
@@ -96,17 +97,17 @@ AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
 ```
 
-Then you can select the `provider` and `model` you would like to use when calling the `create` function, and LLM.js will use the correct access credentials for the provider.
+Then you can select the `provider` and `model` you would like to use when calling the `create` function, and token-js will use the correct access credentials for the provider.
 
 ## Streaming
 
-LLM.js supports streaming for all providers that support it.
+token-js supports streaming for all providers that support it.
 
 ```ts
-import { LLM } from 'llmjs'
+import { TokenJS } from 'token-js'
 
-const llm = new LLM()
-const result = await llm.chat.completions.create({
+const tokenjs = new TokenJS()
+const result = await tokenjs.chat.completions.create({
   stream: true,
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -125,12 +126,12 @@ for await (const part of result) {
 
 ## Tools
 
-LLM.js supports tools for all providers and models that support it.
+token-js supports tools for all providers and models that support it.
 
 ```ts
-import { LLM, ChatCompletionTool } from 'llmjs'
+import { TokenJS, ChatCompletionTool } from 'token-js'
 
-const llm = new LLM()
+const tokenjs = new TokenJS()
 
 const tools: ChatCompletionTool[] = [
   {
@@ -153,7 +154,7 @@ const tools: ChatCompletionTool[] = [
   },
 ]
 
-const result = await llm.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
   messages: [
@@ -183,7 +184,7 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are more providers or features you would like to see implemented in LLM.js please let us know by opening an issue!
+If there are more providers or features you would like to see implemented in token-js please let us know by opening an issue!
 
 ## Contributing
 
@@ -192,7 +193,7 @@ PRs are accepted!
 To get started clone the repo:
 
 ```bash
-git clone https://github.com/sphinx-labs/llm.git
+git clone https://github.com/token-js/token-js.git
 ```
 
 Then open the project and install the dependencies:
@@ -215,4 +216,4 @@ pnpm lint
 
 ## License
 
-LLM.js is free and open source under the GPLv3 license.
+token-js is free and open source under the GPLv3 license.

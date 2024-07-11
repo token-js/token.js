@@ -10,10 +10,16 @@ describe('convertMessages', () => {
       { role: 'system', content: 'Bye' },
     ]
     const output = [
-      { role: 'user', content: [{ type: 'text', text: 'Hi' }, { type: 'text', text: 'System: Bye' }] }
-    ];
-    expect(await convertMessages(input)).toEqual(output);
-  });
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: 'Hi' },
+          { type: 'text', text: 'System: Bye' },
+        ],
+      },
+    ]
+    expect(await convertMessages(input)).toEqual(output)
+  })
 
   it('converts alternating user and assistant messages into blocks', async () => {
     const input: CompletionParams['messages'] = [
@@ -24,10 +30,10 @@ describe('convertMessages', () => {
     const output = [
       { role: 'user', content: [{ type: 'text', text: 'Hi' }] },
       { role: 'assistant', content: [{ type: 'text', text: 'Yo' }] },
-      { role: 'user', content: [{ type: 'text', text: 'Bye' }] }
-    ];
-    expect(await convertMessages(input)).toEqual(output);
-  });
+      { role: 'user', content: [{ type: 'text', text: 'Bye' }] },
+    ]
+    expect(await convertMessages(input)).toEqual(output)
+  })
 
   it('prepends an empty user message when the input messages start with an assistant message', async () => {
     const input: CompletionParams['messages'] = [
@@ -38,9 +44,9 @@ describe('convertMessages', () => {
       { role: 'user', content: [{ type: 'text', text: 'Empty' }] },
       { role: 'assistant', content: [{ type: 'text', text: 'Yo' }] },
       { role: 'user', content: [{ type: 'text', text: 'Bye' }] },
-    ];
-    expect(await convertMessages(input)).toEqual(output);
-  });
+    ]
+    expect(await convertMessages(input)).toEqual(output)
+  })
 
   it('does not prepend a user message when the input messages start with a system message', async () => {
     const input: CompletionParams['messages'] = [
@@ -48,10 +54,16 @@ describe('convertMessages', () => {
       { role: 'user', content: 'Hi' },
     ]
     const output = [
-      { role: 'user', content: [{ type: 'text', text: 'System: Hello' }, { type: 'text', text: 'Hi' }] }
-    ];
-    expect(await convertMessages(input)).toEqual(output);
-  });
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: 'System: Hello' },
+          { type: 'text', text: 'Hi' },
+        ],
+      },
+    ]
+    expect(await convertMessages(input)).toEqual(output)
+  })
 
   it('groups consecutive system messages into a single user message', async () => {
     const input: CompletionParams['messages'] = [
@@ -60,14 +72,24 @@ describe('convertMessages', () => {
       { role: 'user', content: 'Hi' },
     ]
     const output = [
-      { role: 'user', content: [{ type: 'text', text: 'System: Hello' }, { type: 'text', text: 'System: World' }, { type: 'text', text: 'Hi' }] }
-    ];
-    expect(await convertMessages(input)).toEqual(output);
-  });
-});
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: 'System: Hello' },
+          { type: 'text', text: 'System: World' },
+          { type: 'text', text: 'Hi' },
+        ],
+      },
+    ]
+    expect(await convertMessages(input)).toEqual(output)
+  })
+})
 
 describe('convertToolParams', () => {
   it(`returns undefined when 'tool_choice' is 'none'`, () => {
-    expect(convertToolParams('none', [getDummyTool()])).toEqual({toolChoice: undefined, tools: undefined})
+    expect(convertToolParams('none', [getDummyTool()])).toEqual({
+      toolChoice: undefined,
+      tools: undefined,
+    })
   })
 })
