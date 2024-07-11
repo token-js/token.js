@@ -11,7 +11,8 @@ description: >-
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
 * Support for 10 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
-* Completely free with no proxy server required.
+* Completely free and opensource.
+* No proxy server required.
 
 ## Setup
 
@@ -45,7 +46,7 @@ bun add llmjs
 
 ### Usage
 
-Import the LLM.js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with the respective fields.
+Import the LLM.js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
 
 {% tabs %}
 {% tab title="OpenAI" %}
@@ -283,10 +284,31 @@ for await (const part of result) {
 
 LLM.js supports tools for all providers and models that support it.
 
-```ts
-import { LLM, ChatCompletionTool } from 'llmjs'
+<pre class="language-ts"><code class="lang-ts">import { LLM, ChatCompletionTool } from 'llmjs'
 
 const llm = new LLM()
+
+const tools: ChatCompletionTool[] = [{
+<strong>  type: 'function',
+</strong>  function: {
+    name: 'getCurrentWeather',
+    description: 'Get the current weather in a given location',
+    parameters: {
+      type: 'object',
+      properties: {
+        location: {
+          type: 'string',
+          description: 'The city and state, e.g. San Francisco, CA',
+        },
+        unit: { 
+          type: 'string',
+          description: 'The temperature unit, e.g. Fahrenheit or Celsius'
+        },
+      },
+      required: ['location', 'unit'],
+    },
+  },
+}]
 
 const result = await llm.chat.completions.create({
   provider: 'gemini',
@@ -297,30 +319,10 @@ const result = await llm.chat.completions.create({
       content: `What's the weather like in San Francisco?`,
     },
   ],
-  tools: [{
-    type: 'function',
-    function: {
-      name: 'getCurrentWeather',
-      description: 'Get the current weather in a given location',
-      parameters: {
-        type: 'object',
-        properties: {
-          location: {
-            type: 'string',
-            description: 'The city and state, e.g. San Francisco, CA',
-          },
-          unit: { 
-            type: 'string',
-            description: 'The temperature unit, e.g. Fahrenheit or Celsius'
-          },
-        },
-        required: ['location', 'unit'],
-      },
-    },
-  }],
+  tools,
   tool_choice: 'auto',
 })
-```
+</code></pre>
 
 ## Feature Compatibility
 
@@ -338,7 +340,7 @@ Not every feature is supported by every provider and model. This table provides 
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
 
-If there are providers or features you would like to see implemented in LLM.js please let us know by opening an issue!
+If there are providers or features you would like to see implemented in LLM.js please let us know by opening an issue on [Github](https://github.com/sphinx-labs/llm)!
 
 ## Contributing
 
