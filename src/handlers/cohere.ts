@@ -497,12 +497,6 @@ export class CohereHandler extends BaseHandler<CohereModel> {
       )
     }
 
-    if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(
-        `Cohere does not support setting 'n' greater than 1.`
-      )
-    }
-
     const apiKey = this.opts.apiKey ?? process.env.COHERE_API_KEY
     if (apiKey === undefined) {
       throw new InputError(

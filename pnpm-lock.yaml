@@ -97,6 +97,9 @@ devDependencies:
   eslint-plugin-unicorn:
     specifier: ^42.0.0
     version: 42.0.0(eslint@8.57.0)
+  markdown-table:
+    specifier: ^3.0.3
+    version: 3.0.3
   prettier:
     specifier: ^2.3.1
     version: 2.8.8
@@ -4637,6 +4640,10 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       semver: 7.6.2
+    dev: true
+
+  /markdown-table@3.0.3:
+    resolution: {integrity: sha512-Z1NL3Tb1M9wH4XESsCDEksWoKTdlUafKc4pt0GRwjUyXaCFZ+dc3g2erqB6zm3szA2IUSi7VnPI+o/9jnxh9hw==}
     dev: true
 
   /merge-stream@2.0.0:

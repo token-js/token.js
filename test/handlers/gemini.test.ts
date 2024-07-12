@@ -1393,7 +1393,8 @@ describe('GeminiHandler', () => {
       models.gemini.models,
       models.gemini.supportsJSON,
       models.gemini.supportsImages,
-      models.gemini.supportsToolCalls
+      models.gemini.supportsToolCalls,
+      models.gemini.supportsN
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
@@ -1456,7 +1457,8 @@ describe('GeminiHandler', () => {
       models.gemini.models,
       models.gemini.supportsJSON,
       models.gemini.supportsImages,
-      models.gemini.supportsToolCalls
+      models.gemini.supportsToolCalls,
+      models.gemini.supportsN
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
@@ -1513,7 +1515,8 @@ describe('GeminiHandler', () => {
       models.gemini.models,
       models.gemini.supportsJSON,
       models.gemini.supportsImages,
-      models.gemini.supportsToolCalls
+      models.gemini.supportsToolCalls,
+      models.gemini.supportsN
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({

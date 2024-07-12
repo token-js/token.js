@@ -24,7 +24,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.openai.models,
       models.openai.supportsJSON,
       models.openai.supportsImages,
-      models.openai.supportsToolCalls
+      models.openai.supportsToolCalls,
+      models.openai.supportsN
     ),
   ['anthropic']: (opts: ConfigOptions) =>
     new AnthropicHandler(
@@ -32,7 +33,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.anthropic.models,
       models.anthropic.supportsJSON,
       models.anthropic.supportsImages,
-      models.anthropic.supportsToolCalls
+      models.anthropic.supportsToolCalls,
+      models.anthropic.supportsN
     ),
   ['gemini']: (opts: ConfigOptions) =>
     new GeminiHandler(
@@ -40,7 +42,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.gemini.models,
       models.gemini.supportsJSON,
       models.gemini.supportsImages,
-      models.gemini.supportsToolCalls
+      models.gemini.supportsToolCalls,
+      models.gemini.supportsN
     ),
   ['cohere']: (opts: ConfigOptions) =>
     new CohereHandler(
@@ -48,7 +51,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.cohere.models,
       models.cohere.supportsJSON,
       models.cohere.supportsImages,
-      models.cohere.supportsToolCalls
+      models.cohere.supportsToolCalls,
+      models.cohere.supportsN
     ),
   ['bedrock']: (opts: ConfigOptions) =>
     new BedrockHandler(
@@ -56,7 +60,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.bedrock.models,
       models.bedrock.supportsJSON,
       models.bedrock.supportsImages,
-      models.bedrock.supportsToolCalls
+      models.bedrock.supportsToolCalls,
+      models.bedrock.supportsN
     ),
   ['mistral']: (opts: ConfigOptions) =>
     new MistralHandler(
@@ -64,7 +69,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.mistral.models,
       models.mistral.supportsJSON,
       models.mistral.supportsImages,
-      models.mistral.supportsToolCalls
+      models.mistral.supportsToolCalls,
+      models.mistral.supportsN
     ),
   ['groq']: (opts: ConfigOptions) =>
     new GroqHandler(
@@ -72,7 +78,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.groq.models,
       models.groq.supportsJSON,
       models.groq.supportsImages,
-      models.groq.supportsToolCalls
+      models.groq.supportsToolCalls,
+      models.groq.supportsN
     ),
   ['ai21']: (opts: ConfigOptions) =>
     new AI21Handler(
@@ -80,7 +87,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.ai21.models,
       models.ai21.supportsJSON,
       models.ai21.supportsImages,
-      models.ai21.supportsToolCalls
+      models.ai21.supportsToolCalls,
+      models.ai21.supportsN
     ),
   ['perplexity']: (opts: ConfigOptions) =>
     new PerplexityHandler(
@@ -88,7 +96,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.perplexity.models,
       models.perplexity.supportsJSON,
       models.perplexity.supportsImages,
-      models.perplexity.supportsToolCalls
+      models.perplexity.supportsToolCalls,
+      models.perplexity.supportsN
     ),
 }
 
@@ -191,17 +200,6 @@ export const parseImage = (
 
 export const consoleWarn = (message: string): void => {
   console.warn(chalk.yellow.bold(`Warning: ${message}\n`))
-}
-
-export const assertNIsOne = (
-  n: number | null | undefined,
-  provider: string
-): void => {
-  if (typeof n === 'number' && n > 1) {
-    throw new InputError(
-      `${provider} does not support setting 'n' greater than 1.`
-    )
-  }
 }
 
 export const normalizeTemperature = (

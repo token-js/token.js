@@ -572,12 +572,6 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
         `Bedrock does not support the 'detail' field for images. The default image quality will be used.`
       )
     }
-
-    if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(
-        `Bedrock does not support setting 'n' greater than 1.`
-      )
-    }
   }
 
   async create(

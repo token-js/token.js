@@ -503,12 +503,6 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
   validateInputs(body: ProviderCompletionParams<'anthropic'>): void {
     super.validateInputs(body)
 
-    if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(
-        `Anthropic does not support setting 'n' greater than 1.`
-      )
-    }
-
     let logImageDetailWarning: boolean = false
     for (const message of body.messages) {
       if (Array.isArray(message.content)) {

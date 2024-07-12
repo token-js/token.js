@@ -29,15 +29,14 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 })
 ```
 
+### [Gemini Documentation](https://ai.google.dev/gemini-api/docs)
+
+<!-- compatibility -->
 ### Supported Models
 
-| Model            | JSON Output | Tools | Image Input | Streaming | N > 1 |
-| ---------------- | ----------- | ----- | ----------- | --------- | ----- |
-| gemini-1.5-pro   |             |       |             |           |       |
-| gemini-1.5-flash |             |       |             |           |       |
-| gemini-1.0-pro   |             |       |             |           |       |
-
-
-
-### [Gemini Documentation](https://ai.google.dev/gemini-api/docs)
+| Model            | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
+| ---------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
+| gemini-1.5-pro   | ✅          |           | ✅           | ✅           | ✅     | ✅     |
+| gemini-1.5-flash | ✅          |           | ✅           | ✅           | ✅     | ✅     |
+| gemini-1.0-pro   | ✅          |           |             |             | ✅     | ✅     |
 

@@ -12,19 +12,22 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   protected supportsJSON: readonly T[]
   protected supportsImages: readonly T[]
   protected supportsToolCalls: readonly T[]
+  protected supportsN: readonly T[] | boolean
 
   constructor(
     opts: ConfigOptions,
     models: readonly T[],
     supportsJSON: readonly T[],
     supportsImages: readonly T[],
-    supportsToolCalls: readonly T[]
+    supportsToolCalls: readonly T[],
+    suportsN: readonly T[] | boolean
   ) {
     this.opts = opts
     this.models = models
     this.supportsJSON = supportsJSON
     this.supportsImages = supportsImages
     this.supportsToolCalls = supportsToolCalls
+    this.supportsN = suportsN
   }
 
   abstract create(
@@ -36,19 +39,13 @@ export abstract class BaseHandler<T extends LLMChatModel> {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
     }
 
-    if (
-      body.tools !== undefined &&
-      !this.supportsToolCalls.includes(body.model)
-    ) {
+    if (body.tools !== undefined && !this.supportsTools(body.model)) {
       throw new InputError(
         `Detected a 'tools' parameter, but the following model does not support tools: ${body.model}`
       )
     }
 
-    if (
-      body.tool_choice !== undefined &&
-      !this.supportsToolCalls.includes(body.model)
-    ) {
+    if (body.tool_choice !== undefined && !this.supportsTools(body.model)) {
       throw new InputError(
         `Detected a 'tool_choice' parameter, but the following model does not support tools: ${body.model}`
       )
@@ -81,6 +78,16 @@ export abstract class BaseHandler<T extends LLMChatModel> {
           }
         }
       }
+    }
+
+    if (
+      typeof body.n === 'number' &&
+      body.n > 1 &&
+      !this.supportsNGreaterThanOne(body.model)
+    ) {
+      throw new InputError(
+        `The model ${body.model} does not support setting 'n' greater than 1.`
+      )
     }
 
     if (body.response_format?.type === 'json_object') {
@@ -120,15 +127,34 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     }
   }
 
+  protected isSupportedFeature(
+    featureSupport: readonly T[] | boolean,
+    model: T
+  ): boolean {
+    if (typeof featureSupport === 'boolean') {
+      return featureSupport
+    } else {
+      return featureSupport.includes(model)
+    }
+  }
+
   protected isSupportedModel(model: LLMChatModel): model is T {
     return this.models.includes(model as T)
   }
 
   protected supportsJSONMode(model: T): boolean {
-    return this.supportsJSON.includes(model)
+    return this.isSupportedFeature(this.supportsJSON, model)
   }
 
   protected supportsImageMessages(model: T): boolean {
-    return this.supportsImages.includes(model)
+    return this.isSupportedFeature(this.supportsImages, model)
+  }
+
+  protected supportsNGreaterThanOne(model: T): boolean {
+    return this.isSupportedFeature(this.supportsN, model)
+  }
+
+  protected supportsTools(model: T): boolean {
+    return this.isSupportedFeature(this.supportsToolCalls, model)
   }
 }

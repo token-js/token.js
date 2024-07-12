@@ -1,3 +1,13 @@
+export const TableDisplayNames = {
+  models: 'Model',
+  supportsCompletion: 'Completion',
+  supportsStreaming: 'Streaming',
+  supportsJSON: 'JSON Output',
+  supportsImages: 'Image Input',
+  supportsToolCalls: 'Tools',
+  supportsN: 'N > 1',
+}
+
 export const models = {
   openai: {
     models: [
@@ -23,6 +33,8 @@ export const models = {
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-16k-0613',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: [
       'gpt-4o',
       'gpt-4o-2024-05-13',
@@ -61,12 +73,16 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0613',
     ] as const,
+    supportsN: true,
   },
   ai21: {
     models: ['jamba-instruct'] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
+    supportsN: true,
   },
   anthropic: {
     models: [
@@ -78,6 +94,8 @@ export const models = {
       'claude-2.0',
       'claude-instant-1.2',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: [] as const,
     supportsImages: [
       'claude-3-5-sonnet-20240620',
@@ -91,9 +109,12 @@ export const models = {
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
     ] as const,
+    supportsN: false,
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
     supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
     supportsToolCalls: [
@@ -101,6 +122,7 @@ export const models = {
       'gemini-1.5-flash',
       'gemini-1.0-pro',
     ] as const,
+    supportsN: true,
   },
   cohere: {
     models: [
@@ -111,6 +133,8 @@ export const models = {
       'command-light',
       'command-light-nightly',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
     supportsToolCalls: [
@@ -118,6 +142,7 @@ export const models = {
       'command-r',
       'command-nightly',
     ] as const,
+    supportsN: false,
   },
   bedrock: {
     models: [
@@ -141,6 +166,8 @@ export const models = {
       'mistral.mixtral-8x7b-instruct-v0:1',
       'mistral.mistral-large-2402-v1:0',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     // At the time of writing, the only models that Bedrock supports which allow JSON are Mistral
     // models. However, Bedrock's `additionalModelRequestFields` field, which is designed to allow
     // us to pass arbitrary parameters to the model, does not appear to work for Mistral's
@@ -159,6 +186,7 @@ export const models = {
       'cohere.command-r-v1:0',
       'mistral.mistral-large-2402-v1:0',
     ] as const,
+    supportsN: false,
   },
   mistral: {
     models: [
@@ -177,6 +205,8 @@ export const models = {
       'codestral-latest',
       'codestral-2405',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     // Mistral claims that all of its models support JSON, but several of their weaker models either
     // fail to produce valid JSON or produce very low quality results for the following prompt:
     // "Generate a JSON that maps ten athletes to their jersey numbers". We removed these models
@@ -200,6 +230,7 @@ export const models = {
       'mistral-large-latest',
       'mistral-large-2402',
     ] as const,
+    supportsN: false,
   },
   groq: {
     models: [
@@ -209,6 +240,8 @@ export const models = {
       'gemma-7b-it',
       'gemma2-9b-it',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     // Groq claims that all of its models support JSON, but some of the weaker models either fail to
     // produce valid JSON or produce very low quality results for the following prompt: "Generate a
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
@@ -216,6 +249,7 @@ export const models = {
     supportsJSON: ['llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
+    supportsN: false,
   },
   perplexity: {
     models: [
@@ -227,8 +261,11 @@ export const models = {
       'llama-3-70b-instruct',
       'mixtral-8x7b-instruct',
     ] as const,
+    supportsCompletion: true,
+    supportsStreaming: [] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
+    supportsN: false,
   },
 }
