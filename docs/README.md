@@ -1,6 +1,6 @@
 ---
 description: >-
-  Integrate all LLM providers with a single Typescript SDK using OpenAIs format.
+  Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.
   Free and opensource with no proxy server required.
 ---
 
@@ -11,7 +11,7 @@ description: >-
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
 * Support for 9 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
-* Completely free and opensource.
+* Free and opensource under GPLv3.
 * No proxy server required.
 
 ## Setup
