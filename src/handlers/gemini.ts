@@ -1,5 +1,6 @@
 import {
   Content,
+  EnhancedGenerateContentResponse,
   FinishReason,
   FunctionCallPart,
   FunctionCallingMode,
@@ -28,6 +29,39 @@ import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
 import { BaseHandler } from './base'
 import { InputError } from './types'
 import { consoleWarn, getTimestamp, parseImage } from './utils'
+
+// Google's `GenerateContentCandidate.content` field should be optional, but it's a required field
+// in Google's types. This field can be undefined if a content filter is triggered when the user
+// requests a JSON response via `response_format: { type: 'json_object'}`. The types below are
+// identical to Google's types except the `content` field is optional. Manually defining these types
+// is necessary to prevent this edge case from causing a bug in our SDK. The bug was caused by
+// 'gemini-1.5-pro' with the following prompt: "Generate a JSON that represents a person, with name
+// and age. Give a concise answer."
+type EnhancedResponseWithOptionalContent = Omit<
+  EnhancedGenerateContentResponse,
+  'candidates'
+> & {
+  candidates?: GenerateContentCandidateWithOptionalContent[]
+}
+type GenerateContentCandidateWithOptionalContent = Omit<
+  GenerateContentCandidate,
+  'content'
+> & {
+  content?: Content
+}
+type GenerateContentResultWithOptionalContent = Omit<
+  GenerateContentResult,
+  'response'
+> & {
+  response: EnhancedResponseWithOptionalContent
+}
+type GenerateContentStreamResultWithOptionalContent = Omit<
+  GenerateContentStreamResult,
+  'stream' | 'response'
+> & {
+  stream: AsyncGenerator<EnhancedResponseWithOptionalContent>
+  response: Promise<EnhancedResponseWithOptionalContent>
+}
 
 export const convertContentsToParts = (
   contents: Array<ChatCompletionContentPart> | string | null | undefined,
@@ -200,9 +234,9 @@ export const convertMessagesToContents = (
 
 export const convertFinishReason = (
   finishReason: FinishReason,
-  parts: Part[]
+  parts: Part[] | undefined
 ): 'stop' | 'length' | 'tool_calls' | 'content_filter' | 'function_call' => {
-  if (parts.some((part) => part.functionCall !== undefined)) {
+  if (parts?.some((part) => part.functionCall !== undefined)) {
     return 'tool_calls'
   }
 
@@ -223,9 +257,9 @@ export const convertFinishReason = (
 }
 
 export const convertToolCalls = (
-  candidate: GenerateContentCandidate
+  candidate: GenerateContentCandidateWithOptionalContent
 ): Array<ChatCompletionMessageToolCall> | undefined => {
-  const toolCalls = candidate.content.parts
+  const toolCalls = candidate.content?.parts
     .filter((part) => part.functionCall !== undefined)
     .map((part, index) => {
       return {
@@ -240,7 +274,7 @@ export const convertToolCalls = (
       }
     })
 
-  if (toolCalls.length > 0) {
+  if (toolCalls !== undefined && toolCalls.length > 0) {
     return toolCalls
   } else {
     return undefined
@@ -248,7 +282,7 @@ export const convertToolCalls = (
 }
 
 export const convertStreamToolCalls = (
-  candidate: GenerateContentCandidate
+  candidate: GenerateContentCandidateWithOptionalContent
 ): Array<ChatCompletionChunk.Choice.Delta.ToolCall> | undefined => {
   return convertToolCalls(candidate)?.map((toolCall, index) => {
     return {
@@ -259,10 +293,10 @@ export const convertStreamToolCalls = (
 }
 
 export const convertResponseMessage = (
-  candidate: GenerateContentCandidate
+  candidate: GenerateContentCandidateWithOptionalContent
 ): CompletionResponse['choices'][number]['message'] => {
   return {
-    content: candidate.content.parts.map((part) => part.text).join(''),
+    content: candidate.content?.parts.map((part) => part.text).join('') ?? null,
     role: 'assistant',
     tool_calls: convertToolCalls(candidate),
   }
@@ -349,7 +383,7 @@ export const convertTools = (
 }
 
 export const convertResponse = async (
-  result: GenerateContentResult,
+  result: GenerateContentResultWithOptionalContent,
   model: string,
   timestamp: number
 ): Promise<CompletionResponse> => {
@@ -365,7 +399,7 @@ export const convertResponse = async (
           finish_reason: candidate.finishReason
             ? convertFinishReason(
                 candidate.finishReason,
-                candidate.content.parts
+                candidate.content?.parts
               )
             : 'stop',
           message: convertResponseMessage(candidate),
@@ -381,7 +415,7 @@ export const convertResponse = async (
 }
 
 async function* convertStreamResponse(
-  result: GenerateContentStreamResult,
+  result: GenerateContentStreamResultWithOptionalContent,
   model: string,
   timestamp: number
 ): StreamCompletionResponse {
@@ -399,7 +433,7 @@ async function* convertStreamResponse(
             finish_reason: candidate.finishReason
               ? convertFinishReason(
                   candidate.finishReason,
-                  candidate.content.parts
+                  candidate.content?.parts
                 )
               : 'stop',
             delta: {
@@ -470,10 +504,14 @@ export class GeminiHandler extends BaseHandler<GeminiModel> {
 
     const timestamp = getTimestamp()
     if (body.stream) {
-      const result = await model.generateContentStream(params)
+      const result = (await model.generateContentStream(
+        params
+      )) as GenerateContentStreamResultWithOptionalContent
       return convertStreamResponse(result, body.model, timestamp)
     } else {
-      const result = await model.generateContent(params)
+      const result = (await model.generateContent(
+        params
+      )) as GenerateContentResultWithOptionalContent
       return convertResponse(result, body.model, timestamp)
     }
   }
