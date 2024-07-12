@@ -198,13 +198,9 @@ export const convertMessages = async (
 
   const systemMessages: Array<SystemContentBlock> = []
   if (supportsSystemMessages(model)) {
-    for (const message of clonedMessages) {
-      if (message.role === 'system') {
-        systemMessages.push({ text: message.content })
-        clonedMessages.shift()
-      } else {
-        break
-      }
+    while (clonedMessages.length > 0 && clonedMessages[0].role === 'system') {
+      systemMessages.push({ text: clonedMessages[0].content })
+      clonedMessages.shift()
     }
   }
 

@@ -3,8 +3,8 @@ import { ChatCompletionToolMessageParam } from 'openai/resources/index.mjs'
 
 import { CompletionParams } from '../../src/chat'
 import { TokenJS } from '../../src/index'
-import { getCurrentWeather } from './utils'
 import { models } from '../../src/models'
+import { getCurrentWeather } from './utils'
 
 dotenv.config()
 
@@ -31,8 +31,16 @@ async function runConversation() {
 
   const messages: CompletionParams['messages'] = [
     {
+      role: 'system',
+      content: "Respond to the user's question, using tools when necessary.",
+    },
+    {
       role: 'user',
       content: "What's the weather in San Francisco, Tokyo, and Paris?",
+    },
+    {
+      role: 'system',
+      content: "To reiterate, respond to the user's question, using tools when necessary.",
     },
   ]
   const tools: CompletionParams['tools'] = [
@@ -99,6 +107,9 @@ async function runConversation() {
     })
 
     console.log(JSON.stringify(secondResponse, null, 2))
+  } else {
+    console.log('No tool calls.\n')
+    console.log(JSON.stringify(response, null, 2))
   }
 }
 
