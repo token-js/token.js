@@ -15,6 +15,7 @@ import {
   ToolConfig,
   UsageMetadata,
 } from '@google/generative-ai'
+import { nanoid } from 'nanoid'
 import OpenAI from 'openai'
 import {
   ChatCompletionChunk,
@@ -169,10 +170,30 @@ export const convertMessagesToContents = (
         : undefined
   }
 
+  const converted: Array<Content> = []
+  for (const message of clonedMessages) {
+    if (message.role === 'system' || message.role === 'user') {
+      converted.push(convertMessageToContent(message, true))
+    } else if (message.role === 'assistant') {
+      converted.push(convertMessageToContent(message, true))
+      if (message.tool_calls !== undefined) {
+        for (const assistantToolCall of message.tool_calls) {
+          const toolResult = clonedMessages.find(
+            (m) => m.role === 'tool' && m.tool_call_id === assistantToolCall.id
+          )
+          if (toolResult === undefined) {
+            throw new Error(
+              `Could not find tool message with the id: ${assistantToolCall.id}`
+            )
+          }
+          converted.push(convertMessageToContent(toolResult, true))
+        }
+      }
+    }
+  }
+
   return {
-    contents: clonedMessages.map((message) =>
-      convertMessageToContent(message, true)
-    ),
+    contents: converted,
     systemInstruction,
   }
 }
@@ -208,7 +229,7 @@ export const convertToolCalls = (
     .filter((part) => part.functionCall !== undefined)
     .map((part, index) => {
       return {
-        id: part.functionCall!.name,
+        id: nanoid(),
         index,
         function: {
           arguments: JSON.stringify(part.functionCall!.args),
