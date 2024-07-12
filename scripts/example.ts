@@ -23,7 +23,7 @@ const callLLM = async () => {
   console.log(result.choices)
 
   // for await (const part of result) {
-  //   process.stdout.write(part.choices[0]?.delta?.content || "");
+    // process.stdout.write(part.choices[0]?.delta?.content || "");
   // }
 }
 

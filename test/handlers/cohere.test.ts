@@ -247,7 +247,7 @@ describe('convertTools', () => {
 })
 
 describe('convertMessages', () => {
-  it(`converts assistant message with tool calls followed by tool results`, async () => {
+  it(`converts assistant message containing tool calls followed by tool results`, async () => {
     const inputMessages: CompletionParams['messages'] = [
       {
         role: 'user',

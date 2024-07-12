@@ -2,15 +2,31 @@ import * as dotenv from 'dotenv'
 import { ChatCompletionToolMessageParam } from 'openai/resources/index.mjs'
 
 import { CompletionParams } from '../../src/chat'
+import { models } from '../../src/models'
 import { getCurrentWeather } from './utils'
 
 dotenv.config()
 
 const tokenjs = new TokenJS()
 
+// Parse CLI arguments
+const args = process.argv.slice(2)
+let provider: CompletionParams['provider'] | undefined
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--provider' && i + 1 < args.length) {
+    provider = args[i + 1] as CompletionParams['provider']
+    break
+  }
+}
+
 async function runConversation() {
-  const provider: CompletionParams['provider'] = 'openai'
-  const model: CompletionParams['model'] = 'gpt-4o'
+  if (provider === undefined) {
+    throw new Error(
+      'Provider argument is required. Usage: --provider <provider_name>'
+    )
+  }
+
+  const model: CompletionParams['model'] = models[provider].models[0]
 
   const messages: CompletionParams['messages'] = [
     {
@@ -76,6 +92,8 @@ async function runConversation() {
       model,
       messages,
     })
+
+    console.log(JSON.stringify(secondResponse, null, 2))
   }
 }
 

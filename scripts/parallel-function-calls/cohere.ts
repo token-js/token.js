@@ -71,7 +71,8 @@ const runConversation = async () => {
       toolResults,
     }
 
-    await cohere.chat(input)
+    const finalResponse = await cohere.chat(input)
+    console.log(JSON.stringify(finalResponse, null, 2))
   }
 }
 

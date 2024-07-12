@@ -421,6 +421,15 @@ describe('convertFinishReason', () => {
 })
 
 describe('convertToolCalls', () => {
+  beforeEach(() => {
+    // Mock the nanoid module
+    vi.mock('nanoid', () => {
+      return {
+        nanoid: () => 'mockId',
+      }
+    })
+  })
+
   it('should convert parts with functionCall to ChatCompletionMessageToolCall array', () => {
     const candidate: GenerateContentCandidate = {
       index: 0,
@@ -450,7 +459,7 @@ describe('convertToolCalls', () => {
 
     expect(result).toEqual([
       {
-        id: 'function1',
+        id: 'mockId',
         index: 0,
         function: {
           arguments: JSON.stringify({ key: 'value1' }),
@@ -459,7 +468,7 @@ describe('convertToolCalls', () => {
         type: 'function',
       },
       {
-        id: 'function2',
+        id: 'mockId',
         index: 1,
         function: {
           arguments: JSON.stringify({ key: 'value2' }),
@@ -525,7 +534,7 @@ describe('convertToolCalls', () => {
 
     expect(result).toEqual([
       {
-        id: 'complexFunction',
+        id: 'mockId',
         index: 0,
         function: {
           arguments: JSON.stringify({
@@ -709,6 +718,132 @@ describe('convertMessagesToContents', () => {
       },
     })
   })
+
+  it('should convert assistant message containing tool calls followed by randomly ordered tool results', () => {
+    const input: CompletionParams['messages'] = [
+      {
+        role: 'user',
+        content: "What's the weather in San Francisco, Tokyo, and Paris?",
+      },
+      {
+        role: 'assistant',
+        content:
+          'I will use the get_current_weather tool to find the weather in San Francisco, Tokyo and Paris.',
+        tool_calls: [
+          {
+            id: 'tool-call-id-1',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "San Francisco, CA"}',
+            },
+          },
+          {
+            id: 'tool-call-id-2',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "Tokyo, Japan"}',
+            },
+          },
+          {
+            id: 'tool-call-id-3',
+            type: 'function',
+            function: {
+              name: 'get_current_weather',
+              arguments: '{"location": "Paris, France"}',
+            },
+          },
+        ],
+      },
+      {
+        tool_call_id: 'tool-call-id-3',
+        role: 'tool',
+        content: '{"temperature":"22","unit":"fahrenheit"}',
+      },
+      {
+        tool_call_id: 'tool-call-id-1',
+        role: 'tool',
+        content: '{"temperature":"72","unit":"fahrenheit"}',
+      },
+      {
+        tool_call_id: 'tool-call-id-2',
+        role: 'tool',
+        content: '{"temperature":"10","unit":"celsius"}',
+      },
+    ]
+
+    const result = convertMessagesToContents(input)
+    expect(result).toEqual({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            { text: "What's the weather in San Francisco, Tokyo, and Paris?" },
+          ],
+        },
+        {
+          role: 'model',
+          parts: [
+            {
+              functionCall: {
+                name: 'get_current_weather',
+                args: { location: 'San Francisco, CA' },
+              },
+            },
+            {
+              functionCall: {
+                name: 'get_current_weather',
+                args: { location: 'Tokyo, Japan' },
+              },
+            },
+            {
+              functionCall: {
+                name: 'get_current_weather',
+                args: { location: 'Paris, France' },
+              },
+            },
+            {
+              text: 'I will use the get_current_weather tool to find the weather in San Francisco, Tokyo and Paris.',
+            },
+          ],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tool-call-id-1',
+                response: { temperature: '72', unit: 'fahrenheit' },
+              },
+            },
+          ],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tool-call-id-2',
+                response: { temperature: '10', unit: 'celsius' },
+              },
+            },
+          ],
+        },
+        {
+          role: 'user',
+          parts: [
+            {
+              functionResponse: {
+                name: 'tool-call-id-3',
+                response: { temperature: '22', unit: 'fahrenheit' },
+              },
+            },
+          ],
+        },
+      ],
+    })
+  })
 })
 
 describe('convertTools', () => {
@@ -826,7 +961,7 @@ describe('convertStreamToolCalls', () => {
 
     expect(result).toEqual([
       {
-        id: 'function1',
+        id: 'mockId',
         function: {
           arguments: JSON.stringify({ key1: 'value1' }),
           name: 'function1',
@@ -835,7 +970,7 @@ describe('convertStreamToolCalls', () => {
         index: 0,
       },
       {
-        id: 'function2',
+        id: 'mockId',
         function: {
           arguments: JSON.stringify({ key2: 'value2' }),
           name: 'function2',
@@ -878,7 +1013,7 @@ describe('convertStreamToolCalls', () => {
 
     expect(result).toEqual([
       {
-        id: 'function1',
+        id: 'mockId',
         function: {
           arguments: JSON.stringify({ key1: 'value1' }),
           name: 'function1',
@@ -887,7 +1022,7 @@ describe('convertStreamToolCalls', () => {
         index: 0,
       },
       {
-        id: 'function2',
+        id: 'mockId',
         function: {
           arguments: JSON.stringify({ key2: 'value2' }),
           name: 'function2',
@@ -900,6 +1035,15 @@ describe('convertStreamToolCalls', () => {
 })
 
 describe('convertResponseMessage', () => {
+  beforeEach(() => {
+    // Mock the nanoid module
+    vi.mock('nanoid', () => {
+      return {
+        nanoid: () => 'mockId',
+      }
+    })
+  })
+
   it('should convert response message with content and tool calls', () => {
     const candidate: GenerateContentCandidate = {
       index: 0,
@@ -920,7 +1064,7 @@ describe('convertResponseMessage', () => {
       role: 'assistant',
       tool_calls: [
         {
-          id: 'function1',
+          id: 'mockId',
           function: {
             arguments: JSON.stringify({ key1: 'value1' }),
             name: 'function1',
@@ -987,7 +1131,7 @@ describe('convertResponseMessage', () => {
       role: 'assistant',
       tool_calls: [
         {
-          id: 'function1',
+          id: 'mockId',
           function: {
             arguments: JSON.stringify({ key1: 'value1' }),
             name: 'function1',
@@ -996,7 +1140,7 @@ describe('convertResponseMessage', () => {
           index: 0,
         },
         {
-          id: 'function2',
+          id: 'mockId',
           function: {
             arguments: JSON.stringify({ key2: 'value2' }),
             name: 'function2',
@@ -1385,7 +1529,7 @@ describe('GeminiHandler', () => {
                   arguments: '{"location":"Portland, OR","unit":"fahrenheit"}',
                   name: 'getCurrentWeather',
                 },
-                id: 'getCurrentWeather',
+                id: 'mockId',
                 type: 'function',
                 index: 0,
               },
@@ -1458,7 +1602,7 @@ describe('GeminiHandler', () => {
                       '{"location":"Portland, OR","unit":"fahrenheit"}',
                     name: 'getCurrentWeather',
                   },
-                  id: 'getCurrentWeather',
+                  id: 'mockId',
                   index: 0,
                   type: 'function',
                 },
