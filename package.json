@@ -8,8 +8,8 @@
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "test:manual": "vitest test/manual --testTimeout 100000",
-    "lint": "yarn lint:fix && yarn lint:check",
-    "lint:fix": "yarn lint:check --fix",
+    "lint": "pnpm lint:fix && pnpm lint:check",
+    "lint:fix": "pnpm lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "build": "tsc -p ./tsconfig.json"

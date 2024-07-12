@@ -1,13 +1,10 @@
-name: Release packages (prod)
+name: CI
 
 on:
-  workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  pull_request:
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
@@ -24,11 +21,5 @@ jobs:
       run: pnpm install
     - name: Build
       run: pnpm build
-    - name: Publish to NPM
-      uses: changesets/action@v1
-      id: changesets
-      with:
-        publish: pnpm changeset publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - name: Run ESLint
+      run: pnpm lint:check

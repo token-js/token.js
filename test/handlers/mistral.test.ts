@@ -746,7 +746,8 @@ describe('MistralHandler', () => {
   const handler = new MistralHandler(
     handlerOptions,
     models.mistral.models,
-    models.mistral.supportsJSON
+    models.mistral.supportsJSON,
+    models.mistral.supportsImages
   )
 
   it('should return a completion response', async () => {

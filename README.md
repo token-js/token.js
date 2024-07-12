@@ -1,6 +1,6 @@
 # token.js
 
-Integrate all LLM providers with a single Typescript SDK using OpenAIs format. Free and opensource with no proxy server required.
+Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format. Free and opensource with no proxy server required.
 
 ### [Documentation](http://tokenjs.ai)
 
@@ -8,8 +8,8 @@ Integrate all LLM providers with a single Typescript SDK using OpenAIs format. F
 
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
-* Support for 10 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
-* Completely free and opensource.
+* Support for 9 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
+* Free and opensource under GPLv3.
 * No proxy server required.
 
 ## Setup
@@ -192,29 +192,31 @@ If there are more providers or features you would like to see implemented in tok
 
 PRs are accepted!
 
-To get started clone the repo:
+### Clone the repo
 
 ```bash
 git clone https://github.com/token-js/token-js.git
 ```
 
-Then open the project and install the dependencies:
+### Open the project and install the dependencies
 
 ```bash
 cd llm && pnpm install
 ```
 
-Test your changes:
+### Test your changes
 
 ```bash
 pnpm test
 ```
 
-Run the linter and fix any issues:
+### Run the linter
 
 ```bash
 pnpm lint
 ```
+
+### Open a pull request!
 
 ## License
 
