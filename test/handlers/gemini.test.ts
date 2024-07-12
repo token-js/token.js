@@ -1375,11 +1375,11 @@ describe('GeminiHandler', () => {
     }
   })
 
+  const fakeDate = new Date(2000, 1, 1, 13)
+
   beforeEach(() => {
     vi.useFakeTimers()
-
-    const date = new Date(2000, 1, 1, 13)
-    vi.setSystemTime(date)
+    vi.setSystemTime(fakeDate)
   })
 
   afterEach(() => {
@@ -1541,7 +1541,7 @@ describe('GeminiHandler', () => {
     expect(chunks).toEqual([
       {
         id: null,
-        created: 949438800,
+        created: fakeDate.getTime() / 1000,
         object: 'chat.completion.chunk',
         model,
         choices: [
