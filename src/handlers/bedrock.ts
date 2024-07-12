@@ -171,7 +171,7 @@ const toChatCompletionChoiceMessage = (
   }
 }
 
-const convertMessages = async (
+export const convertMessages = async (
   messages: CompletionParams['messages'],
   model: BedrockModel
 ): Promise<{
@@ -269,6 +269,27 @@ const convertMessages = async (
         },
       }
       currentParams.push(toolResult)
+    } else if (message.role === 'assistant') {
+      if (typeof message.content === 'string') {
+        const text = makeTextContent(message.role, message.content)
+        currentParams.push({
+          text,
+        })
+      }
+
+      if (Array.isArray(message.tool_calls)) {
+        const convertedContent: Array<ContentBlock.ToolUseMember> =
+          message.tool_calls?.map((toolCall) => {
+            return {
+              toolUse: {
+                toolUseId: toolCall.id,
+                input: JSON.parse(toolCall.function.arguments),
+                name: toolCall.function.name,
+              },
+            }
+          })
+        currentParams.push(...convertedContent)
+      }
     } else if (typeof message.content === 'string') {
       const text = makeTextContent(message.role, message.content)
       currentParams.push({
@@ -297,21 +318,6 @@ const convertMessages = async (
           }
         })
       )
-      currentParams.push(...convertedContent)
-    } else if (
-      message.role === 'assistant' &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const convertedContent: Array<ContentBlock.ToolUseMember> =
-        message.tool_calls.map((toolCall) => {
-          return {
-            toolUse: {
-              toolUseId: toolCall.id,
-              input: JSON.parse(toolCall.function.arguments),
-              name: toolCall.function.name,
-            },
-          }
-        })
       currentParams.push(...convertedContent)
     }
     previousRole = newRole
@@ -656,9 +662,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
     const topP = body.top_p ?? undefined
     const maxTokens = body.max_tokens ?? undefined
     const stopSequences = convertStopSequences(body.stop)
-    const modelId = body.model.startsWith('bedrock/')
-      ? body.model.replace('bedrock/', '')
-      : body.model
+    const modelId = body.model
     const toolConfig = convertToolParams(body.tool_choice, body.tools)
 
     const convertedParams: ConverseCommandInput = {

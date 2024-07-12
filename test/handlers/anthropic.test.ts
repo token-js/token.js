@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { CompletionParams } from '../../src/chat'
 import { convertMessages } from '../../src/handlers/anthropic'
+import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
 describe('convertMessages', () => {
   it('converts user and system messages into a block with system messages prefixed', async () => {
@@ -82,6 +83,77 @@ describe('convertMessages', () => {
       },
     ]
     expect(await convertMessages(input)).toEqual(output)
+  })
+
+  it(`converts assistant message containing tool calls followed by tool results`, async () => {
+    const { systemMessage, messages } = await convertMessages(
+      MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS
+    )
+    expect(systemMessage).toEqual(undefined)
+    expect(messages).toEqual([
+      {
+        content: [
+          {
+            text: "What's the weather in San Francisco, Tokyo, and Paris?",
+            type: 'text',
+          },
+        ],
+        role: 'user',
+      },
+      {
+        content: [
+          {
+            text: 'I will use the get_current_weather tool to find the weather in San Francisco, Tokyo and Paris.',
+            type: 'text',
+          },
+          {
+            id: 'tool-call-id-1',
+            input: {
+              location: 'San Francisco, CA',
+            },
+            name: 'get_current_weather',
+            type: 'tool_use',
+          },
+          {
+            id: 'tool-call-id-2',
+            input: {
+              location: 'Tokyo, Japan',
+            },
+            name: 'get_current_weather',
+            type: 'tool_use',
+          },
+          {
+            id: 'tool-call-id-3',
+            input: {
+              location: 'Paris, France',
+            },
+            name: 'get_current_weather',
+            type: 'tool_use',
+          },
+        ],
+        role: 'assistant',
+      },
+      {
+        content: [
+          {
+            content: '{"temperature":"72","unit":"fahrenheit"}',
+            tool_use_id: 'tool-call-id-1',
+            type: 'tool_result',
+          },
+          {
+            content: '{"temperature":"10","unit":"celsius"}',
+            tool_use_id: 'tool-call-id-2',
+            type: 'tool_result',
+          },
+          {
+            content: '{"temperature":"22","unit":"fahrenheit"}',
+            tool_use_id: 'tool-call-id-3',
+            type: 'tool_result',
+          },
+        ],
+        role: 'user',
+      },
+    ])
   })
 })
 
