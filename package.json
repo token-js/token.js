@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest --exclude 'test/manual/**'",
-    "test:coverage": "vitest run --coverage",
-    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --exclude 'test/manual/**' run --coverage",
+    "test:ui": "vitest --exclude 'test/manual/**' --ui",
     "test:manual": "vitest test/manual --testTimeout 100000",
     "lint": "pnpm lint:fix && pnpm lint:check",
     "lint:fix": "pnpm lint:check --fix",
