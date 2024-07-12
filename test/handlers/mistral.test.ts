@@ -614,7 +614,7 @@ describe('MistralHandler', () => {
     id: '46d695c96b4545f4b842d4801632da3b',
     object: 'chat.completion',
     created: 1720551878,
-    model: 'open-mistral-7b',
+    model: 'open-mixtral-8x22b',
     choices: [
       {
         index: 0,
@@ -747,7 +747,8 @@ describe('MistralHandler', () => {
     handlerOptions,
     models.mistral.models,
     models.mistral.supportsJSON,
-    models.mistral.supportsImages
+    models.mistral.supportsImages,
+    models.mistral.supportsToolCalls
   )
 
   it('should return a completion response', async () => {
@@ -758,7 +759,7 @@ describe('MistralHandler', () => {
 
     const params: CompletionParams = {
       provider: 'mistral',
-      model: 'open-mistral-7b',
+      model: 'open-mixtral-8x22b',
       messages: [
         {
           role: 'user',

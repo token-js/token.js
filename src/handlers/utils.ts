@@ -23,63 +23,72 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       opts,
       models.openai.models,
       models.openai.supportsJSON,
-      models.openai.supportsImages
+      models.openai.supportsImages,
+      models.openai.supportsToolCalls
     ),
   ['anthropic']: (opts: ConfigOptions) =>
     new AnthropicHandler(
       opts,
       models.anthropic.models,
       models.anthropic.supportsJSON,
-      models.anthropic.supportsImages
+      models.anthropic.supportsImages,
+      models.anthropic.supportsToolCalls
     ),
   ['gemini']: (opts: ConfigOptions) =>
     new GeminiHandler(
       opts,
       models.gemini.models,
       models.gemini.supportsJSON,
-      models.gemini.supportsImages
+      models.gemini.supportsImages,
+      models.gemini.supportsToolCalls
     ),
   ['cohere']: (opts: ConfigOptions) =>
     new CohereHandler(
       opts,
       models.cohere.models,
       models.cohere.supportsJSON,
-      models.cohere.supportsImages
+      models.cohere.supportsImages,
+      models.cohere.supportsToolCalls
     ),
   ['bedrock']: (opts: ConfigOptions) =>
     new BedrockHandler(
       opts,
       models.bedrock.models,
       models.bedrock.supportsJSON,
-      models.bedrock.supportsImages
+      models.bedrock.supportsImages,
+      models.bedrock.supportsToolCalls
     ),
   ['mistral']: (opts: ConfigOptions) =>
     new MistralHandler(
       opts,
       models.mistral.models,
       models.mistral.supportsJSON,
-      models.mistral.supportsImages
+      models.mistral.supportsImages,
+      models.mistral.supportsToolCalls
     ),
   ['groq']: (opts: ConfigOptions) =>
     new GroqHandler(
       opts,
       models.groq.models,
       models.groq.supportsJSON,
-      models.groq.supportsImages
+      models.groq.supportsImages,
+      models.groq.supportsToolCalls
     ),
   ['ai21']: (opts: ConfigOptions) =>
     new AI21Handler(
       opts,
       models.ai21.models,
       models.ai21.supportsJSON,
-      models.ai21.supportsImages
+      models.ai21.supportsImages,
+      models.ai21.supportsToolCalls
     ),
   ['perplexity']: (opts: ConfigOptions) =>
     new PerplexityHandler(
       opts,
       models.perplexity.models,
       models.perplexity.supportsJSON,
-      models.perplexity.supportsImages
+      models.perplexity.supportsImages,
+      models.perplexity.supportsToolCalls
     ),
 }
 

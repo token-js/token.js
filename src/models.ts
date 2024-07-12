@@ -46,11 +46,27 @@ export const models = {
       'gpt-4-1106-preview',
       'gpt-4-vision-preview',
     ] as const,
+    supportsToolCalls: [
+      'gpt-4o',
+      'gpt-4o-2024-05-13',
+      'gpt-4-turbo',
+      'gpt-4-turbo-2024-04-09',
+      'gpt-4-turbo-preview',
+      'gpt-4-0125-preview',
+      'gpt-4-1106-preview',
+      'gpt-4',
+      'gpt-4-0613',
+      'gpt-3.5-turbo',
+      'gpt-3.5-turbo-0125',
+      'gpt-3.5-turbo-1106',
+      'gpt-3.5-turbo-0613',
+    ] as const,
   },
   ai21: {
     models: ['jamba-instruct'] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
+    supportsToolCalls: [] as const,
   },
   anthropic: {
     models: [
@@ -69,11 +85,22 @@ export const models = {
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
     ] as const,
+    supportsToolCalls: [
+      'claude-3-5-sonnet-20240620',
+      'claude-3-opus-20240229',
+      'claude-3-sonnet-20240229',
+      'claude-3-haiku-20240307',
+    ] as const,
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
     supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
     supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
+    supportsToolCalls: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.0-pro',
+    ] as const,
   },
   cohere: {
     models: [
@@ -86,6 +113,11 @@ export const models = {
     ] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
+    supportsToolCalls: [
+      'command-r-plus',
+      'command-r',
+      'command-nightly',
+    ] as const,
   },
   bedrock: {
     models: [
@@ -118,6 +150,14 @@ export const models = {
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
+    ] as const,
+    supportsToolCalls: [
+      'anthropic.claude-3-opus-20240229-v1:0',
+      'anthropic.claude-3-sonnet-20240229-v1:0',
+      'anthropic.claude-3-haiku-20240307-v1:0',
+      'cohere.command-r-plus-v1:0',
+      'cohere.command-r-v1:0',
+      'mistral.mistral-large-2402-v1:0',
     ] as const,
   },
   mistral: {
@@ -152,6 +192,14 @@ export const models = {
       'codestral-2405',
     ] as const,
     supportsImages: [] as const,
+    supportsToolCalls: [
+      'open-mixtral-8x22b',
+      'open-mixtral-8x22b-2404',
+      'mistral-small-latest',
+      'mistral-small-2402',
+      'mistral-large-latest',
+      'mistral-large-2402',
+    ] as const,
   },
   groq: {
     models: [
@@ -167,6 +215,7 @@ export const models = {
     // to ensure that we only support models that reliably produce decent results.
     supportsJSON: ['llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
     supportsImages: [] as const,
+    supportsToolCalls: [] as const,
   },
   perplexity: {
     models: [
@@ -180,5 +229,6 @@ export const models = {
     ] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
+    supportsToolCalls: [] as const,
   },
 }

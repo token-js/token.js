@@ -11,17 +11,20 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   protected models: readonly T[]
   protected supportsJSON: readonly T[]
   protected supportsImages: readonly T[]
+  protected supportsToolCalls: readonly T[]
 
   constructor(
     opts: ConfigOptions,
     models: readonly T[],
     supportsJSON: readonly T[],
-    supportsImages: readonly T[]
+    supportsImages: readonly T[],
+    supportsToolCalls: readonly T[]
   ) {
     this.opts = opts
     this.models = models
     this.supportsJSON = supportsJSON
     this.supportsImages = supportsImages
+    this.supportsToolCalls = supportsToolCalls
   }
 
   abstract create(
@@ -31,6 +34,24 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   protected validateInputs(body: CompletionParams): void {
     if (!this.isSupportedModel(body.model)) {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
+    }
+
+    if (
+      body.tools !== undefined &&
+      !this.supportsToolCalls.includes(body.model)
+    ) {
+      throw new InputError(
+        `Detected a 'tools' parameter, but the following model does not support tools: ${body.model}`
+      )
+    }
+
+    if (
+      body.tool_choice !== undefined &&
+      !this.supportsToolCalls.includes(body.model)
+    ) {
+      throw new InputError(
+        `Detected a 'tool_choice' parameter, but the following model does not support tools: ${body.model}`
+      )
     }
 
     if (typeof body.temperature === 'number' && body.temperature > 2) {
