@@ -43,13 +43,6 @@ export const convertMessages = (
   messages: (ChatCompletionMessageParam | ChatCompletionMessage)[]
 ): Array<Message | ChatCompletionResponseChoice['message']> => {
   return messages.map((message) => {
-    if (
-      typeof message.content !== 'string' &&
-      message.content?.some((part) => part.type === 'image_url')
-    ) {
-      throw new Error('Image inputs are not supported by Mistral')
-    }
-
     if (message.role === 'tool') {
       const name = findLinkedToolCallName(
         messages as ChatCompletionMessage[],

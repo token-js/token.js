@@ -337,10 +337,6 @@ export const convertMessages = (
             role: convertRole(message.role),
             message: e.text,
           })
-        } else {
-          throw new InputError(
-            `Cohere does not support images. Please remove them from your prompt message.`
-          )
         }
       }
     }
