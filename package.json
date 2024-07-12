@@ -2,7 +2,7 @@
   "name": "token.js",
   "version": "0.0.2",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "vitest --exclude 'test/manual/**'",
     "test:coverage": "vitest --exclude 'test/manual/**' run --coverage",
