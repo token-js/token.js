@@ -40,30 +40,30 @@ import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 describe('convertContentsToParts', () => {
   const systemPrefix = 'PREFIX_'
 
-  it('should return an empty array when contents is null', () => {
-    expect(convertContentsToParts(null, systemPrefix)).toEqual([])
+  it('should return an empty array when contents is null', async () => {
+    expect(await convertContentsToParts(null, systemPrefix)).toEqual([])
   })
 
-  it('should return an empty array when contents is undefined', () => {
-    expect(convertContentsToParts(undefined, systemPrefix)).toEqual([])
+  it('should return an empty array when contents is undefined', async () => {
+    expect(await convertContentsToParts(undefined, systemPrefix)).toEqual([])
   })
 
-  it('should return a single part with prefixed text when contents is a string', () => {
+  it('should return a single part with prefixed text when contents is a string', async () => {
     const contents = 'some text'
-    const result = convertContentsToParts(contents, systemPrefix)
+    const result = await convertContentsToParts(contents, systemPrefix)
     expect(result).toEqual([{ text: 'PREFIX_some text' }])
   })
 
-  it('should return parts with prefixed text when contents is an array of text parts', () => {
+  it('should return parts with prefixed text when contents is an array of text parts', async () => {
     const contents: ChatCompletionContentPart[] = [
       { type: 'text', text: 'text1' },
       { type: 'text', text: 'text2' },
     ]
-    const result = convertContentsToParts(contents, systemPrefix)
+    const result = await convertContentsToParts(contents, systemPrefix)
     expect(result).toEqual([{ text: 'PREFIX_text1' }, { text: 'PREFIX_text2' }])
   })
 
-  it('should return parts with inlineData when contents is an array of base64 encoded image URL parts', () => {
+  it('should return parts with inlineData when contents is an array of base64 encoded image URL parts', async () => {
     const contents: ChatCompletionContentPart[] = [
       {
         type: 'image_url',
@@ -74,14 +74,14 @@ describe('convertContentsToParts', () => {
         image_url: { url: 'data:image/png;base64,examplebase64data2' },
       },
     ]
-    const result = convertContentsToParts(contents, systemPrefix)
+    const result = await convertContentsToParts(contents, systemPrefix)
     expect(result).toEqual([
       { inlineData: { mimeType: 'image/png', data: 'examplebase64data1' } },
       { inlineData: { mimeType: 'image/png', data: 'examplebase64data2' } },
     ])
   })
 
-  it('should handle mixed array of text and base64 encoded image URL parts', () => {
+  it('should handle mixed array of text and base64 encoded image URL parts', async () => {
     const contents: ChatCompletionContentPart[] = [
       { type: 'text', text: 'text1' },
       {
@@ -89,23 +89,23 @@ describe('convertContentsToParts', () => {
         image_url: { url: 'data:image/png;base64,examplebase64data' },
       },
     ]
-    const result = convertContentsToParts(contents, systemPrefix)
+    const result = await convertContentsToParts(contents, systemPrefix)
     expect(result).toEqual([
       { text: 'PREFIX_text1' },
       { inlineData: { mimeType: 'image/png', data: 'examplebase64data' } },
     ])
   })
 
-  it('should throw an InputError when contents contains an invalid type', () => {
+  it('should throw an InputError when contents contains an invalid type', async () => {
     const contents = [{ type: 'invalid_type', text: 'text' }] as any
-    expect(() => convertContentsToParts(contents, systemPrefix)).toThrow(
-      InputError
-    )
+    await expect(() =>
+      convertContentsToParts(contents, systemPrefix)
+    ).rejects.toThrow(InputError)
   })
 
-  it('should return an empty array when contents is an empty array', () => {
+  it('should return an empty array when contents is an empty array', async () => {
     const contents: ChatCompletionContentPart[] = []
-    const result = convertContentsToParts(contents, systemPrefix)
+    const result = await convertContentsToParts(contents, systemPrefix)
     expect(result).toEqual([])
   })
 })
@@ -260,14 +260,14 @@ describe('convertAssistantMessage', () => {
 })
 
 describe('convertMessageToContent', () => {
-  it('should convert a tool message correctly', () => {
+  it('should convert a tool message correctly', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'tool',
       content: '{"response": "data"}',
       tool_call_id: 'testTool',
     }
 
-    const result = convertMessageToContent(message, false)
+    const result = await convertMessageToContent(message, false)
 
     expect(result).toEqual({
       role: 'user',
@@ -282,7 +282,7 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should convert an assistant message correctly', () => {
+  it('should convert an assistant message correctly', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'assistant',
       content: 'Hello, world!',
@@ -295,7 +295,7 @@ describe('convertMessageToContent', () => {
       ],
     }
 
-    const result = convertMessageToContent(message, false)
+    const result = await convertMessageToContent(message, false)
 
     expect(result).toEqual({
       role: 'model',
@@ -306,13 +306,13 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should convert a user message correctly', () => {
+  it('should convert a user message correctly', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'user',
       content: 'Hello, world!',
     }
 
-    const result = convertMessageToContent(message, false)
+    const result = await convertMessageToContent(message, false)
 
     expect(result).toEqual({
       role: 'user',
@@ -320,13 +320,13 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should convert a system message correctly without prefix', () => {
+  it('should convert a system message correctly without prefix', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'system',
       content: 'System message',
     }
 
-    const result = convertMessageToContent(message, false)
+    const result = await convertMessageToContent(message, false)
 
     expect(result).toEqual({
       role: 'user',
@@ -334,13 +334,13 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should convert a system message correctly with prefix', () => {
+  it('should convert a system message correctly with prefix', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'system',
       content: 'System message',
     }
 
-    const result = convertMessageToContent(message, true)
+    const result = await convertMessageToContent(message, true)
 
     expect(result).toEqual({
       role: 'user',
@@ -348,13 +348,13 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should handle messages with empty array content', () => {
+  it('should handle messages with empty array content', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'user',
       content: [],
     }
 
-    const result = convertMessageToContent(message, false)
+    const result = await convertMessageToContent(message, false)
 
     expect(result).toEqual({
       role: 'user',
@@ -362,13 +362,15 @@ describe('convertMessageToContent', () => {
     })
   })
 
-  it('should throw an InputError for an unexpected message role', () => {
+  it('should throw an InputError for an unexpected message role', async () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessageParam = {
       role: 'unexpectedRole' as any,
       content: 'Hello, world!',
     }
 
-    expect(() => convertMessageToContent(message, false)).toThrow(InputError)
+    await expect(convertMessageToContent(message, false)).rejects.toThrow(
+      InputError
+    )
   })
 })
 
@@ -636,13 +638,13 @@ describe('convertToolConfig', () => {
 })
 
 describe('convertMessagesToContents', () => {
-  it('should convert messages and include a system instruction if the first message is a system message', () => {
+  it('should convert messages and include a system instruction if the first message is a system message', async () => {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'system', content: 'System message' },
       { role: 'user', content: 'User message' },
     ]
 
-    const result = convertMessagesToContents(messages)
+    const result = await convertMessagesToContents(messages)
 
     expect(result).toEqual({
       contents: [{ role: 'user', parts: [{ text: 'User message' }] }],
@@ -653,13 +655,13 @@ describe('convertMessagesToContents', () => {
     })
   })
 
-  it('should convert messages without a system instruction if the first message is not a system message', () => {
+  it('should convert messages without a system instruction if the first message is not a system message', async () => {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'user', content: 'User message 1' },
       { role: 'user', content: 'User message 2' },
     ]
 
-    const result = convertMessagesToContents(messages)
+    const result = await convertMessagesToContents(messages)
 
     expect(result).toEqual({
       contents: [
@@ -670,10 +672,10 @@ describe('convertMessagesToContents', () => {
     })
   })
 
-  it('should return an empty contents array and undefined systemInstruction if messages are empty', () => {
+  it('should return an empty contents array and undefined systemInstruction if messages are empty', async () => {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
 
-    const result = convertMessagesToContents(messages)
+    const result = await convertMessagesToContents(messages)
 
     expect(result).toEqual({
       contents: [],
@@ -681,12 +683,12 @@ describe('convertMessagesToContents', () => {
     })
   })
 
-  it('should handle a single system message correctly', () => {
+  it('should handle a single system message correctly', async () => {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'system', content: 'System message' },
     ]
 
-    const result = convertMessagesToContents(messages)
+    const result = await convertMessagesToContents(messages)
 
     expect(result).toEqual({
       contents: [],
@@ -697,7 +699,7 @@ describe('convertMessagesToContents', () => {
     })
   })
 
-  it('should handle multiple system messages correctly by only considering the first as systemInstruction', () => {
+  it('should handle multiple system messages correctly by only considering the first as systemInstruction', async () => {
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: 'system', content: 'System message 1' },
       { role: 'system', content: 'System message 2' },
@@ -705,7 +707,7 @@ describe('convertMessagesToContents', () => {
       { role: 'system', content: 'System message 3' },
     ]
 
-    const result = convertMessagesToContents(messages)
+    const result = await convertMessagesToContents(messages)
 
     expect(result).toEqual({
       contents: [
@@ -720,8 +722,8 @@ describe('convertMessagesToContents', () => {
     })
   })
 
-  it('should convert assistant message containing tool calls followed by randomly ordered tool results', () => {
-    const result = convertMessagesToContents(
+  it('should convert assistant message containing tool calls followed by randomly ordered tool results', async () => {
+    const result = await convertMessagesToContents(
       MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS
     )
     expect(result).toEqual({
@@ -1389,7 +1391,8 @@ describe('GeminiHandler', () => {
     const handler = new GeminiHandler(
       handlerOptions,
       models.gemini.models,
-      models.gemini.supportsJSON
+      models.gemini.supportsJSON,
+      models.gemini.supportsImages
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
@@ -1450,7 +1453,8 @@ describe('GeminiHandler', () => {
     const handler = new GeminiHandler(
       handlerOptions,
       models.gemini.models,
-      models.gemini.supportsJSON
+      models.gemini.supportsJSON,
+      models.gemini.supportsImages
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
@@ -1505,7 +1509,8 @@ describe('GeminiHandler', () => {
     const handler = new GeminiHandler(
       handlerOptions,
       models.gemini.models,
-      models.gemini.supportsJSON
+      models.gemini.supportsJSON,
+      models.gemini.supportsImages
     )
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({

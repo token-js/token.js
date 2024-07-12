@@ -7,7 +7,7 @@
     "test": "vitest --exclude 'test/manual/**'",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "test:manual": "vitest test/manual",
+    "test:manual": "vitest test/manual --testTimeout 100000",
     "lint": "pnpm lint:fix && pnpm lint:check",
     "lint:fix": "pnpm lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
