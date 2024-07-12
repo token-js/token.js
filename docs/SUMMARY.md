@@ -11,4 +11,3 @@
   * [Mistral](providers/mistral.md)
   * [OpenAI](providers/openai.md)
   * [Perplexity](providers/perplexity.md)
-  * [Azure](providers/azure.md)

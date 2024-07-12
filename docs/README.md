@@ -10,7 +10,7 @@ description: >-
 
 * Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
 * Support for tools, JSON output, image inputs, streaming, and more.
-* Support for 10 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, Perplexity, and Azure with more coming soon.
+* Support for 9 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
 * Completely free and opensource.
 * No proxy server required.
 
