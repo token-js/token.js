@@ -9,9 +9,9 @@ GEMINI_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the LLM.js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -21,7 +21,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -39,6 +39,5 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 
 
 
-### Provider Documentation
+### [Gemini Documentation](https://ai.google.dev/gemini-api/docs)
 
-[https://ai.google.dev/gemini-api/docs](https://ai.google.dev/gemini-api/docs)
