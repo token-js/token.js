@@ -9,9 +9,9 @@ PERPLEXITY_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the LLM.js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -21,7 +21,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'perplexity',
   model: 'llama-3-70b-instruct',
@@ -43,6 +43,4 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 
 
 
-### Provider Documentation
-
-[https://docs.anthropic.com/en/docs/welcome](https://docs.anthropic.com/en/docs/welcome)
+### [Perplexity Documentation](https://docs.perplexity.ai/)

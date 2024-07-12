@@ -11,9 +11,9 @@ AWS_SECRET_ACCESS_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'llmjs'
+import { TokenJS, ChatCompletionMessageParam } from 'token.js'
 
-// Import and create the LLM.js client
+// Import and create the token.js client
 const tokenjs = new TokenJS()
 
 // Specify OpenAI compatible messages
@@ -23,7 +23,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
+const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'bedrock',
   model: 'amazon.titan-text-express-v1',
@@ -57,6 +57,4 @@ const result: ChatCompletionMessageParam[] = await llm.chat.completions.create({
 
 
 
-### Provider Documentation
-
-[https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)
+### [Bedrock Documentation](https://docs.aws.amazon.com/bedrock/latest/APIReference/welcome.html)
