@@ -28,7 +28,7 @@ import { GeminiModel, ProviderCompletionParams } from '../chat'
 import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
 import { BaseHandler } from './base'
 import { InputError } from './types'
-import { consoleWarn, getTimestamp, parseImage } from './utils'
+import { consoleWarn, fetchThenParseImage, getTimestamp } from './utils'
 
 // Google's `GenerateContentCandidate.content` field should be optional, but it's a required field
 // in Google's types. This field can be undefined if a content filter is triggered when the user
@@ -63,10 +63,10 @@ type GenerateContentStreamResultWithOptionalContent = Omit<
   response: Promise<EnhancedResponseWithOptionalContent>
 }
 
-export const convertContentsToParts = (
+export const convertContentsToParts = async (
   contents: Array<ChatCompletionContentPart> | string | null | undefined,
   systemPrefix: string
-): Part[] => {
+): Promise<Part[]> => {
   if (contents === null || contents === undefined) {
     return []
   }
@@ -78,27 +78,29 @@ export const convertContentsToParts = (
       },
     ]
   } else {
-    return contents.map((part) => {
-      if (part.type === 'text') {
-        return {
-          text: `${systemPrefix}${part.text}`,
+    return Promise.all(
+      contents.map(async (part) => {
+        if (part.type === 'text') {
+          return {
+            text: `${systemPrefix}${part.text}`,
+          }
+        } else if (part.type === 'image_url') {
+          const imageData = await fetchThenParseImage(part.image_url.url)
+          return {
+            inlineData: {
+              mimeType: imageData.mimeType,
+              data: imageData.content,
+            },
+          }
+        } else {
+          throw new InputError(
+            `Invalid content part type: ${
+              (part as any).type
+            }. Must be "text" or "image_url".`
+          )
         }
-      } else if (part.type === 'image_url') {
-        const imageData = parseImage(part.image_url.url)
-        return {
-          inlineData: {
-            mimeType: imageData.mimeType,
-            data: imageData.content,
-          },
-        }
-      } else {
-        throw new InputError(
-          `Invalid content part type: ${
-            (part as any).type
-          }. Must be "text" or "image_url".`
-        )
-      }
-    })
+      })
+    )
   }
 }
 
@@ -147,10 +149,10 @@ export const convertAssistantMessage = (
   }
 }
 
-export const convertMessageToContent = (
+export const convertMessageToContent = async (
   message: OpenAI.Chat.Completions.ChatCompletionMessageParam,
   includeSystemPrefix: boolean
-): Content => {
+): Promise<Content> => {
   switch (message.role) {
     case 'tool':
       return {
@@ -176,19 +178,19 @@ export const convertMessageToContent = (
         message.role === 'system' && includeSystemPrefix ? 'System:\n' : ''
       return {
         role: convertRole(message.role),
-        parts: convertContentsToParts(message.content, systemPrefix),
+        parts: await convertContentsToParts(message.content, systemPrefix),
       }
     default:
       throw new InputError(`Unexpected message role: ${message.role}`)
   }
 }
 
-export const convertMessagesToContents = (
+export const convertMessagesToContents = async (
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[]
-): {
+): Promise<{
   contents: Content[]
   systemInstruction: Content | undefined
-} => {
+}> => {
   const clonedMessages = structuredClone(messages)
 
   // Pop the first element from the user-defined `messages` array if it begins with a 'system'
@@ -200,16 +202,16 @@ export const convertMessagesToContents = (
     const systemMessage = clonedMessages.shift()
     systemInstruction =
       systemMessage !== undefined
-        ? convertMessageToContent(systemMessage, false)
+        ? await convertMessageToContent(systemMessage, false)
         : undefined
   }
 
   const converted: Array<Content> = []
   for (const message of clonedMessages) {
     if (message.role === 'system' || message.role === 'user') {
-      converted.push(convertMessageToContent(message, true))
+      converted.push(await convertMessageToContent(message, true))
     } else if (message.role === 'assistant') {
-      converted.push(convertMessageToContent(message, true))
+      converted.push(await convertMessageToContent(message, true))
       if (message.tool_calls !== undefined) {
         for (const assistantToolCall of message.tool_calls) {
           const toolResult = clonedMessages.find(
@@ -220,7 +222,7 @@ export const convertMessagesToContents = (
               `Could not find tool message with the id: ${assistantToolCall.id}`
             )
           }
-          converted.push(convertMessageToContent(toolResult, true))
+          converted.push(await convertMessageToContent(toolResult, true))
         }
       }
     }
@@ -492,7 +494,7 @@ export class GeminiHandler extends BaseHandler<GeminiModel> {
       // Google also supports cached content which does not fit into the OpenAI format
     })
 
-    const { contents, systemInstruction } = convertMessagesToContents(
+    const { contents, systemInstruction } = await convertMessagesToContents(
       body.messages
     )
     const params: GenerateContentRequest = {

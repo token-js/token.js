@@ -295,7 +295,7 @@ export const convertMessages = async (
               image: {
                 format: normalizeMIMEType(parsedImage.mimeType),
                 source: {
-                  bytes: new TextEncoder().encode(parsedImage.content),
+                  bytes: Buffer.from(parsedImage.content, 'base64'),
                 },
               },
             }
