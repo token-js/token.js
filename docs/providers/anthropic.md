@@ -29,18 +29,18 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 })
 ```
 
+### [Anthropic Documentation](https://docs.anthropic.com/en/docs/welcome)
+
+<!-- compatibility -->
 ### Supported Models
 
-| Model                      | JSON Output | Tools | Image Input | Streaming | N > 1 |
-| -------------------------- | ----------- | ----- | ----------- | --------- | ----- |
-| claude-3-5-sonnet-20240620 |             |       |             |           |       |
-| claude-3-opus-20240229     |             |       |             |           |       |
-| claude-3-sonnet-20240229   |             |       |             |           |       |
-| claude-3-haiku-20240307    |             |       |             |           |       |
-| claude-2.1                 |             |       |             |           |       |
-| claude-2.0                 |             |       |             |           |       |
-| claude-instant-1.2         |             |       |             |           |       |
+| Model                      | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
+| -------------------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
+| claude-3-5-sonnet-20240620 | ✅          |           |             | ✅           | ✅     |       |
+| claude-3-opus-20240229     | ✅          |           |             | ✅           | ✅     |       |
+| claude-3-sonnet-20240229   | ✅          |           |             | ✅           | ✅     |       |
+| claude-3-haiku-20240307    | ✅          |           |             | ✅           | ✅     |       |
+| claude-2.1                 | ✅          |           |             |             |       |       |
+| claude-2.0                 | ✅          |           |             |             |       |       |
+| claude-instant-1.2         | ✅          |           |             |             |       |       |
 
-
-
-### [Anthropic Documentation](https://docs.anthropic.com/en/docs/welcome)

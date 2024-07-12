@@ -29,10 +29,16 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 })
 ```
 
+### [Groq Documentation](https://console.groq.com/docs/quickstart)
+
+<!-- compatibility -->
 ### Supported Models
 
-<table><thead><tr><th width="192">Model</th><th>JSON Output</th><th>Tools</th><th>Image Input</th><th>Streaming</th><th>N > 1</th></tr></thead><tbody><tr><td>llama3-8b-8192</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>llama3-70b-8192</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>mixtral-8x7b-32768</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>gemma-7b-it</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>gemma2-9b-it</td><td></td><td></td><td></td><td></td><td></td></tr></tbody></table>
+| Model              | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
+| ------------------ | ---------- | --------- | ----------- | ----------- | ----- | ----- |
+| llama3-8b-8192     | ✅          |           |             |             |       |       |
+| llama3-70b-8192    | ✅          |           | ✅           |             |       |       |
+| mixtral-8x7b-32768 | ✅          |           |             |             |       |       |
+| gemma-7b-it        | ✅          |           | ✅           |             |       |       |
+| gemma2-9b-it       | ✅          |           | ✅           |             |       |       |
 
-
-
-### [Groq Documentation](https://console.groq.com/docs/quickstart)

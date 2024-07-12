@@ -4,7 +4,6 @@ import { GroqModel, ProviderCompletionParams } from '../chat'
 import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
 import { BaseHandler } from './base'
 import { InputError } from './types'
-import { assertNIsOne } from './utils'
 
 // Groq is very compatible with OpenAI's API, so we could likely reuse the OpenAI SDK for this handler
 // to reducee the bundle size.
@@ -45,7 +44,6 @@ export class GroqHandler extends BaseHandler<GroqModel> {
       )
     }
 
-    assertNIsOne(body.n, 'Groq')
     return client.chat.completions.create({
       stream: body.stream,
       messages: body.messages as Groq.Chat.ChatCompletionMessageParam[],

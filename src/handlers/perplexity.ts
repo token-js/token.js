@@ -20,17 +20,12 @@ export class PerplexityHandler extends BaseHandler<PerplexityModel> {
   async create(
     body: ProviderCompletionParams<'perplexity'>
   ): Promise<CompletionResponse | StreamCompletionResponse> {
+    this.validateInputs(body)
     const apiKey = this.opts.apiKey ?? process.env.PERPLEXITY_API_KEY
 
     if (apiKey === undefined) {
       throw new InputError(
         'API key is required for Perplexity, define PERPLEXITY_API_KEY in your environment or specifty the apiKey option.'
-      )
-    }
-
-    if (typeof body.n === 'number' && body.n > 1) {
-      throw new InputError(
-        `Perplexity does not support setting 'n' greater than 1.`
       )
     }
 

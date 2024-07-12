@@ -70,4 +70,21 @@ describe('Base Handler', () => {
       )
     )
   })
+
+  it("throws an error when n > 1 but the model doesn't support n > 1", async () => {
+    const tokenjs = new TokenJS()
+    await expect(
+      tokenjs.chat.completions.create({
+        provider: 'anthropic',
+        model: 'claude-2.0',
+        messages: getDummyMessages(),
+        temperature: 0.5,
+        n: 2,
+      })
+    ).rejects.toThrow(
+      new InputError(
+        `The model claude-2.0 does not support setting 'n' greater than 1.`
+      )
+    )
+  })
 })

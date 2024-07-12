@@ -29,17 +29,17 @@ const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.crea
 })
 ```
 
+### [Cohere Documentation](https://docs.cohere.com)
+
+<!-- compatibility -->
 ### Supported Models
 
-| Model                 | JSON Output | Tools | Image Input | Streaming | N > 1 |
-| --------------------- | ----------- | ----- | ----------- | --------- | ----- |
-| command-r-plus        |             |       |             |           |       |
-| command-r             |             |       |             |           |       |
-| command               |             |       |             |           |       |
-| command-nightly       |             |       |             |           |       |
-| command-light         |             |       |             |           |       |
-| command-light-nightly |             |       |             |           |       |
+| Model                 | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
+| --------------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
+| command-r-plus        | ✅          |           |             |             | ✅     |       |
+| command-r             | ✅          |           |             |             | ✅     |       |
+| command               | ✅          |           |             |             |       |       |
+| command-nightly       | ✅          |           |             |             | ✅     |       |
+| command-light         | ✅          |           |             |             |       |       |
+| command-light-nightly | ✅          |           |             |             |       |       |
 
-
-
-### [Cohere Documentation](https://docs.cohere.com)
