@@ -10,15 +10,18 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   opts: ConfigOptions
   protected models: readonly T[]
   protected supportsJSON: readonly T[]
+  protected supportsImages: readonly T[]
 
   constructor(
     opts: ConfigOptions,
     models: readonly T[],
-    supportsJSON: readonly T[]
+    supportsJSON: readonly T[],
+    supportsImages: readonly T[]
   ) {
     this.opts = opts
     this.models = models
     this.supportsJSON = supportsJSON
+    this.supportsImages = supportsImages
   }
 
   abstract create(
@@ -41,6 +44,21 @@ export abstract class BaseHandler<T extends LLMChatModel> {
         throw new InputError(
           `The 'function' role is deprecated. Please use the 'tool' role instead.`
         )
+      }
+
+      if (message.role === 'user') {
+        if (Array.isArray(message.content)) {
+          for (const content of message.content) {
+            if (
+              content.type === 'image_url' &&
+              !this.supportsImageMessages(body.model)
+            ) {
+              throw new InputError(
+                `Detected an image in the 'messages' array, but the following model does not support images: ${body.model}`
+              )
+            }
+          }
+        }
       }
     }
 
@@ -87,5 +105,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
 
   protected supportsJSONMode(model: T): boolean {
     return this.supportsJSON.includes(model)
+  }
+
+  protected supportsImageMessages(model: T): boolean {
+    return this.supportsImages.includes(model)
   }
 }

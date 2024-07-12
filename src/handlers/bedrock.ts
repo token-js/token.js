@@ -48,18 +48,6 @@ const normalizeMIMEType = (mimeType: MIMEType): ImageFormat => {
   }
 }
 
-const supportsImages = (model: BedrockModel): boolean => {
-  if (
-    model === 'anthropic.claude-3-haiku-20240307-v1:0' ||
-    model === 'anthropic.claude-3-opus-20240229-v1:0' ||
-    model === 'anthropic.claude-3-sonnet-20240229-v1:0'
-  ) {
-    return true
-  } else {
-    return false
-  }
-}
-
 const supportsSystemMessages = (model: BedrockModel): boolean => {
   return (
     model !== 'cohere.command-light-text-v14' &&
@@ -568,11 +556,7 @@ export class BedrockHandler extends BaseHandler<BedrockModel> {
       if (Array.isArray(message.content)) {
         for (const e of message.content) {
           if (e.type === 'image_url') {
-            if (!supportsImages(body.model)) {
-              throw new InputError(
-                `Model '${body.model}' does not support images. Remove any images from the prompt or use a model that supports images.`
-              )
-            } else if (
+            if (
               e.image_url.detail !== undefined &&
               e.image_url.detail !== 'auto'
             ) {

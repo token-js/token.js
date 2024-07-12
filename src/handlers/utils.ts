@@ -1,5 +1,6 @@
 import axios from 'axios'
 import chalk from 'chalk'
+import { lookup } from 'mime-types'
 
 import { LLMChatModel, LLMProvider } from '../chat'
 import { models } from '../models'
@@ -18,38 +19,67 @@ import { InputError, MIMEType } from './types'
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   ['openai']: (opts: ConfigOptions) =>
-    new OpenAIHandler(opts, models.openai.models, models.openai.supportsJSON),
+    new OpenAIHandler(
+      opts,
+      models.openai.models,
+      models.openai.supportsJSON,
+      models.openai.supportsImages
+    ),
   ['anthropic']: (opts: ConfigOptions) =>
     new AnthropicHandler(
       opts,
       models.anthropic.models,
-      models.anthropic.supportsJSON
+      models.anthropic.supportsJSON,
+      models.anthropic.supportsImages
     ),
   ['gemini']: (opts: ConfigOptions) =>
-    new GeminiHandler(opts, models.gemini.models, models.gemini.supportsJSON),
+    new GeminiHandler(
+      opts,
+      models.gemini.models,
+      models.gemini.supportsJSON,
+      models.gemini.supportsImages
+    ),
   ['cohere']: (opts: ConfigOptions) =>
-    new CohereHandler(opts, models.cohere.models, models.cohere.supportsJSON),
+    new CohereHandler(
+      opts,
+      models.cohere.models,
+      models.cohere.supportsJSON,
+      models.cohere.supportsImages
+    ),
   ['bedrock']: (opts: ConfigOptions) =>
     new BedrockHandler(
       opts,
       models.bedrock.models,
-      models.bedrock.supportsJSON
+      models.bedrock.supportsJSON,
+      models.bedrock.supportsImages
     ),
   ['mistral']: (opts: ConfigOptions) =>
     new MistralHandler(
       opts,
       models.mistral.models,
-      models.mistral.supportsJSON
+      models.mistral.supportsJSON,
+      models.mistral.supportsImages
     ),
   ['groq']: (opts: ConfigOptions) =>
-    new GroqHandler(opts, models.groq.models, models.groq.supportsJSON),
+    new GroqHandler(
+      opts,
+      models.groq.models,
+      models.groq.supportsJSON,
+      models.groq.supportsImages
+    ),
   ['ai21']: (opts: ConfigOptions) =>
-    new AI21Handler(opts, models.ai21.models, models.ai21.supportsJSON),
+    new AI21Handler(
+      opts,
+      models.ai21.models,
+      models.ai21.supportsJSON,
+      models.ai21.supportsImages
+    ),
   ['perplexity']: (opts: ConfigOptions) =>
     new PerplexityHandler(
       opts,
       models.perplexity.models,
-      models.perplexity.supportsJSON
+      models.perplexity.supportsJSON,
+      models.perplexity.supportsImages
     ),
 }
 
@@ -78,9 +108,11 @@ export const fetchImageAsBase64 = async (url: string): Promise<string> => {
   return buffer.toString('base64')
 }
 
-const fetchMIMEType = async (url: string): Promise<string | null> => {
-  const response = await axios.head(url)
-  return response.headers['content-type'] || null
+export const getMimeType = (url: string): string => {
+  const parsedUrl = new URL(url)
+  const pathname = parsedUrl.pathname
+  const extension = pathname.split('.').pop()
+  return lookup(extension)
 }
 
 const isUrl = (input: string): boolean => {
@@ -100,7 +132,7 @@ export const fetchThenParseImage = async (
 ): Promise<{ content: string; mimeType: MIMEType }> => {
   if (isUrl(urlOrBase64Image)) {
     const content = await fetchImageAsBase64(urlOrBase64Image)
-    const mimeType = await fetchMIMEType(urlOrBase64Image)
+    const mimeType = getMimeType(urlOrBase64Image)
     if (mimeType === null) {
       throw new Error(
         `Failed to get the mime type for the URL: ${urlOrBase64Image}`

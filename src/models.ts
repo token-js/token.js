@@ -36,10 +36,21 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
     ] as const,
+    supportsImages: [
+      'gpt-4o',
+      'gpt-4o-2024-05-13',
+      'gpt-4-turbo',
+      'gpt-4-turbo-2024-04-09',
+      'gpt-4-0125-preview',
+      'gpt-4-turbo-preview',
+      'gpt-4-1106-preview',
+      'gpt-4-vision-preview',
+    ] as const,
   },
   ai21: {
     models: ['jamba-instruct'] as const,
     supportsJSON: [] as const,
+    supportsImages: [] as const,
   },
   anthropic: {
     models: [
@@ -52,10 +63,17 @@ export const models = {
       'claude-instant-1.2',
     ] as const,
     supportsJSON: [] as const,
+    supportsImages: [
+      'claude-3-5-sonnet-20240620',
+      'claude-3-opus-20240229',
+      'claude-3-sonnet-20240229',
+      'claude-3-haiku-20240307',
+    ] as const,
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
     supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
+    supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
   },
   cohere: {
     models: [
@@ -67,6 +85,7 @@ export const models = {
       'command-light-nightly',
     ] as const,
     supportsJSON: [] as const,
+    supportsImages: [] as const,
   },
   bedrock: {
     models: [
@@ -95,6 +114,11 @@ export const models = {
     // us to pass arbitrary parameters to the model, does not appear to work for Mistral's
     // `responseFormat` field.
     supportsJSON: [],
+    supportsImages: [
+      'anthropic.claude-3-opus-20240229-v1:0',
+      'anthropic.claude-3-sonnet-20240229-v1:0',
+      'anthropic.claude-3-haiku-20240307-v1:0',
+    ] as const,
   },
   mistral: {
     models: [
@@ -127,6 +151,7 @@ export const models = {
       'codestral-latest',
       'codestral-2405',
     ] as const,
+    supportsImages: [] as const,
   },
   groq: {
     models: [
@@ -141,6 +166,7 @@ export const models = {
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
     // to ensure that we only support models that reliably produce decent results.
     supportsJSON: ['llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
+    supportsImages: [] as const,
   },
   perplexity: {
     models: [
@@ -153,5 +179,6 @@ export const models = {
       'mixtral-8x7b-instruct',
     ] as const,
     supportsJSON: [] as const,
+    supportsImages: [] as const,
   },
 }

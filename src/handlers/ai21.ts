@@ -113,7 +113,7 @@ const convertMessages = (
               message.role === 'system' ? `System: ${e.text}` : e.text
             return text
           } else {
-            throw new InputError(`AI12 does not support images.`)
+            throw new InputError(`AI21 does not support images.`)
           }
         })
         currentMessages.push(...convertedContent)
@@ -195,18 +195,6 @@ export class AI21Handler extends BaseHandler<AI21Model> {
       throw new InputError(
         `AI21 requires that 'n' equals '1' when streaming is enabled. Received an 'n' value of: ${body.n}`
       )
-    }
-
-    for (const message of body.messages) {
-      if (Array.isArray(message.content)) {
-        for (const e of message.content) {
-          if (e.type === 'image_url') {
-            throw new InputError(
-              `Model '${body.model}' does not support images. Remove any images from the prompt or use a different model.`
-            )
-          }
-        }
-      }
     }
   }
 
