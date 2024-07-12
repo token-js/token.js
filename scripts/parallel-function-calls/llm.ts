@@ -2,12 +2,13 @@ import * as dotenv from 'dotenv'
 import { ChatCompletionToolMessageParam } from 'openai/resources/index.mjs'
 
 import { CompletionParams } from '../../src/chat'
-import { models } from '../../src/models'
+import { TokenJS } from '../../src/index'
 import { getCurrentWeather } from './utils'
+import { models } from '../../src/models'
 
 dotenv.config()
 
-const tokenjs = new TokenJS()
+const client = new TokenJS()
 
 // Parse CLI arguments
 const args = process.argv.slice(2)
@@ -34,30 +35,32 @@ async function runConversation() {
       content: "What's the weather in San Francisco, Tokyo, and Paris?",
     },
   ]
-  const response = await llm.chat.completions.create({
+  const tools: CompletionParams['tools'] = [
+    {
+      type: 'function',
+      function: {
+        name: 'get_current_weather',
+        description: 'Get the current weather in a given location',
+        parameters: {
+          type: 'object',
+          properties: {
+            location: {
+              type: 'string',
+              description: 'The city and state, e.g. San Francisco, CA',
+            },
+            unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
+          },
+          required: ['location'],
+        },
+      },
+    },
+  ]
+
+  const response = await client.chat.completions.create({
     provider,
     model,
     messages,
-    tools: [
-      {
-        type: 'function',
-        function: {
-          name: 'get_current_weather',
-          description: 'Get the current weather in a given location',
-          parameters: {
-            type: 'object',
-            properties: {
-              location: {
-                type: 'string',
-                description: 'The city and state, e.g. San Francisco, CA',
-              },
-              unit: { type: 'string', enum: ['celsius', 'fahrenheit'] },
-            },
-            required: ['location'],
-          },
-        },
-      },
-    ],
+    tools,
   })
   const responseMessage = response.choices[0].message
 
@@ -87,10 +90,12 @@ async function runConversation() {
       }
       messages.push(message)
     }
-    const secondResponse = await llm.chat.completions.create({
+    messages.push({ content: 'Hi', role: 'user' })
+    const secondResponse = await client.chat.completions.create({
       provider,
       model,
       messages,
+      tools,
     })
 
     console.log(JSON.stringify(secondResponse, null, 2))

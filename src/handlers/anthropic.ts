@@ -412,6 +412,26 @@ export const convertMessages = async (
         type: 'tool_result',
       }
       currentParams.push(toolResult)
+    } else if (message.role === 'assistant') {
+      if (typeof message.content === 'string') {
+        currentParams.push({
+          text: message.content,
+          type: 'text',
+        })
+      }
+
+      if (Array.isArray(message.tool_calls)) {
+        const convertedContent: Array<ToolUseBlockParam> =
+          message.tool_calls.map((toolCall) => {
+            return {
+              id: toolCall.id,
+              input: JSON.parse(toolCall.function.arguments),
+              name: toolCall.function.name,
+              type: 'tool_use',
+            }
+          })
+        currentParams.push(...convertedContent)
+      }
     } else if (typeof message.content === 'string') {
       const text =
         message.role === 'system'
@@ -445,21 +465,6 @@ export const convertMessages = async (
             }
           })
         )
-      currentParams.push(...convertedContent)
-    } else if (
-      message.role === 'assistant' &&
-      Array.isArray(message.tool_calls)
-    ) {
-      const convertedContent: Array<ToolUseBlockParam> = message.tool_calls.map(
-        (toolCall) => {
-          return {
-            id: toolCall.id,
-            input: JSON.parse(toolCall.function.arguments),
-            name: toolCall.function.name,
-            type: 'tool_use',
-          }
-        }
-      )
       currentParams.push(...convertedContent)
     }
 
