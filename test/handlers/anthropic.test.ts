@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { CompletionParams } from '../../src/chat'
-import { convertMessages } from '../../src/handlers/anthropic'
+import {
+  convertMessages,
+  convertToolParams,
+} from '../../src/handlers/anthropic'
+import { getDummyTool } from '../dummy'
 import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
 describe('convertMessages', () => {
@@ -19,7 +23,9 @@ describe('convertMessages', () => {
         ],
       },
     ]
-    expect(await convertMessages(input)).toEqual(output)
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual(undefined)
+    expect(messages).toEqual(output)
   })
 
   it('converts alternating user and assistant messages into blocks', async () => {
@@ -33,7 +39,9 @@ describe('convertMessages', () => {
       { role: 'assistant', content: [{ type: 'text', text: 'Yo' }] },
       { role: 'user', content: [{ type: 'text', text: 'Bye' }] },
     ]
-    expect(await convertMessages(input)).toEqual(output)
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual(undefined)
+    expect(messages).toEqual(output)
   })
 
   it('prepends an empty user message when the input messages start with an assistant message', async () => {
@@ -46,10 +54,12 @@ describe('convertMessages', () => {
       { role: 'assistant', content: [{ type: 'text', text: 'Yo' }] },
       { role: 'user', content: [{ type: 'text', text: 'Bye' }] },
     ]
-    expect(await convertMessages(input)).toEqual(output)
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual(undefined)
+    expect(messages).toEqual(output)
   })
 
-  it('does not prepend a user message when the input messages start with a system message', async () => {
+  it('separates the first system message when the input messages start with a system message', async () => {
     const input: CompletionParams['messages'] = [
       { role: 'system', content: 'Hello' },
       { role: 'user', content: 'Hi' },
@@ -57,16 +67,15 @@ describe('convertMessages', () => {
     const output = [
       {
         role: 'user',
-        content: [
-          { type: 'text', text: 'System: Hello' },
-          { type: 'text', text: 'Hi' },
-        ],
+        content: [{ type: 'text', text: 'Hi' }],
       },
     ]
-    expect(await convertMessages(input)).toEqual(output)
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual('Hello')
+    expect(messages).toEqual(output)
   })
 
-  it('groups consecutive system messages into a single user message', async () => {
+  it('separates the first system message and keeps the next system message in the messages array', async () => {
     const input: CompletionParams['messages'] = [
       { role: 'system', content: 'Hello' },
       { role: 'system', content: 'World' },
@@ -76,13 +85,14 @@ describe('convertMessages', () => {
       {
         role: 'user',
         content: [
-          { type: 'text', text: 'System: Hello' },
           { type: 'text', text: 'System: World' },
           { type: 'text', text: 'Hi' },
         ],
       },
     ]
-    expect(await convertMessages(input)).toEqual(output)
+    const { systemMessage, messages } = await convertMessages(input)
+    expect(systemMessage).toEqual('Hello')
+    expect(messages).toEqual(output)
   })
 
   it(`converts assistant message containing tool calls followed by tool results`, async () => {
