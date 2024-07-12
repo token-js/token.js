@@ -40,7 +40,8 @@ async function runConversation() {
     },
     {
       role: 'system',
-      content: "To reiterate, respond to the user's question, using tools when necessary.",
+      content:
+        "To reiterate, respond to the user's question, using tools when necessary.",
     },
   ]
   const tools: CompletionParams['tools'] = [
@@ -98,7 +99,6 @@ async function runConversation() {
       }
       messages.push(message)
     }
-    messages.push({ content: 'Hi', role: 'user' })
     const secondResponse = await client.chat.completions.create({
       provider,
       model,

@@ -25,10 +25,6 @@ export class GroqHandler extends BaseHandler<GroqModel> {
         )
       }
     }
-
-    if (body.tools && body.tools?.length > 0) {
-      throw new InputError(`Groq does not support tools`)
-    }
   }
 
   async create(
