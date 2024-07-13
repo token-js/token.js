@@ -1,0 +1,59 @@
+name: Ci
+
+on:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install
+    - name: Build
+      run: pnpm build
+    - name: Run ESLint
+      run: pnpm lint:check
+  docs:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install
+    - name: Check Docs
+      run: pnpm docs:check
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'pnpm'
+    - name: Install dependencies
+      run: pnpm install
+    - name: Run Tests
+      run: pnpm test
