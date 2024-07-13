@@ -21,7 +21,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'groq',
   model: 'llama3-70b-8192',

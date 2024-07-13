@@ -43,21 +43,21 @@ const messages: ChatCompletionMessageParam[] = [
 ]
 
 // Call OpenAI
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   provider: 'openai',
   model: 'gpt-4o',
   messages,
 })
 
 // Call Gemini
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   provider: 'gemini',
   model: 'gemini-1.5-pro',
   messages,
 })
 
 // Call Anthropic
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   provider: 'anthropic',
   model: 'claude-2.0',
   messages,

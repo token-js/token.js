@@ -1,7 +1,7 @@
 {
   "name": "token.js",
   "version": "0.0.2",
-  "description": "",
+  "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index",
   "types": "dist/index",
   "files": [
@@ -29,7 +29,7 @@
     "@google/generative-ai": "^0.14.1",
     "@mistralai/mistralai": "^0.5.0",
     "axios": "^1.7.2",
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "cohere-ai": "^7.10.6",
     "groq-sdk": "^0.5.0",
     "mime-types": "^2.1.35",
