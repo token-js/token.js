@@ -21,7 +21,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'gemini',
   model: 'gemini-1.5-pro',

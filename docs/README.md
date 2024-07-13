@@ -70,7 +70,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'openai',
   model: 'gpt-4o',
@@ -100,7 +100,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'anthropic',
   model: 'claude-2.0',
@@ -129,7 +129,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'gemini',
   model: 'gemini-1.5-pro',
@@ -160,7 +160,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'bedrock',
   model: 'amazon.titan-text-express-v1',
@@ -189,7 +189,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'cohere',
   model: 'command-r',
@@ -218,7 +218,7 @@ const messages: ChatCompletionMessageParam = [{
 }]
 
 // Call the create function
-const result: ChatCompletionMessageParam[] = await tokenjs.chat.completions.create({
+const result = await tokenjs.chat.completions.create({
   // Specify the target model and provider
   provider: 'mistral',
   model: 'mistral-large-2402',
