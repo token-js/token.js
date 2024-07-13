@@ -1,5 +1,5 @@
 ---
-description: Learn how to work with different LLM providers and models using token.js.
+description: Integrate LLM providers and models using Token.js.
 ---
 
 # Providers

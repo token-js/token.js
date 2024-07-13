@@ -1,6 +1,8 @@
 # Anthropic
 
-### Usage
+[Get an Anthropic API key](https://console.anthropic.com/settings/keys)
+
+## Usage
 
 {% code title=".env" %}
 ```bash
@@ -9,38 +11,50 @@ ANTHROPIC_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'anthropic',
-  model: 'claude-2.0',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'anthropic',
+    model: 'claude-3-sonnet-20240229',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 
-### [Anthropic Documentation](https://docs.anthropic.com/en/docs/welcome)
-
 <!-- compatibility -->
-### Supported Models
+## Supported Models
 
-| Model                      | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
-| -------------------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
-| claude-3-5-sonnet-20240620 | ✅          |           |             | ✅           | ✅     |       |
-| claude-3-opus-20240229     | ✅          |           |             | ✅           | ✅     |       |
-| claude-3-sonnet-20240229   | ✅          |           |             | ✅           | ✅     |       |
-| claude-3-haiku-20240307    | ✅          |           |             | ✅           | ✅     |       |
-| claude-2.1                 | ✅          |           |             |             |       |       |
-| claude-2.0                 | ✅          |           |             |             |       |       |
-| claude-instant-1.2         | ✅          |           |             |             |       |       |
+| Model                      | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
+| -------------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
+| claude-3-5-sonnet-20240620 | ✅               | ➖         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-opus-20240229     | ✅               | ➖         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-sonnet-20240229   | ✅               | ➖         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-haiku-20240307    | ✅               | ➖         | ➖           | ✅           | ✅                | ➖     |
+| claude-2.1                 | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| claude-2.0                 | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| claude-instant-1.2         | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
 
+### Legend
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
+<!-- end compatibility -->
+
+## Additional Resources
+
+* [Anthropic Documentation](https://docs.anthropic.com)

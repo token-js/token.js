@@ -1,18 +1,29 @@
 ---
 description: >-
-  Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.
-  Free and opensource with no proxy server required.
+  Integrate 60+ LLMs with one TypeScript SDK using OpenAI's format.
+  Free and open source. No proxy server required.
 ---
 
-# token.js
+# Token.js
 
 ## Features
 
-* Define prompts in OpenAIs format and have them translated automatially for each LLM provider.
-* Support for tools, JSON output, image inputs, streaming, and more.
-* Support for 9 popular LLM providers: AI21, Anthropic, AWS Bedrock, Cohere, Gemini, Groq, Mistral, OpenAI, and Perplexity with more coming soon.
-* Free and opensource under GPLv3.
-* No proxy server required.
+* Use OpenAI's format to call 60+ LLMs from 9 providers.
+* Supports tools, JSON outputs, image inputs, streaming, and more.
+* Runs completely on the client side. No proxy server needed.
+* Free and open source under GPLv3.
+
+## Supported Providers
+
+* AI21
+* Anthropic
+* AWS Bedrock
+* Cohere
+* Gemini
+* Groq
+* Mistral
+* OpenAI
+* Perplexity
 
 ## Setup
 
@@ -46,7 +57,7 @@ bun add token.js
 
 ### Usage
 
-Import the token.js client and call the `create` function with the same input messages you would use with OpenAIs SDK. Specify the model and LLM provider you would like use with their respective fields.
+Import the Token.js client and call the `create` function with a prompt in OpenAI's format. Specify the model and LLM provider using their respective fields.
 
 {% tabs %}
 {% tab title="OpenAI" %}
@@ -58,24 +69,28 @@ OPENAI_API_KEY=<openai api key>
 
 {% code fullWidth="false" %}
 ```ts
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'openai',
-  model: 'gpt-4o',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'openai',
+    model: 'gpt-4o',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endcode %}
 {% endtab %}
@@ -88,24 +103,28 @@ ANTHROPIC_API_KEY=<anthropic api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'anthropic',
-  model: 'claude-2.0',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'anthropic',
+    model: 'claude-3-sonnet-20240229',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endtab %}
 
@@ -117,24 +136,28 @@ GEMINI_API_KEY=<gemini api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'gemini',
-  model: 'gemini-1.5-pro',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'gemini',
+    model: 'gemini-1.5-pro',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endtab %}
 
@@ -148,24 +171,28 @@ AWS_SECRET_ACCESS_KEY=<aws secret access key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'bedrock',
-  model: 'amazon.titan-text-express-v1',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'bedrock',
+    model: 'meta.llama3-70b-instruct-v1:0',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endtab %}
 
@@ -177,24 +204,28 @@ COHERE_API_KEY=<cohere api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'cohere',
-  model: 'command-r',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'cohere',
+    model: 'command-r-plus',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endtab %}
 
@@ -206,24 +237,28 @@ MISTRAL_API_KEY=<mistral api key>
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'mistral',
-  model: 'mistral-large-2402',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'mistral',
+    model: 'open-mixtral-8x22b',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 {% endtab %}
 {% endtabs %}
@@ -257,91 +292,104 @@ AWS_SECRET_ACCESS_KEY=
 
 ### Streaming
 
-token.js supports streaming for all providers that support it.
+Token.js supports streaming responses for all providers that offer it.
 
 ```ts
 import { TokenJS } from 'token.js'
 
 const tokenjs = new TokenJS()
-const result = await tokenjs.chat.completions.create({
-  stream: true,
-  provider: 'gemini',
-  model: 'gemini-1.5-pro',
-  messages: [
-    {
-      role: 'user',
-      content: `How are you?`,
-    },
-  ],
-})
 
-for await (const part of result) {
-  process.stdout.write(part.choices[0]?.delta?.content || '')
+async function main() {
+  const result = await tokenjs.chat.completions.create({
+    stream: true,
+    provider: 'openai',
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'user',
+        content: `Tell me about yourself.`,
+      },
+    ],
+  })
+
+  for await (const part of result) {
+    process.stdout.write(part.choices[0]?.delta?.content || '')
+  }
 }
+main()
 ```
 
-### Tools
+### Function Calling
 
-token.js supports tools for all providers and models that support it.
+Token.js supports the function calling tool for all providers and models that offer it.
 
 <pre class="language-ts"><code class="lang-ts">import { TokenJS, ChatCompletionTool } from 'token.js'
 
 const tokenjs = new TokenJS()
 
-const tools: ChatCompletionTool[] = [{
-<strong>  type: 'function',
-</strong>  function: {
-    name: 'getCurrentWeather',
-    description: 'Get the current weather in a given location',
-    parameters: {
-      type: 'object',
-      properties: {
-        location: {
-          type: 'string',
-          description: 'The city and state, e.g. San Francisco, CA',
-        },
-        unit: {
-          type: 'string',
-          description: 'The temperature unit, e.g. Fahrenheit or Celsius'
+async function main() {
+  const tools: ChatCompletionTool[] = [
+    {
+      type: 'function',
+      function: {
+        name: 'get_current_weather',
+        description: 'Get the current weather in a given location',
+        parameters: {
+          type: 'object',
+          properties: {
+            location: {
+              type: 'string',
+              description: 'The city and state, e.g. San Francisco, CA',
+            },
+          },
+          required: ['location'],
         },
       },
-      required: ['location', 'unit'],
     },
-  },
-}]
+  ]
 
-const result = await tokenjs.chat.completions.create({
-  provider: 'gemini',
-  model: 'gemini-1.5-pro',
-  messages: [
-    {
-      role: 'user',
-      content: `What's the weather like in San Francisco?`,
-    },
-  ],
-  tools,
-  tool_choice: 'auto',
-})
+  const result = await tokenjs.chat.completions.create({
+    provider: 'gemini',
+    model: 'gemini-1.5-pro',
+    messages: [
+      {
+        role: 'user',
+        content: `What's the weather like in San Francisco?`,
+      },
+    ],
+    tools,
+    tool_choice: 'auto',
+  })
+
+  console.log(result.choices[0].message.tool_calls)
+}
+main()
 </code></pre>
 
 ## Feature Compatibility
 
-Not every feature is supported by every provider and model. This table provides a general overview of what features are supported by each provider. For details on which features are supported by individual models from different providers see the provider documentation.
+This table provides an overview of the features that Token.js supports from each LLM provider.
 
-| Provider   | Completion           | Streaming            | Tools                | JSON Output          | Image Input          |
+| Provider   | Chat Completion           | Streaming            | Function Calling Tool                | JSON Output          | Image Input          |
 | ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
 | OpenAI     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
 | Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
 | Bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |
-| Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |                      |                      |
-| AI21       | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
+| Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |
+| Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
+| AI21       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
 | Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Groq       | :white\_check\_mark: | :white\_check\_mark: |                      | :white\_check\_mark: |                      |
-| Perplexity | :white\_check\_mark: | :white\_check\_mark: |                      |                      |                      |
+| Groq       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  | :white\_check\_mark: |  :heavy_minus_sign:  |
+| Perplexity | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
 
-If there are providers or features you would like to see implemented in token.js please let us know by opening an issue on [Github](https://github.com/token-js/token.js?tab=readme-ov-file#contributing)!
+### Legend
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
 
-## Contributing
+**Note**: Certain LLMs, particularly older or weaker models, do not support some features in this table. For details about these restrictions, see our [LLM provider documentation](providers/README.md).
 
-token.js is free and opensource under the GPLv3 license. If you would like to contribute, [please visit our Github.](https://github.com/token-js/token.js?tab=readme-ov-file#contributing)
+## License
+
+Token.js is free and open source software licensed under [GPLv3](https://github.com/token-js/token.js/blob/main/LICENSE).

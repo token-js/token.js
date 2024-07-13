@@ -1,6 +1,8 @@
 # OpenAI
 
-### Usage
+[Get an OpenAI API key](https://platform.openai.com/account/api-keys)
+
+## Usage
 
 {% code title=".env" %}
 ```bash
@@ -9,52 +11,64 @@ OPENAI_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'openai',
-  model: 'gpt-4o',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'openai',
+    model: 'gpt-4o',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 
-### [OpenAI Documentation](https://platform.openai.com/docs/introduction)
-
 <!-- compatibility -->
-### Supported Models
+## Supported Models
 
-| Model                  | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
-| ---------------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
-| gpt-4o                 | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4o-2024-05-13      | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-turbo            | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-turbo-2024-04-09 | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-0125-preview     | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-turbo-preview    | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-1106-preview     | ✅          |           | ✅           | ✅           | ✅     | ✅     |
-| gpt-4-vision-preview   | ✅          |           | ✅           | ✅           |       | ✅     |
-| gpt-4                  | ✅          |           |             |             | ✅     | ✅     |
-| gpt-4-0314             | ✅          |           |             |             |       | ✅     |
-| gpt-4-0613             | ✅          |           |             |             | ✅     | ✅     |
-| gpt-4-32k              | ✅          |           |             |             |       | ✅     |
-| gpt-4-32k-0314         | ✅          |           |             |             |       | ✅     |
-| gpt-4-32k-0613         | ✅          |           |             |             |       | ✅     |
-| gpt-3.5-turbo          | ✅          |           | ✅           |             | ✅     | ✅     |
-| gpt-3.5-turbo-16k      | ✅          |           |             |             |       | ✅     |
-| gpt-3.5-turbo-0301     | ✅          |           |             |             |       | ✅     |
-| gpt-3.5-turbo-0613     | ✅          |           |             |             | ✅     | ✅     |
-| gpt-3.5-turbo-1106     | ✅          |           | ✅           |             | ✅     | ✅     |
-| gpt-3.5-turbo-0125     | ✅          |           | ✅           |             | ✅     | ✅     |
-| gpt-3.5-turbo-16k-0613 | ✅          |           |             |             |       | ✅     |
+| Model                  | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
+| ---------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
+| gpt-4o                 | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4o-2024-05-13      | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-turbo            | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-turbo-2024-04-09 | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-0125-preview     | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-turbo-preview    | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-1106-preview     | ✅               | ➖         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4-vision-preview   | ✅               | ➖         | ✅           | ✅           | ➖                | ✅     |
+| gpt-4                  | ✅               | ➖         | ➖           | ➖           | ✅                | ✅     |
+| gpt-4-0314             | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-4-0613             | ✅               | ➖         | ➖           | ➖           | ✅                | ✅     |
+| gpt-4-32k              | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-4-32k-0314         | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-4-32k-0613         | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-3.5-turbo          | ✅               | ➖         | ✅           | ➖           | ✅                | ✅     |
+| gpt-3.5-turbo-16k      | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-3.5-turbo-0301     | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
+| gpt-3.5-turbo-0613     | ✅               | ➖         | ➖           | ➖           | ✅                | ✅     |
+| gpt-3.5-turbo-1106     | ✅               | ➖         | ✅           | ➖           | ✅                | ✅     |
+| gpt-3.5-turbo-0125     | ✅               | ➖         | ✅           | ➖           | ✅                | ✅     |
+| gpt-3.5-turbo-16k-0613 | ✅               | ➖         | ➖           | ➖           | ➖                | ✅     |
 
+### Legend
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
+<!-- end compatibility -->
+
+## Additional Resources
+
+* [OpenAI Documentation](https://platform.openai.com/docs/overview)

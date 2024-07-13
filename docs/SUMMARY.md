@@ -1,6 +1,6 @@
-# Table of contents
+# Table of Contents
 
-* [token.js](README.md)
+* [Token.js](README.md)
 * [Providers](providers/README.md)
   * [AI21](providers/ai21.md)
   * [Anthropic](providers/anthropic.md)
@@ -11,3 +11,4 @@
   * [Mistral](providers/mistral.md)
   * [OpenAI](providers/openai.md)
   * [Perplexity](providers/perplexity.md)
+* [Contact Us](contact-us.md)

@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv'
+
 import { CompletionParams, LLMChatModel } from '../chat'
 import {
   CompletionResponse,
@@ -5,6 +7,8 @@ import {
   StreamCompletionResponse,
 } from '../userTypes'
 import { InputError } from './types'
+
+dotenv.config()
 
 export abstract class BaseHandler<T extends LLMChatModel> {
   opts: ConfigOptions

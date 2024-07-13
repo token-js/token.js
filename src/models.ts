@@ -1,10 +1,10 @@
 export const TableDisplayNames = {
   models: 'Model',
-  supportsCompletion: 'Completion',
+  supportsCompletion: 'Chat Completion',
   supportsStreaming: 'Streaming',
   supportsJSON: 'JSON Output',
   supportsImages: 'Image Input',
-  supportsToolCalls: 'Tools',
+  supportsToolCalls: 'Function Calling',
   supportsN: 'N > 1',
 }
 
