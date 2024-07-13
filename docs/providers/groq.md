@@ -1,6 +1,8 @@
 # Groq
 
-### Usage
+[Get a Groq API key](https://console.groq.com/keys)
+
+## Usage
 
 {% code title=".env" %}
 ```bash
@@ -9,36 +11,48 @@ GROQ_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'groq',
-  model: 'llama3-70b-8192',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'groq',
+    model: 'llama3-70b-8192',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 
-### [Groq Documentation](https://console.groq.com/docs/quickstart)
-
 <!-- compatibility -->
-### Supported Models
+## Supported Models
 
-| Model              | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
-| ------------------ | ---------- | --------- | ----------- | ----------- | ----- | ----- |
-| llama3-8b-8192     | ✅          |           |             |             |       |       |
-| llama3-70b-8192    | ✅          |           | ✅           |             |       |       |
-| mixtral-8x7b-32768 | ✅          |           |             |             |       |       |
-| gemma-7b-it        | ✅          |           | ✅           |             |       |       |
-| gemma2-9b-it       | ✅          |           | ✅           |             |       |       |
+| Model              | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
+| ------------------ | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
+| llama3-8b-8192     | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| llama3-70b-8192    | ✅               | ➖         | ✅           | ➖           | ➖                | ➖     |
+| mixtral-8x7b-32768 | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| gemma-7b-it        | ✅               | ➖         | ✅           | ➖           | ➖                | ➖     |
+| gemma2-9b-it       | ✅               | ➖         | ✅           | ➖           | ➖                | ➖     |
 
+### Legend
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
+<!-- end compatibility -->
+
+## Additional Resources
+
+* [Groq Documentation](https://console.groq.com/docs/quickstart)

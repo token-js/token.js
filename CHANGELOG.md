@@ -1,4 +1,4 @@
-# token.js
+# Token.js
 
 ## 0.0.1
 
