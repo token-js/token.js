@@ -12,3 +12,4 @@
   * [OpenAI](providers/openai.md)
   * [Perplexity](providers/perplexity.md)
 * [Contact Us](contact-us.md)
+* [Contributing](https://github.com/token-js/token.js/blob/main/CONTRIBUTING.md)

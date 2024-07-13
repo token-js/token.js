@@ -191,31 +191,7 @@ This table provides an overview of the features that Token.js supports from each
 
 ## Contributing
 
-PRs are accepted!
-
-### Clone the repo
-
-```bash
-git clone https://github.com/token-js/token-js.git
-```
-
-### Open the project and install the dependencies
-
-```bash
-cd llm && pnpm install
-```
-
-### Test your changes
-
-```bash
-pnpm test
-```
-
-### Run the linter
-
-```bash
-pnpm lint
-```
+See our [Contributing guide](./CONTRIBUTING.md) to learn how to contribute to Token.js.
 
 ## Contact Us
 
