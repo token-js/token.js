@@ -1,6 +1,8 @@
 # Cohere
 
-### Usage
+[Get a Cohere API key](https://dashboard.cohere.com/api-keys)
+
+## Usage
 
 {% code title=".env" %}
 ```bash
@@ -9,37 +11,49 @@ COHERE_API_KEY=
 {% endcode %}
 
 ```typescript
-import { TokenJS, ChatCompletionMessageParam } from 'token.js'
+import { TokenJS } from 'token.js'
 
-// Import and create the token.js client
+// Create the Token.js client
 const tokenjs = new TokenJS()
 
-// Specify OpenAI compatible messages
-const messages: ChatCompletionMessageParam = [{
-  role: 'user',
-  content: `How are you?`,
-}]
-
-// Call the create function
-const result = await tokenjs.chat.completions.create({
-  // Specify the target model and provider
-  provider: 'cohere',
-  model: 'command-r',
-  messages,
-})
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'cohere',
+    model: 'command-r-plus',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
 ```
 
-### [Cohere Documentation](https://docs.cohere.com)
-
 <!-- compatibility -->
-### Supported Models
+## Supported Models
 
-| Model                 | Completion | Streaming | JSON Output | Image Input | Tools | N > 1 |
-| --------------------- | ---------- | --------- | ----------- | ----------- | ----- | ----- |
-| command-r-plus        | ✅          |           |             |             | ✅     |       |
-| command-r             | ✅          |           |             |             | ✅     |       |
-| command               | ✅          |           |             |             |       |       |
-| command-nightly       | ✅          |           |             |             | ✅     |       |
-| command-light         | ✅          |           |             |             |       |       |
-| command-light-nightly | ✅          |           |             |             |       |       |
+| Model                 | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
+| --------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
+| command-r-plus        | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
+| command-r             | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
+| command               | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| command-nightly       | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
+| command-light         | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| command-light-nightly | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
 
+### Legend
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
+<!-- end compatibility -->
+
+## Additional Resources
+
+* [Cohere Documentation](https://docs.cohere.com)
