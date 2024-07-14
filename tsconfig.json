@@ -1,11 +1,26 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2020",
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["vite/client", "node"],
     "sourceMap": true,
-    "esModuleInterop": true,
     "composite": true,
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "baseUrl": "./",
+    "paths": {
+      "~/*": ["src/*"],
+    },
+    "preserveSymlinks": true,
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -13,18 +28,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictNullChecks": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "skipLibCheck": true,
   },
-  "exclude": [
-    "node_modules",
-    "dist",
-  ],
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["./src"],
+  "exclude": ["node_modules"]
 }

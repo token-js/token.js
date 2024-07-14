@@ -10,7 +10,7 @@ try {
   if (gitStatus) {
     // Step 3: If there are modifications, throw an error
     throw new Error(
-      'Generated documentation files are not up to date. Please run `pnpm docs:update` and commit the changes.'
+      'Generated documentation files are not up to date. Please run `yarn docs:update` and commit the changes.'
     )
   } else {
     console.log('Documentation files are up to date.')

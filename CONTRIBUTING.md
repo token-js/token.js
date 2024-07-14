@@ -17,17 +17,17 @@ git clone https://github.com/token-js/token-js.git
 ### Open the project and install the dependencies
 
 ```bash
-cd llm && pnpm install
+cd llm && yarn install
 ```
 
 ### Test your changes
 
 ```bash
-pnpm test
+yarn test
 ```
 
 ### Run the linter
 
 ```bash
-pnpm lint
+yarn lint
 ```

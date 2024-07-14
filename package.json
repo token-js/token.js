@@ -2,21 +2,28 @@
   "name": "token.js",
   "version": "0.0.2",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
-  "main": "dist/index",
-  "types": "dist/index",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "typings": "./dist/src/index.d.ts",
   "files": [
-    "dist/*"
+    "dist"
   ],
   "scripts": {
     "test": "vitest --exclude 'test/manual/**'",
     "test:coverage": "vitest --exclude 'test/manual/**' run --coverage",
     "test:ui": "vitest --exclude 'test/manual/**' --ui",
     "test:manual": "vitest test/manual --testTimeout 100000",
-    "lint": "pnpm lint:fix && pnpm lint:check",
-    "lint:fix": "pnpm lint:check --fix",
+    "lint": "yarn lint:fix && yarn lint:check",
+    "lint:fix": "yarn lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "build": "tsc -p ./tsconfig.json",
+    "build": "tsc -p ./tsconfig.json && vite build",
     "docs:update": "vite-node ./scripts/docs/generate.ts",
     "docs:check": "vite-node ./scripts/docs/check.ts"
   },
@@ -37,8 +44,11 @@
     "openai": "^4.52.2"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.18.2",
+    "@babel/core": "^7.24.8",
+    "@babel/eslint-parser": "^7.24.8",
     "@changesets/cli": "^2.16.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "@types/node": "^17.0.35",
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^4.26.0",
     "@vitest/coverage-v8": "^2.0.1",
@@ -58,8 +68,11 @@
     "eslint-plugin-unicorn": "^42.0.0",
     "markdown-table": "^3.0.3",
     "prettier": "^2.3.1",
+    "rollup-plugin-typescript-paths": "^1.3.0",
+    "tslib": "^2.4.0",
     "typescript": "^5.5.3",
+    "vite": "^5.3.1",
     "vite-node": "^1.6.0",
-    "vitest": "^2.0.1"
+    "vitest": "^2.0.2"
   }
 }

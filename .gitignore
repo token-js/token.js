@@ -18,3 +18,5 @@
 /dist
 
 *.tsbuildinfo
+
+.rollup.cache
