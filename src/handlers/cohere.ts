@@ -21,11 +21,14 @@ import {
   CohereModel,
   CompletionParams,
   ProviderCompletionParams,
-} from '../chat'
-import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError, InvariantError, MessageRole } from './types'
-import { consoleWarn, getTimestamp } from './utils'
+} from '../chat/index.js'
+import {
+  CompletionResponse,
+  StreamCompletionResponse,
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError, InvariantError, MessageRole } from './types.js'
+import { consoleWarn, getTimestamp } from './utils.js'
 
 type CohereMessageRole = 'CHATBOT' | 'SYSTEM' | 'USER' | 'TOOL'
 

@@ -1,4 +1,4 @@
-import { CompletionParams } from '../../src/chat'
+import { CompletionParams } from '../../../src/chat'
 
 export const MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS: CompletionParams['messages'] =
   [

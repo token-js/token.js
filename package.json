@@ -2,23 +2,34 @@
   "name": "token.js",
   "version": "0.0.2",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
-  "main": "dist/index",
-  "types": "dist/index",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
     "dist/*"
   ],
   "scripts": {
-    "test": "vitest --exclude 'test/manual/**'",
-    "test:coverage": "vitest --exclude 'test/manual/**' run --coverage",
-    "test:ui": "vitest --exclude 'test/manual/**' --ui",
-    "test:manual": "vitest test/manual --testTimeout 100000",
+    "test": "vitest --dir test/automated",
+    "test:coverage": "vitest --dir test/automated run --coverage",
+    "test:ui": "vitest --dir test/automated --ui",
+    "test:manual": "vitest --dir test/manual --testTimeout 100000",
+    "test:commonjs": "jest 'test/commonjs/index.test.cjs'",
     "lint": "pnpm lint:fix && pnpm lint:check",
     "lint:fix": "pnpm lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "build": "tsc -p ./tsconfig.json",
+    "build:tsc": "pnpm tsc -p tsconfig.json",
+    "build": "vite-node ./scripts/build.ts && pnpm build:tsc",
     "docs:update": "vite-node ./scripts/docs/generate.ts",
-    "docs:check": "vite-node ./scripts/docs/check.ts"
+    "docs:check": "vite-node ./scripts/docs/check.ts",
+    "clean": "rimraf dist/ ./tsconfig.tsbuildinfo"
   },
   "author": "Sam Goldman",
   "keywords": [],
@@ -31,7 +42,6 @@
     "axios": "^1.7.2",
     "chalk": "^4.1.2",
     "cohere-ai": "^7.10.6",
-    "groq-sdk": "^0.5.0",
     "mime-types": "^2.1.35",
     "nanoid": "^5.0.7",
     "openai": "^4.52.2"
@@ -44,6 +54,7 @@
     "@vitest/coverage-v8": "^2.0.1",
     "@vitest/ui": "^2.0.1",
     "dotenv": "^16.4.5",
+    "esbuild": "^0.23.0",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
@@ -56,6 +67,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-unicorn": "^42.0.0",
+    "jest": "^29.7.0",
     "markdown-table": "^3.0.3",
     "prettier": "^2.3.1",
     "typescript": "^5.5.3",

@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { TokenJS } from '../../src'
-import { BaseHandler } from '../../src/handlers/base'
-import { InputError } from '../../src/handlers/types'
+import { TokenJS } from '../../../src'
+import { BaseHandler } from '../../../src/handlers/base'
+import { InputError } from '../../../src/handlers/types'
 import {
   getDummyMessages,
   getDummyMessagesWithImage,
   getDummyTool,
-} from '../dummy'
+} from '../../dummy'
 
 describe('Base Handler', () => {
   it('throws an error for a number greater than the max temperature', async () => {

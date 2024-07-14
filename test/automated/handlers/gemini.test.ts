@@ -14,7 +14,7 @@ import OpenAI from 'openai'
 import { ChatCompletionContentPart } from 'openai/resources/index'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { CompletionParams } from '../../src/chat'
+import { CompletionParams } from '../../../src/chat'
 import {
   convertAssistantMessage,
   convertContentsToParts,
@@ -28,10 +28,10 @@ import {
   convertToolConfig,
   convertTools,
   convertUsageData,
-} from '../../src/handlers/gemini'
-import { InputError } from '../../src/handlers/types'
-import { getHandler, getTimestamp } from '../../src/handlers/utils'
-import { StreamCompletionResponse } from '../../src/userTypes'
+} from '../../../src/handlers/gemini'
+import { InputError } from '../../../src/handlers/types'
+import { getHandler, getTimestamp } from '../../../src/handlers/utils'
+import { StreamCompletionResponse } from '../../../src/userTypes'
 import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
 // Unit Tests

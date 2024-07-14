@@ -1,4 +1,4 @@
-name: Ci
+name: CI
 
 on:
   pull_request:
@@ -55,5 +55,9 @@ jobs:
         cache: 'pnpm'
     - name: Install dependencies
       run: pnpm install
-    - name: Run Tests
+    - name: Build
+      run: pnpm build
+    - name: Run ESM Tests
       run: pnpm test
+    - name: Run CommonJS Tests
+      run: pnpm test:commonjs
