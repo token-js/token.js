@@ -24,11 +24,14 @@ import {
 } from 'openai/resources/index'
 import { ChatCompletionMessageToolCall } from 'openai/src/resources/index.js'
 
-import { GeminiModel, ProviderCompletionParams } from '../chat'
-import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError } from './types'
-import { consoleWarn, fetchThenParseImage, getTimestamp } from './utils'
+import { GeminiModel, ProviderCompletionParams } from '../chat/index.js'
+import {
+  CompletionResponse,
+  StreamCompletionResponse,
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError } from './types.js'
+import { consoleWarn, fetchThenParseImage, getTimestamp } from './utils.js'
 
 // Google's `GenerateContentCandidate.content` field should be optional, but it's a required field
 // in Google's types. This field can be undefined if a content filter is triggered when the user

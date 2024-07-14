@@ -4,7 +4,7 @@ import { ChatCompletionToolMessageParam } from 'openai/resources/index.mjs'
 import { CompletionParams } from '../../src/chat'
 import { TokenJS } from '../../src/index'
 import { models } from '../../src/models'
-import { getCurrentWeather } from './utils'
+import { getCurrentWeather } from './utils.js'
 
 dotenv.config()
 

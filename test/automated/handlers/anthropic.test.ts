@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { CompletionParams } from '../../src/chat'
+import { CompletionParams } from '../../../src/chat'
 import {
   convertMessages,
   convertToolParams,
-} from '../../src/handlers/anthropic'
-import { getDummyTool } from '../dummy'
+} from '../../../src/handlers/anthropic'
+import { getDummyTool } from '../../dummy'
 import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
 describe('convertMessages', () => {

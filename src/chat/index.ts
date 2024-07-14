@@ -1,12 +1,12 @@
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions'
 
-import { getHandler } from '../handlers/utils'
-import { models } from '../models'
+import { getHandler } from '../handlers/utils.js'
+import { models } from '../models.js'
 import {
   CompletionResponse,
   ConfigOptions,
   StreamCompletionResponse,
-} from '../userTypes'
+} from '../userTypes/index.js'
 
 export type OpenAIModel = (typeof models.openai.models)[number]
 export type AI21Model = (typeof models.ai21.models)[number]
