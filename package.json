@@ -16,7 +16,7 @@
     "lint:fix": "pnpm lint:check --fix",
     "lint:check": "eslint . --max-warnings=0",
     "format": "prettier --write .",
-    "build": "tsc -p ./tsconfig.json",
+    "build": "vite-node ./scripts/build.ts",
     "docs:update": "vite-node ./scripts/docs/generate.ts",
     "docs:check": "vite-node ./scripts/docs/check.ts"
   },
@@ -44,6 +44,7 @@
     "@vitest/coverage-v8": "^2.0.1",
     "@vitest/ui": "^2.0.1",
     "dotenv": "^16.4.5",
+    "esbuild": "^0.23.0",
     "eslint": "^8.16.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
