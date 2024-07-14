@@ -7,11 +7,14 @@ import {
   CompletionParams,
   LLMChatModel,
   ProviderCompletionParams,
-} from '../chat'
-import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError } from './types'
-import { getTimestamp } from './utils'
+} from '../chat/index.js'
+import {
+  CompletionResponse,
+  StreamCompletionResponse,
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError } from './types.js'
+import { getTimestamp } from './utils.js'
 
 type AI21ChatCompletionParams = {
   model: string

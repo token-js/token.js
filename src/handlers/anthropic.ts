@@ -18,20 +18,20 @@ import {
   AnthropicModel,
   CompletionParams,
   ProviderCompletionParams,
-} from '../chat'
+} from '../chat/index.js'
 import {
   CompletionResponse,
   CompletionResponseChunk,
   StreamCompletionResponse,
-} from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError, InvariantError } from './types'
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError, InvariantError } from './types.js'
 import {
   consoleWarn,
   fetchThenParseImage,
   getTimestamp,
   isEmptyObject,
-} from './utils'
+} from './utils.js'
 
 export const createCompletionResponseNonStreaming = (
   response: Message,

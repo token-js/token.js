@@ -10,17 +10,17 @@ import {
 import { ChatCompletionMessageParam } from 'openai/src/resources/index.js'
 import { describe, expect, it, vi } from 'vitest'
 
-import { CompletionParams } from '../../src/chat'
+import { CompletionParams } from '../../../src/chat'
 import {
   convertMessages,
   convertStreamToolCalls,
   convertToolCalls,
   convertToolConfig,
   findLinkedToolCallName,
-} from '../../src/handlers/mistral'
-import { InputError } from '../../src/handlers/types'
-import { getHandler } from '../../src/handlers/utils'
-import { StreamCompletionResponse } from '../../src/userTypes'
+} from '../../../src/handlers/mistral'
+import { InputError } from '../../../src/handlers/types'
+import { getHandler } from '../../../src/handlers/utils'
+import { StreamCompletionResponse } from '../../../src/userTypes'
 
 describe('findLinkedToolCallName', () => {
   it('should return the correct function name for a given tool call ID', () => {
