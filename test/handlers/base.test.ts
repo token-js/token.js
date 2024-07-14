@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { TokenJS } from '../../src'
+import { BaseHandler } from '../../src/handlers/base'
 import { InputError } from '../../src/handlers/types'
 import {
   getDummyMessages,
@@ -86,5 +87,27 @@ describe('Base Handler', () => {
         `The model claude-2.0 does not support setting 'n' greater than 1.`
       )
     )
+  })
+
+  it('throws an error when the model does not support streaming', async () => {
+    const mockIsSupportedModel = vi
+      .spyOn(BaseHandler.prototype, 'isSupportedModel')
+      .mockReturnValue(true)
+
+    const tokenjs = new TokenJS()
+    await expect(
+      tokenjs.chat.completions.create({
+        provider: 'openai',
+        model: 'dummyModel' as any,
+        messages: getDummyMessages(),
+      })
+    ).rejects.toThrow(
+      new InputError(
+        `Detected 'stream: true', but the following model does not support streaming: dummyModel`
+      )
+    )
+
+    expect(mockIsSupportedModel).toHaveBeenCalled()
+    mockIsSupportedModel.mockRestore()
   })
 })

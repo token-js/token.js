@@ -16,7 +16,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CompletionParams } from '../../src/chat'
 import {
-  GeminiHandler,
   convertAssistantMessage,
   convertContentsToParts,
   convertFinishReason,
@@ -31,8 +30,7 @@ import {
   convertUsageData,
 } from '../../src/handlers/gemini'
 import { InputError } from '../../src/handlers/types'
-import { getTimestamp } from '../../src/handlers/utils'
-import { models } from '../../src/models'
+import { getHandler, getTimestamp } from '../../src/handlers/utils'
 import { StreamCompletionResponse } from '../../src/userTypes'
 import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
@@ -1388,14 +1386,7 @@ describe('GeminiHandler', () => {
 
   it('should return a completion response', async () => {
     const handlerOptions = { apiKey: 'test-api-key' }
-    const handler = new GeminiHandler(
-      handlerOptions,
-      models.gemini.models,
-      models.gemini.supportsJSON,
-      models.gemini.supportsImages,
-      models.gemini.supportsToolCalls,
-      models.gemini.supportsN
-    )
+    const handler = getHandler('gemini', handlerOptions)
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
       getGenerativeModel: vi.fn().mockReturnValue({
@@ -1452,14 +1443,7 @@ describe('GeminiHandler', () => {
 
   it('should return a tool completion response', async () => {
     const handlerOptions = { apiKey: 'test-api-key' }
-    const handler = new GeminiHandler(
-      handlerOptions,
-      models.gemini.models,
-      models.gemini.supportsJSON,
-      models.gemini.supportsImages,
-      models.gemini.supportsToolCalls,
-      models.gemini.supportsN
-    )
+    const handler = getHandler('gemini', handlerOptions)
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
       getGenerativeModel: vi.fn().mockReturnValue({
@@ -1510,14 +1494,7 @@ describe('GeminiHandler', () => {
 
   it('should return a stream completion response', async () => {
     const handlerOptions = { apiKey: 'test-api-key' }
-    const handler = new GeminiHandler(
-      handlerOptions,
-      models.gemini.models,
-      models.gemini.supportsJSON,
-      models.gemini.supportsImages,
-      models.gemini.supportsToolCalls,
-      models.gemini.supportsN
-    )
+    const handler = getHandler('gemini', handlerOptions)
 
     ;(GoogleGenerativeAI as any).mockImplementationOnce(() => ({
       getGenerativeModel: vi.fn().mockReturnValue({

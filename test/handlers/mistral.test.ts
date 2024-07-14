@@ -12,7 +12,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { CompletionParams } from '../../src/chat'
 import {
-  MistralHandler,
   convertMessages,
   convertStreamToolCalls,
   convertToolCalls,
@@ -20,7 +19,7 @@ import {
   findLinkedToolCallName,
 } from '../../src/handlers/mistral'
 import { InputError } from '../../src/handlers/types'
-import { models } from '../../src/models'
+import { getHandler } from '../../src/handlers/utils'
 import { StreamCompletionResponse } from '../../src/userTypes'
 
 describe('findLinkedToolCallName', () => {
@@ -743,13 +742,7 @@ describe('MistralHandler', () => {
   }
 
   const handlerOptions = { apiKey: 'test-api-key' }
-  const handler = new MistralHandler(
-    handlerOptions,
-    models.mistral.models,
-    models.mistral.supportsJSON,
-    models.mistral.supportsImages,
-    models.mistral.supportsToolCalls
-  )
+  const handler = getHandler('mistral', handlerOptions)
 
   it('should return a completion response', async () => {
     ;(MistralClient as any).mockImplementationOnce(() => ({
