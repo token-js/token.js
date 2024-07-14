@@ -1,13 +1,13 @@
 import { ChatCompletionTool } from 'openai/resources/index'
 import { describe, expect, it } from 'vitest'
 
-import { CompletionParams } from '../../src/chat'
+import { CompletionParams } from '../../../src/chat'
 import {
   convertMessages,
   convertTools,
   toCohereTool,
-} from '../../src/handlers/cohere'
-import { getDummyTool } from '../dummy'
+} from '../../../src/handlers/cohere'
+import { getDummyTool } from '../../dummy'
 
 describe('toCohereTool', () => {
   it('converts simple type', () => {

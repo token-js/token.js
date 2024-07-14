@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2020",
+    "module": "NodeNext",
+    "target": "ES2015",
+    "moduleResolution": "NodeNext",
     "sourceMap": true,
     "esModuleInterop": true,
     "composite": true,
-    "resolveJsonModule": true,
     "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
@@ -19,10 +19,12 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "skipLibCheck": true,
+    "declarationDir": "./dist",
+    "emitDeclarationOnly": true
   },
   "exclude": [
     "node_modules",
-    "dist",
+    "dist"
   ],
   "include": [
     "src/**/*"

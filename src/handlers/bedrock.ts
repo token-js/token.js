@@ -19,20 +19,20 @@ import {
   CompletionParams,
   CompletionStreaming,
   ProviderCompletionParams,
-} from '../chat'
+} from '../chat/index.js'
 import {
   CompletionResponse,
   CompletionResponseChunk,
   StreamCompletionResponse,
-} from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError, InvariantError, MIMEType } from './types'
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError, InvariantError, MIMEType } from './types.js'
 import {
   consoleWarn,
   fetchThenParseImage,
   getTimestamp,
   normalizeTemperature,
-} from './utils'
+} from './utils.js'
 
 const normalizeMIMEType = (mimeType: MIMEType): ImageFormat => {
   if (mimeType === 'image/gif') {

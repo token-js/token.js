@@ -1,10 +1,13 @@
 import OpenAI from 'openai'
 import { Stream } from 'openai/streaming'
 
-import { PerplexityModel, ProviderCompletionParams } from '../chat'
-import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
-import { InputError } from './types'
+import { PerplexityModel, ProviderCompletionParams } from '../chat/index.js'
+import {
+  CompletionResponse,
+  StreamCompletionResponse,
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
+import { InputError } from './types.js'
 
 export const PERPLEXITY_PREFIX = 'perplexity/'
 

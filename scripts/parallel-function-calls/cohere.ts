@@ -2,7 +2,7 @@ import { CohereClient } from 'cohere-ai'
 import { ChatRequest } from 'cohere-ai/api'
 import * as dotenv from 'dotenv'
 
-import { getCurrentWeather } from './utils'
+import { getCurrentWeather } from './utils.js'
 
 dotenv.config()
 

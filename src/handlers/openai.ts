@@ -1,9 +1,12 @@
 import OpenAI from 'openai'
 import { Stream } from 'openai/streaming'
 
-import { OpenAIModel, ProviderCompletionParams } from '../chat'
-import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
+import { OpenAIModel, ProviderCompletionParams } from '../chat/index.js'
+import {
+  CompletionResponse,
+  StreamCompletionResponse,
+} from '../userTypes/index.js'
+import { BaseHandler } from './base.js'
 
 async function* streamOpenAI(
   response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>

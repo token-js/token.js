@@ -2,20 +2,20 @@ import axios from 'axios'
 import chalk from 'chalk'
 import { lookup } from 'mime-types'
 
-import { LLMChatModel, LLMProvider } from '../chat'
-import { models } from '../models'
-import { ConfigOptions } from '../userTypes'
-import { AI21Handler } from './ai21'
-import { AnthropicHandler } from './anthropic'
-import { BaseHandler } from './base'
-import { BedrockHandler } from './bedrock'
-import { CohereHandler } from './cohere'
-import { GeminiHandler } from './gemini'
-import { GroqHandler } from './groq'
-import { MistralHandler } from './mistral'
-import { OpenAIHandler } from './openai'
-import { PerplexityHandler } from './perplexity'
-import { InputError, MIMEType } from './types'
+import { LLMChatModel, LLMProvider } from '../chat/index.js'
+import { models } from '../models.js'
+import { ConfigOptions } from '../userTypes/index.js'
+import { AI21Handler } from './ai21.js'
+import { AnthropicHandler } from './anthropic.js'
+import { BaseHandler } from './base.js'
+import { BedrockHandler } from './bedrock.js'
+import { CohereHandler } from './cohere.js'
+import { GeminiHandler } from './gemini.js'
+import { GroqHandler } from './groq.js'
+import { MistralHandler } from './mistral.js'
+import { OpenAIHandler } from './openai.js'
+import { PerplexityHandler } from './perplexity.js'
+import { InputError, MIMEType } from './types.js'
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
   ['openai']: (opts: ConfigOptions) =>
@@ -218,7 +218,7 @@ export const normalizeTemperature = (
 ): number => {
   const normalizeProviders = ['mistral', 'anthropic', 'cohere', 'bedrock']
 
-  if (normalizeProviders.includes(provider)) {
+  if (normalizeProviders.includes(provider as string)) {
     return temperature / 2
   } else if (provider === 'bedrock') {
     if (

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { convertMessages, convertToolParams } from '../../src/handlers/bedrock'
-import { getDummyTool } from '../dummy'
+import {
+  convertMessages,
+  convertToolParams,
+} from '../../../src/handlers/bedrock'
+import { getDummyTool } from '../../dummy'
 import { MESSAGES_WITH_ASSISTANT_TOOL_CALLS_AND_TOOL_RESULTS } from './messages'
 
 describe('convertToolParams', () => {
