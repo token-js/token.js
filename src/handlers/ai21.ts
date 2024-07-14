@@ -9,8 +9,8 @@ import {
   ProviderCompletionParams,
 } from '../chat'
 import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
-import { BaseHandler } from './base'
 import { InputError } from './types'
+import { BaseHandler } from './base'
 import { getTimestamp } from './utils'
 
 type AI21ChatCompletionParams = {
