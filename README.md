@@ -21,6 +21,8 @@ Integrate 60+ LLMs with one TypeScript SDK using OpenAI's format. Free and open 
 * OpenAI
 * Perplexity
 
+## [Documentation](https://docs.tokenjs.ai/)
+
 ## Setup
 
 ### Installation
