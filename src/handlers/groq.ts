@@ -1,4 +1,4 @@
-import Groq from 'groq-sdk'
+import OpenAI from 'openai'
 
 import { GroqModel, ProviderCompletionParams } from '../chat'
 import { CompletionResponse, StreamCompletionResponse } from '../userTypes'
@@ -32,10 +32,9 @@ export class GroqHandler extends BaseHandler<GroqModel> {
     this.validateInputs(body)
 
     const apiKey = this.opts.apiKey ?? process.env.GROQ_API_KEY
-    const baseURL = this.opts.baseURL
-    const client = new Groq({
+    const client = new OpenAI({
       apiKey,
-      baseURL,
+      baseURL: 'https://api.groq.com/openai/v1',
     })
 
     if (apiKey === undefined) {
@@ -44,16 +43,6 @@ export class GroqHandler extends BaseHandler<GroqModel> {
       )
     }
 
-    return client.chat.completions.create({
-      stream: body.stream,
-      messages: body.messages as Groq.Chat.ChatCompletionMessageParam[],
-      model: body.model,
-      temperature: body.temperature,
-      max_tokens: body.max_tokens,
-      top_p: body.top_p,
-      stop: body.stop,
-      n: body.n,
-      response_format: body.response_format,
-    })
+    return client.chat.completions.create(body)
   }
 }
