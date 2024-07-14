@@ -40,12 +40,12 @@ main()
 
 | Model                 | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
 | --------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
-| command-r-plus        | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
-| command-r             | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
-| command               | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
-| command-nightly       | ✅               | ➖         | ➖           | ➖           | ✅                | ➖     |
-| command-light         | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
-| command-light-nightly | ✅               | ➖         | ➖           | ➖           | ➖                | ➖     |
+| command-r-plus        | ✅               | ✅         | ➖           | ➖           | ✅                | ➖     |
+| command-r             | ✅               | ✅         | ➖           | ➖           | ✅                | ➖     |
+| command               | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| command-nightly       | ✅               | ✅         | ➖           | ➖           | ✅                | ➖     |
+| command-light         | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| command-light-nightly | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 
 ### Legend
 | Symbol             | Description                           |

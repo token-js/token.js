@@ -25,7 +25,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.openai.supportsJSON,
       models.openai.supportsImages,
       models.openai.supportsToolCalls,
-      models.openai.supportsN
+      models.openai.supportsN,
+      models.openai.supportsStreaming
     ),
   ['anthropic']: (opts: ConfigOptions) =>
     new AnthropicHandler(
@@ -34,7 +35,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.anthropic.supportsJSON,
       models.anthropic.supportsImages,
       models.anthropic.supportsToolCalls,
-      models.anthropic.supportsN
+      models.anthropic.supportsN,
+      models.anthropic.supportsStreaming
     ),
   ['gemini']: (opts: ConfigOptions) =>
     new GeminiHandler(
@@ -43,7 +45,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.gemini.supportsJSON,
       models.gemini.supportsImages,
       models.gemini.supportsToolCalls,
-      models.gemini.supportsN
+      models.gemini.supportsN,
+      models.gemini.supportsStreaming
     ),
   ['cohere']: (opts: ConfigOptions) =>
     new CohereHandler(
@@ -52,7 +55,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.cohere.supportsJSON,
       models.cohere.supportsImages,
       models.cohere.supportsToolCalls,
-      models.cohere.supportsN
+      models.cohere.supportsN,
+      models.cohere.supportsStreaming
     ),
   ['bedrock']: (opts: ConfigOptions) =>
     new BedrockHandler(
@@ -61,7 +65,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.bedrock.supportsJSON,
       models.bedrock.supportsImages,
       models.bedrock.supportsToolCalls,
-      models.bedrock.supportsN
+      models.bedrock.supportsN,
+      models.bedrock.supportsStreaming
     ),
   ['mistral']: (opts: ConfigOptions) =>
     new MistralHandler(
@@ -70,7 +75,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.mistral.supportsJSON,
       models.mistral.supportsImages,
       models.mistral.supportsToolCalls,
-      models.mistral.supportsN
+      models.mistral.supportsN,
+      models.mistral.supportsStreaming
     ),
   ['groq']: (opts: ConfigOptions) =>
     new GroqHandler(
@@ -79,7 +85,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.groq.supportsJSON,
       models.groq.supportsImages,
       models.groq.supportsToolCalls,
-      models.groq.supportsN
+      models.groq.supportsN,
+      models.groq.supportsStreaming
     ),
   ['ai21']: (opts: ConfigOptions) =>
     new AI21Handler(
@@ -88,7 +95,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.ai21.supportsJSON,
       models.ai21.supportsImages,
       models.ai21.supportsToolCalls,
-      models.ai21.supportsN
+      models.ai21.supportsN,
+      models.ai21.supportsStreaming
     ),
   ['perplexity']: (opts: ConfigOptions) =>
     new PerplexityHandler(
@@ -97,7 +105,8 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.perplexity.supportsJSON,
       models.perplexity.supportsImages,
       models.perplexity.supportsToolCalls,
-      models.perplexity.supportsN
+      models.perplexity.supportsN,
+      models.perplexity.supportsStreaming
     ),
 }
 

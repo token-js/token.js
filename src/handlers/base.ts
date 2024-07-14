@@ -13,6 +13,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   protected supportsImages: readonly T[]
   protected supportsToolCalls: readonly T[]
   protected supportsN: readonly T[] | boolean
+  protected supportsStreamingMessages: readonly T[]
 
   constructor(
     opts: ConfigOptions,
@@ -20,7 +21,8 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     supportsJSON: readonly T[],
     supportsImages: readonly T[],
     supportsToolCalls: readonly T[],
-    suportsN: readonly T[] | boolean
+    suportsN: readonly T[] | boolean,
+    supportsStreamingMessages: readonly T[]
   ) {
     this.opts = opts
     this.models = models
@@ -28,6 +30,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     this.supportsImages = supportsImages
     this.supportsToolCalls = supportsToolCalls
     this.supportsN = suportsN
+    this.supportsStreamingMessages = supportsStreamingMessages
   }
 
   abstract create(
@@ -37,6 +40,12 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   protected validateInputs(body: CompletionParams): void {
     if (!this.isSupportedModel(body.model)) {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
+    }
+
+    if (!this.supportsStreaming(body.model)) {
+      throw new Error(
+        `Detected 'stream: true', but the following model does not support streaming: ${body.model}`
+      )
     }
 
     if (body.tools !== undefined && !this.supportsTools(body.model)) {
@@ -138,7 +147,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     }
   }
 
-  protected isSupportedModel(model: LLMChatModel): model is T {
+  // We make this public so that we can mock it in tests, which is fine because the `BaseHandler`
+  // class isn't exposed to the user.
+  public isSupportedModel(model: LLMChatModel): model is T {
     return this.models.includes(model as T)
   }
 
@@ -156,5 +167,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
 
   protected supportsTools(model: T): boolean {
     return this.isSupportedFeature(this.supportsToolCalls, model)
+  }
+
+  protected supportsStreaming(model: T): boolean {
+    return this.isSupportedFeature(this.supportsStreamingMessages, model)
   }
 }
