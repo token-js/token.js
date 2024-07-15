@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.2.0
+
+### Minor Changes
+
+- d33fb2a: Initial release
+
 ## 0.1.0
 
 ### Minor Changes
