@@ -11,7 +11,7 @@ description: >-
 * Use OpenAI's format to call 60+ LLMs from 9 providers.
 * Supports tools, JSON outputs, image inputs, streaming, and more.
 * Runs completely on the client side. No proxy server needed.
-* Free and open source under GPLv3.
+* Free and open source under MIT.
 
 ## Supported Providers
 
