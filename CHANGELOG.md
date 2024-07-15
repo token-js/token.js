@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.2.2
+
+### Patch Changes
+
+- 4524c42: Update license reference in README
+
 ## 0.2.1
 
 ### Patch Changes
