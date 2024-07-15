@@ -392,4 +392,4 @@ This table provides an overview of the features that Token.js supports from each
 
 ## License
 
-Token.js is free and open source software licensed under [GPLv3](https://github.com/token-js/token.js/blob/main/LICENSE).
+Token.js is free and open source software licensed under [MIT](https://github.com/token-js/token.js/blob/main/LICENSE).
