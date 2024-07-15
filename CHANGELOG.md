@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.2.3
+
+### Patch Changes
+
+- a4bf186: MIT in features section
+
 ## 0.2.2
 
 ### Patch Changes
