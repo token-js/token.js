@@ -33,7 +33,7 @@
   },
   "author": "Sam Goldman",
   "keywords": [],
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.24.3",
     "@aws-sdk/client-bedrock-runtime": "^3.609.0",
