@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.2.1
+
+### Patch Changes
+
+- 2c3cc3f: Switch to MIT license
+
 ## 0.2.0
 
 ### Minor Changes
