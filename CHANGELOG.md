@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.3.0
+
+### Minor Changes
+
+- ba35d6b: Minimize bundle size
+
 ## 0.2.3
 
 ### Patch Changes
