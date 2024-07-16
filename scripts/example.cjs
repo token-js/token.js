@@ -1,6 +1,6 @@
 const dotenv = require('dotenv')
 
-const { TokenJS } = require('./dist/index.cjs')
+const { TokenJS } = require('../dist/index.cjs')
 
 dotenv.config()
 
