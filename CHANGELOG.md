@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.1
+
+### Patch Changes
+
+- c1e9c14: Fix type import issue
+
 ## 0.4.0
 
 ### Minor Changes
