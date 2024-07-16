@@ -12,6 +12,16 @@ const build = async () => {
       platform: 'node',
       treeShaking: true,
       tsconfig: 'tsconfig.json',
+      external: [
+        '@anthropic-ai/sdk',
+        '@aws-sdk/client-bedrock-runtime',
+        '@google/generative-ai',
+        'chalk',
+        'axios',
+        'cohere-ai',
+        'mime-types',
+        'openai',
+      ],
     }),
   ])
 }

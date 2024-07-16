@@ -3,15 +3,7 @@
   "version": "0.2.3",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index.cjs",
-  "module": "dist/index.js",
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "files": [
     "dist/*"
   ],

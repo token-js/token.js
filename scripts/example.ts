@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv'
 import { OpenAI } from 'openai'
 
-import { TokenJS } from '../src'
+import { TokenJS } from '../dist/index.cjs'
 dotenv.config()
 
 const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
@@ -15,15 +15,15 @@ const callLLM = async () => {
   const tokenjs = new TokenJS()
   const result = await tokenjs.chat.completions.create({
     // stream: true,
-    provider: 'openai',
-    model: 'gpt-4o',
+    provider: 'gemini',
+    model: 'gemini-1.5-pro',
     messages,
   })
 
   console.log(result.choices)
 
   // for await (const part of result) {
-    // process.stdout.write(part.choices[0]?.delta?.content || "");
+  // process.stdout.write(part.choices[0]?.delta?.content || "");
   // }
 }
 
