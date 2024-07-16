@@ -54,6 +54,7 @@ main()
 | mistral-large-2402      | ✅               | ✅         | ✅           | ➖           | ✅                | ➖     |
 | codestral-latest        | ✅               | ✅         | ✅           | ➖           | ➖                | ➖     |
 | codestral-2405          | ✅               | ✅         | ✅           | ➖           | ➖                | ➖     |
+| codestral-mamba-2407    | ✅               | ✅         | ✅           | ➖           | ✅                | ➖     |
 
 ### Legend
 | Symbol             | Description                           |

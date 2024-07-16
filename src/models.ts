@@ -265,6 +265,7 @@ export const models = {
       'mistral-large-2402',
       'codestral-latest',
       'codestral-2405',
+      'codestral-mamba-2407',
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
@@ -282,6 +283,7 @@ export const models = {
       'mistral-large-2402',
       'codestral-latest',
       'codestral-2405',
+      'codestral-mamba-2407',
     ] as const,
     // Mistral claims that all of its models support JSON, but several of their weaker models either
     // fail to produce valid JSON or produce very low quality results for the following prompt:
@@ -296,6 +298,7 @@ export const models = {
       'mistral-large-2402',
       'codestral-latest',
       'codestral-2405',
+      'codestral-mamba-2407',
     ] as const,
     supportsImages: [] as const,
     supportsToolCalls: [
@@ -305,6 +308,7 @@ export const models = {
       'mistral-small-2402',
       'mistral-large-latest',
       'mistral-large-2402',
+      'codestral-mamba-2407',
     ] as const,
     supportsN: false,
   },
