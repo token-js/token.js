@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.0
+
+### Minor Changes
+
+- e68abf2: Add support for Codestral Mamba
+
 ## 0.3.0
 
 ### Minor Changes
