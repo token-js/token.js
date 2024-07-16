@@ -42,7 +42,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
     }
 
-    if (!this.supportsStreaming(body.model)) {
+    if (body.stream && !this.supportsStreaming(body.model)) {
       throw new Error(
         `Detected 'stream: true', but the following model does not support streaming: ${body.model}`
       )

@@ -100,6 +100,7 @@ describe('Base Handler', () => {
         provider: 'openai',
         model: 'dummyModel' as any,
         messages: getDummyMessages(),
+        stream: true,
       })
     ).rejects.toThrow(
       new InputError(
