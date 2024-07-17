@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.2
+
+### Patch Changes
+
+- 50a0584: Support OpenRouter
+
 ## 0.4.1
 
 ### Patch Changes
