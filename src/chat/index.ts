@@ -17,6 +17,7 @@ export type BedrockModel = (typeof models.bedrock.models)[number]
 export type MistralModel = (typeof models.mistral.models)[number]
 export type PerplexityModel = (typeof models.perplexity.models)[number]
 export type GroqModel = (typeof models.groq.models)[number]
+export type OpenRouterModel = string
 
 export type LLMChatModel =
   | OpenAIModel
@@ -28,6 +29,7 @@ export type LLMChatModel =
   | MistralModel
   | PerplexityModel
   | GroqModel
+  | OpenRouterModel
 
 export type LLMProvider = keyof typeof models
 
@@ -41,6 +43,7 @@ type ProviderModelMap = {
   mistral: MistralModel
   perplexity: PerplexityModel
   groq: GroqModel
+  openrouter: OpenRouterModel
 }
 
 type CompletionBase<P extends LLMProvider> = Pick<

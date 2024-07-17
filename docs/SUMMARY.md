@@ -10,6 +10,7 @@
   * [Groq](providers/groq.md)
   * [Mistral](providers/mistral.md)
   * [OpenAI](providers/openai.md)
+  * [OpenRouter](providers/openrouter.md)
   * [Perplexity](providers/perplexity.md)
 * [Contact Us](contact-us.md)
 * [Contributing](https://github.com/token-js/token.js/blob/main/CONTRIBUTING.md)

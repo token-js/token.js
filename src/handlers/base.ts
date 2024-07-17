@@ -8,21 +8,21 @@ import { InputError } from './types.js'
 
 export abstract class BaseHandler<T extends LLMChatModel> {
   opts: ConfigOptions
-  protected models: readonly T[]
-  protected supportsJSON: readonly T[]
-  protected supportsImages: readonly T[]
-  protected supportsToolCalls: readonly T[]
+  protected models: readonly T[] | boolean
+  protected supportsJSON: readonly T[] | boolean
+  protected supportsImages: readonly T[] | boolean
+  protected supportsToolCalls: readonly T[] | boolean
   protected supportsN: readonly T[] | boolean
-  protected supportsStreamingMessages: readonly T[]
+  protected supportsStreamingMessages: readonly T[] | boolean
 
   constructor(
     opts: ConfigOptions,
-    models: readonly T[],
-    supportsJSON: readonly T[],
-    supportsImages: readonly T[],
-    supportsToolCalls: readonly T[],
+    models: readonly T[] | boolean,
+    supportsJSON: readonly T[] | boolean,
+    supportsImages: readonly T[] | boolean,
+    supportsToolCalls: readonly T[] | boolean,
     suportsN: readonly T[] | boolean,
-    supportsStreamingMessages: readonly T[]
+    supportsStreamingMessages: readonly T[] | boolean
   ) {
     this.opts = opts
     this.models = models
@@ -38,6 +38,10 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   ): Promise<CompletionResponse | StreamCompletionResponse>
 
   protected validateInputs(body: CompletionParams): void {
+    // We remove the provider key from the body just in case the provider does validation which errors due to it.
+    // This can only occur on OpenAI compatible providers, but we do it for all providers for consistency.
+    delete (body as any).provider
+
     if (!this.isSupportedModel(body.model)) {
       throw new InputError(`Invalid 'model' field: ${body.model}.`)
     }
@@ -149,8 +153,8 @@ export abstract class BaseHandler<T extends LLMChatModel> {
 
   // We make this public so that we can mock it in tests, which is fine because the `BaseHandler`
   // class isn't exposed to the user.
-  public isSupportedModel(model: LLMChatModel): model is T {
-    return this.models.includes(model as T)
+  public isSupportedModel(model: string): model is T {
+    return this.isSupportedFeature(this.models, model as T)
   }
 
   protected supportsJSONMode(model: T): boolean {
