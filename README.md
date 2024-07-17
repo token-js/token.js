@@ -1,10 +1,10 @@
 # Token.js
 
-Integrate 60+ LLMs with one TypeScript SDK using OpenAI's format. Free and open source. No proxy server required.
+Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open source. No proxy server required.
 
 ## Features
 
-* Use OpenAI's format to call 60+ LLMs from 9 providers.
+* Use OpenAI's format to call 200+ LLMs from 10 providers.
 * Supports tools, JSON outputs, image inputs, streaming, and more.
 * Runs completely on the client side. No proxy server needed.
 * Free and open source under MIT.
@@ -20,6 +20,7 @@ Integrate 60+ LLMs with one TypeScript SDK using OpenAI's format. Free and open 
 * Mistral
 * OpenAI
 * Perplexity
+* OpenRouter
 
 ## [Documentation](https://docs.tokenjs.ai/)
 

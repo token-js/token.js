@@ -14,6 +14,7 @@ import { GeminiHandler } from './gemini.js'
 import { GroqHandler } from './groq.js'
 import { MistralHandler } from './mistral.js'
 import { OpenAIHandler } from './openai.js'
+import { OpenRouterHandler } from './openrouter.js'
 import { PerplexityHandler } from './perplexity.js'
 import { InputError, MIMEType } from './types.js'
 
@@ -107,6 +108,16 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.perplexity.supportsToolCalls,
       models.perplexity.supportsN,
       models.perplexity.supportsStreaming
+    ),
+  ['openrouter']: (opts: ConfigOptions) =>
+    new OpenRouterHandler(
+      opts,
+      models.openrouter.models,
+      models.openrouter.supportsJSON,
+      models.openrouter.supportsImages,
+      models.openrouter.supportsToolCalls,
+      models.openrouter.supportsN,
+      models.openrouter.supportsStreaming
     ),
 }
 

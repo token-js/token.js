@@ -1,6 +1,6 @@
 ---
 description: >-
-  Integrate 60+ LLMs with one TypeScript SDK using OpenAI's format.
+  Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format.
   Free and open source. No proxy server required.
 ---
 
@@ -8,7 +8,7 @@ description: >-
 
 ## Features
 
-* Use OpenAI's format to call 60+ LLMs from 9 providers.
+* Use OpenAI's format to call 200+ LLMs from 10 providers.
 * Supports tools, JSON outputs, image inputs, streaming, and more.
 * Runs completely on the client side. No proxy server needed.
 * Free and open source under MIT.
@@ -24,6 +24,7 @@ description: >-
 * Mistral
 * OpenAI
 * Perplexity
+* OpenRouter
 
 ## Setup
 
@@ -261,6 +262,39 @@ async function main() {
 main()
 ```
 {% endtab %}
+
+{% tab title="OpenRouter" %}
+{% code title=".env" %}
+```bash
+OPENROUTER_API_KEY=<openrouter api key>
+```
+{% endcode %}
+
+```typescript
+import { TokenJS } from 'token.js'
+
+// Create the Token.js client
+const tokenjs = new TokenJS()
+
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'openrouter',
+    model: 'nvidia/nemotron-4-340b-instruct',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
+```
+{% endtab %}
 {% endtabs %}
 
 ### Access Credentials
@@ -284,6 +318,8 @@ GROQ_API_KEY=
 MISTRAL_API_KEY=
 # Perplexity
 PERPLEXITY_API_KEY=
+# OpenRouter
+OPENROUTER_API_KEY=
 # AWS Bedrock
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=

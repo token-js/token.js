@@ -14,10 +14,22 @@ const generateCompatibility = async () => {
 
     let pushHeader = true
 
+    if (compatibility.generateDocs === false) {
+      continue
+    }
+
+    if (typeof compatibility.models === 'boolean') {
+      throw new Error(
+        'Auto-generating model compatibility tables is not supported for providers that do not have explicitly defined models.'
+      )
+    }
+
     for (const model of compatibility.models) {
       const header: string[] = []
       const features: string[] = [model]
       for (const [feature, models] of Object.entries(compatibility)) {
+        if (feature === 'generateDocs') continue
+
         header.push(TableDisplayNames[feature])
 
         if (feature === 'models') continue
@@ -40,7 +52,9 @@ const generateCompatibility = async () => {
     const mkdTable = markdownTable(table)
     const providerDocs = readFileSync(`docs/providers/${provider}.md`, 'utf-8')
     const docsSplit = providerDocs.split('<!-- compatibility -->')
-    const afterCompatibilitySplit = docsSplit[1].split('<!-- end compatibility -->')
+    const afterCompatibilitySplit = docsSplit[1].split(
+      '<!-- end compatibility -->'
+    )
 
     const newDocs = `${docsSplit[0]}<!-- compatibility -->\n## Supported Models\n\n${mkdTable}\n\n${legend}<!-- end compatibility -->${afterCompatibilitySplit[1]}`
 

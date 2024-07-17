@@ -96,6 +96,7 @@ export const models = {
       'gpt-3.5-turbo-0613',
     ] as const,
     supportsN: true,
+    generateDocs: true,
   },
   ai21: {
     models: ['jamba-instruct'] as const,
@@ -105,6 +106,7 @@ export const models = {
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
     supportsN: true,
+    generateDocs: true,
   },
   anthropic: {
     models: [
@@ -140,6 +142,7 @@ export const models = {
       'claude-3-haiku-20240307',
     ] as const,
     supportsN: false,
+    generateDocs: true,
   },
   gemini: {
     models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
@@ -157,6 +160,7 @@ export const models = {
       'gemini-1.0-pro',
     ] as const,
     supportsN: true,
+    generateDocs: true,
   },
   cohere: {
     models: [
@@ -184,6 +188,7 @@ export const models = {
       'command-nightly',
     ] as const,
     supportsN: false,
+    generateDocs: true,
   },
   bedrock: {
     models: [
@@ -248,6 +253,7 @@ export const models = {
       'mistral.mistral-large-2402-v1:0',
     ] as const,
     supportsN: false,
+    generateDocs: true,
   },
   mistral: {
     models: [
@@ -311,6 +317,7 @@ export const models = {
       'codestral-mamba-2407',
     ] as const,
     supportsN: false,
+    generateDocs: true,
   },
   groq: {
     models: [
@@ -336,6 +343,7 @@ export const models = {
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
     supportsN: false,
+    generateDocs: true,
   },
   perplexity: {
     models: [
@@ -361,5 +369,16 @@ export const models = {
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
     supportsN: false,
+    generateDocs: true,
+  },
+  openrouter: {
+    models: true,
+    supportsCompletion: true,
+    supportsStreaming: true,
+    supportsJSON: true,
+    supportsImages: true,
+    supportsToolCalls: true,
+    supportsN: true,
+    generateDocs: false,
   },
 }
