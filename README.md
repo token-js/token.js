@@ -183,6 +183,7 @@ This table provides an overview of the features that Token.js supports from each
 | Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  | :white\_check\_mark: |  :heavy_minus_sign:  |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
+| OpenRouter | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 
 ### Legend
 | Symbol             | Description                           |
