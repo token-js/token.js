@@ -17,7 +17,6 @@ const build = async () => {
         '@aws-sdk/client-bedrock-runtime',
         '@google/generative-ai',
         'chalk',
-        'axios',
         'cohere-ai',
         'mime-types',
         'openai',
