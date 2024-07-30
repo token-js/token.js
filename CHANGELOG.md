@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.3
+
+### Patch Changes
+
+- ae4304b: remove axios for compatibility in edge environments
+
 ## 0.4.2
 
 ### Patch Changes
