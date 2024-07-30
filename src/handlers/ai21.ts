@@ -1,7 +1,3 @@
-import { IncomingMessage } from 'http'
-
-import axios from 'axios'
-
 import {
   AI21Model,
   CompletionParams,
@@ -137,50 +133,65 @@ const convertMessages = (
 }
 
 async function* createCompletionResponseStreaming(
-  responseStream: IncomingMessage,
+  responseStream: ReadableStream<Uint8Array>,
   model: LLMChatModel,
   created: number
 ): StreamCompletionResponse {
-  for await (const chunk of responseStream) {
-    const decodedText = new TextDecoder().decode(chunk)
-    if (decodedText.startsWith('data: [DONE]')) {
-      return
-    }
+  const reader = responseStream.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
 
-    const responses: Array<AI21ChatCompletionResponseStreaming> = decodedText
-      .split('\n')
-      .filter((line) => line.trim().startsWith('data:'))
-      .map((line) => JSON.parse(line.replace(/^data:\s*/, '').trim()))
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
 
-    let content: string = ''
-    for (const response of responses) {
-      for (const choice of response.choices) {
-        if (typeof choice.delta.content === 'string') {
-          content += choice.delta.content
+      buffer += decoder.decode(value, { stream: true })
+      const lines = buffer.split('\n')
+      buffer = lines.pop() || ''
+
+      for (const line of lines) {
+        if (line.trim() === 'data: [DONE]') {
+          return
+        }
+
+        if (line.trim().startsWith('data:')) {
+          const response: AI21ChatCompletionResponseStreaming = JSON.parse(
+            line.replace(/^data:\s*/, '').trim()
+          )
+
+          let content = ''
+          for (const choice of response.choices) {
+            if (typeof choice.delta.content === 'string') {
+              content += choice.delta.content
+            }
+          }
+
+          const { id, choices } = response
+          const finish_reason = choices[0].finish_reason
+
+          yield {
+            choices: [
+              {
+                index: 0,
+                finish_reason,
+                logprobs: null,
+                delta: {
+                  role: 'assistant',
+                  content,
+                },
+              },
+            ],
+            id,
+            created,
+            model,
+            object: 'chat.completion.chunk',
+          }
         }
       }
     }
-
-    const { id, choices } = responses[responses.length - 1]
-    const finish_reason = choices[0].finish_reason
-
-    yield {
-      choices: [
-        {
-          index: 0,
-          finish_reason,
-          logprobs: null,
-          delta: {
-            role: 'assistant',
-            content,
-          },
-        },
-      ],
-      id,
-      created,
-      model,
-      object: 'chat.completion.chunk',
-    }
+  } finally {
+    reader.releaseLock()
   }
 }
 
@@ -227,28 +238,32 @@ export class AI21Handler extends BaseHandler<AI21Model> {
     }
 
     const created = getTimestamp()
-    const axiosResponse = await axios.post(
+    const response = await fetch(
       'https://api.ai21.com/studio/v1/chat/completions',
-      params,
       {
+        method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
         },
-        responseType: body.stream === true ? 'stream' : undefined,
+        body: JSON.stringify(params),
       }
     )
 
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
     if (body.stream === true) {
       return createCompletionResponseStreaming(
-        axiosResponse.data,
+        response.body as ReadableStream<Uint8Array>,
         body.model,
         created
       )
     } else {
-      const response: AI21ChatCompletionResponseNonStreaming =
-        axiosResponse.data
+      const data: AI21ChatCompletionResponseNonStreaming = await response.json()
 
-      const convertedChoices = response.choices.map((choice) => {
+      const convertedChoices = data.choices.map((choice) => {
         return {
           ...choice,
           logprobs: null,
@@ -256,8 +271,8 @@ export class AI21Handler extends BaseHandler<AI21Model> {
       })
       const convertedResponse: CompletionResponse = {
         choices: convertedChoices,
-        id: response.id,
-        usage: response.usage,
+        id: data.id,
+        usage: data.usage,
         created,
         model: body.model,
         object: 'chat.completion',

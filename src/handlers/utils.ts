@@ -1,4 +1,3 @@
-import axios from 'axios'
 import chalk from 'chalk'
 import { lookup } from 'mime-types'
 
@@ -141,9 +140,9 @@ export const getTimestamp = () => {
 }
 
 export const fetchImageAsBase64 = async (url: string): Promise<string> => {
-  const response = await axios.get(url, { responseType: 'arraybuffer' })
-  const buffer = Buffer.from(response.data, 'binary')
-  return buffer.toString('base64')
+  const response = await fetch(url);
+  const arrayBuffer = await response.arrayBuffer();
+  return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
 }
 
 export const getMimeType = (url: string): string => {
