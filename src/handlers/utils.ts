@@ -140,9 +140,9 @@ export const getTimestamp = () => {
 }
 
 export const fetchImageAsBase64 = async (url: string): Promise<string> => {
-  const response = await fetch(url);
-  const arrayBuffer = await response.arrayBuffer();
-  return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)));
+  const response = await fetch(url)
+  const arrayBuffer = await response.arrayBuffer()
+  return btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
 }
 
 export const getMimeType = (url: string): string => {
