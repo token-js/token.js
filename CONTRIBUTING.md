@@ -40,10 +40,17 @@ git commit -m "fix: linter suggestions"
 
 > Sometimes the linter may suggest changes that it is not able to fix itself, you should make sure to review and fix them manually before opening a pull request or the linter will block your PR during review.
 
+### Make sure the docs are updated
+```bash
+pnpm docs:update
+```
+
+> You'll generally only need to update to docs if you [modify the models object](https://github.com/token-js/token.js/blob/main/src/models.ts).
+
 ### Add a changeset
 
 ```bash
-yarn changeset
+pnpm changeset
 ```
 
 > Adding a changeset ensures that a new release will be triggered with your changes once they are reviewed and merged. Please make sure to select an appropriate change level (major, minor, patch) and provide a concise description of the change. Your description will be included in the public facing changelog.
