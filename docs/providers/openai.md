@@ -41,6 +41,7 @@ main()
 | Model                  | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
 | ---------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
 | gpt-4o                 | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
+| gpt-4o-mini            | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 | gpt-4o-2024-05-13      | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 | gpt-4-turbo            | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 | gpt-4-turbo-2024-04-09 | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
