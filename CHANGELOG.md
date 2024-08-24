@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.4
+
+### Patch Changes
+
+- 0823e3b: Add gpt-4o mini
+
 ## 0.4.3
 
 ### Patch Changes
