@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.5
+
+### Patch Changes
+
+- 2c90288: adding support for openai model gpt-4o-2024-08-06
+
 ## 0.4.4
 
 ### Patch Changes

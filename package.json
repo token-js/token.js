@@ -1,6 +1,6 @@
 {
   "name": "token.js",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
