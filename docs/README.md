@@ -409,7 +409,7 @@ This table provides an overview of the features that Token.js supports from each
 | Provider   | Chat Completion           | Streaming            | Function Calling Tool                | JSON Output          | Image Input          |
 | ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
 | OpenAI     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
+| Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign: |
 | Bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
 | Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |
 | Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
