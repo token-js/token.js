@@ -1,7 +1,7 @@
 ---
 description: >-
-  Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format.
-  Free and open source. No proxy server required.
+  Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and
+  open source. No proxy server required.
 ---
 
 # Token.js
@@ -359,7 +359,8 @@ main()
 
 Token.js supports the function calling tool for all providers and models that offer it.
 
-<pre class="language-ts"><code class="lang-ts">import { TokenJS, ChatCompletionTool } from 'token.js'
+```ts
+import { TokenJS, ChatCompletionTool } from 'token.js'
 
 const tokenjs = new TokenJS()
 
@@ -400,31 +401,32 @@ async function main() {
   console.log(result.choices[0].message.tool_calls)
 }
 main()
-</code></pre>
+```
 
 ## Feature Compatibility
 
 This table provides an overview of the features that Token.js supports from each LLM provider.
 
-| Provider   | Chat Completion           | Streaming            | Function Calling Tool                | JSON Output          | Image Input          |
-| ---------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
-| OpenAI     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign: |
-| Bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |
-| Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
-| AI21       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
-| Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark: |
-| Groq       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  | :white\_check\_mark: |  :heavy_minus_sign:  |
-| Perplexity | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
+| Provider   | Chat Completion      | Streaming            | Function Calling Tool | JSON Output          | Image Input          |
+| ---------- | -------------------- | -------------------- | --------------------- | -------------------- | -------------------- |
+| OpenAI     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| Anthropic  | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
+| Bedrock    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| Mistral    | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :heavy\_minus\_sign: |
+| Cohere     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
+| AI21       | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
+| Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| Groq       | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :white\_check\_mark: | :heavy\_minus\_sign: |
+| Perplexity | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
 
 ### Legend
-| Symbol             | Description                           |
-|--------------------|---------------------------------------|
-| :white_check_mark: | Supported by Token.js                 |
-| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
 
-**Note**: Certain LLMs, particularly older or weaker models, do not support some features in this table. For details about these restrictions, see our [LLM provider documentation](providers/README.md).
+| Symbol               | Description                                                      |
+| -------------------- | ---------------------------------------------------------------- |
+| :white\_check\_mark: | Supported by Token.js                                            |
+| :heavy\_minus\_sign: | Not supported by the LLM provider, so Token.js cannot support it |
+
+**Note**: Certain LLMs, particularly older or weaker models, do not support some features in this table. For details about these restrictions, see our [LLM provider documentation](providers/).
 
 ## License
 
