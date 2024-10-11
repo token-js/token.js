@@ -55,6 +55,8 @@ main()
 | cohere.command-r-v1:0                     | ✅               | ✅         | ➖           | ➖           | ✅                | ➖     |
 | cohere.command-text-v14                   | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 | cohere.command-light-text-v14             | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| meta.llama3-2-11b-instruct-v1:0           | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| meta.llama3-2-90b-instruct-v1:0           | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 | meta.llama3-8b-instruct-v1:0              | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 | meta.llama3-70b-instruct-v1:0             | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 | meta.llama2-13b-chat-v1                   | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
