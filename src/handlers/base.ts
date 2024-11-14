@@ -160,22 +160,30 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   }
 
   protected supportsJSONMode(model: T): boolean {
-    return this.isSupportedFeature(this.supportsJSON, model)
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(this.supportsJSON, baseModel as T)
   }
 
   protected supportsImageMessages(model: T): boolean {
-    return this.isSupportedFeature(this.supportsImages, model)
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(this.supportsImages, baseModel as T)
   }
 
   protected supportsNGreaterThanOne(model: T): boolean {
-    return this.isSupportedFeature(this.supportsN, model)
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(this.supportsN, baseModel as T)
   }
 
   protected supportsTools(model: T): boolean {
-    return this.isSupportedFeature(this.supportsToolCalls, model)
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(this.supportsToolCalls, baseModel as T)
   }
 
   protected supportsStreaming(model: T): boolean {
-    return this.isSupportedFeature(this.supportsStreamingMessages, model)
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(
+      this.supportsStreamingMessages,
+      baseModel as T
+    )
   }
 }
