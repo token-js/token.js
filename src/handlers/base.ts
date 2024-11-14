@@ -42,7 +42,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     // This can only occur on OpenAI compatible providers, but we do it for all providers for consistency.
     delete (body as any).provider
 
-    const baseModel = body.model.split(':')[1]
+    const baseModel = body.model.split(':')[1] || body.model
 
     if (!this.isSupportedModel(baseModel)) {
       throw new InputError(`Invalid 'model' field: ${baseModel}.`)
@@ -157,32 +157,32 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   // class isn't exposed to the user.
   public isSupportedModel(model: string): model is T {
     // For OpenAI models, allow appending :string
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(this.models, baseModel as T)
   }
 
   protected supportsJSONMode(model: T): boolean {
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(this.supportsJSON, baseModel as T)
   }
 
   protected supportsImageMessages(model: T): boolean {
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(this.supportsImages, baseModel as T)
   }
 
   protected supportsNGreaterThanOne(model: T): boolean {
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(this.supportsN, baseModel as T)
   }
 
   protected supportsTools(model: T): boolean {
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(this.supportsToolCalls, baseModel as T)
   }
 
   protected supportsStreaming(model: T): boolean {
-    const baseModel = model.split(':')[1]
+    const baseModel = model.split(':')[1] || model
     return this.isSupportedFeature(
       this.supportsStreamingMessages,
       baseModel as T
