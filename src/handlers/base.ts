@@ -154,7 +154,9 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   // We make this public so that we can mock it in tests, which is fine because the `BaseHandler`
   // class isn't exposed to the user.
   public isSupportedModel(model: string): model is T {
-    return this.isSupportedFeature(this.models, model as T)
+    // For OpenAI models, allow appending :string
+    const baseModel = model.split(':')[0]
+    return this.isSupportedFeature(this.models, baseModel as T)
   }
 
   protected supportsJSONMode(model: T): boolean {
