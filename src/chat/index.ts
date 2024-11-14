@@ -8,7 +8,7 @@ import {
   StreamCompletionResponse,
 } from '../userTypes/index.js'
 
-export type OpenAIModel = (typeof models.openai.models)[number]
+export type OpenAIModel = `${(typeof models.openai.models)[number]}:${string}`
 export type AI21Model = (typeof models.ai21.models)[number]
 export type AnthropicModel = (typeof models.anthropic.models)[number]
 export type GeminiModel = (typeof models.gemini.models)[number]
