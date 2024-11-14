@@ -42,25 +42,27 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     // This can only occur on OpenAI compatible providers, but we do it for all providers for consistency.
     delete (body as any).provider
 
-    if (!this.isSupportedModel(body.model)) {
-      throw new InputError(`Invalid 'model' field: ${body.model}.`)
+    const baseModel = body.model.split(':')[0]
+
+    if (!this.isSupportedModel(baseModel)) {
+      throw new InputError(`Invalid 'model' field: ${baseModel}.`)
     }
 
-    if (body.stream && !this.supportsStreaming(body.model)) {
+    if (body.stream && !this.supportsStreaming(baseModel)) {
       throw new Error(
-        `Detected 'stream: true', but the following model does not support streaming: ${body.model}`
+        `Detected 'stream: true', but the following model does not support streaming: ${baseModel}`
       )
     }
 
-    if (body.tools !== undefined && !this.supportsTools(body.model)) {
+    if (body.tools !== undefined && !this.supportsTools(baseModel)) {
       throw new InputError(
-        `Detected a 'tools' parameter, but the following model does not support tools: ${body.model}`
+        `Detected a 'tools' parameter, but the following model does not support tools: ${baseModel}`
       )
     }
 
-    if (body.tool_choice !== undefined && !this.supportsTools(body.model)) {
+    if (body.tool_choice !== undefined && !this.supportsTools(baseModel)) {
       throw new InputError(
-        `Detected a 'tool_choice' parameter, but the following model does not support tools: ${body.model}`
+        `Detected a 'tool_choice' parameter, but the following model does not support tools: ${baseModel}`
       )
     }
 
@@ -82,10 +84,10 @@ export abstract class BaseHandler<T extends LLMChatModel> {
           for (const content of message.content) {
             if (
               content.type === 'image_url' &&
-              !this.supportsImageMessages(body.model)
+              !this.supportsImageMessages(baseModel)
             ) {
               throw new InputError(
-                `Detected an image in the 'messages' array, but the following model does not support images: ${body.model}`
+                `Detected an image in the 'messages' array, but the following model does not support images: ${baseModel}`
               )
             }
           }
@@ -96,17 +98,17 @@ export abstract class BaseHandler<T extends LLMChatModel> {
     if (
       typeof body.n === 'number' &&
       body.n > 1 &&
-      !this.supportsNGreaterThanOne(body.model)
+      !this.supportsNGreaterThanOne(baseModel)
     ) {
       throw new InputError(
-        `The model ${body.model} does not support setting 'n' greater than 1.`
+        `The model ${baseModel} does not support setting 'n' greater than 1.`
       )
     }
 
     if (body.response_format?.type === 'json_object') {
-      if (!this.supportsJSONMode(body.model)) {
+      if (!this.supportsJSONMode(baseModel)) {
         throw new InputError(
-          `The model ${body.model} does not support the 'response_format' type 'json_object'.`
+          `The model ${baseModel} does not support the 'response_format' type 'json_object'.`
         )
       }
 
