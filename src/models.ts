@@ -155,18 +155,20 @@ export const models = {
     generateDocs: true,
   },
   gemini: {
-    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
+    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b', 'gemini-1.0-pro'] as const,
     supportsCompletion: true,
     supportsStreaming: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
-    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
-    supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
+    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b',] as const,
+    supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'] as const,
     supportsToolCalls: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
     supportsN: true,
