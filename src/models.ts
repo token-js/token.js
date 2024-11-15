@@ -163,7 +163,7 @@ export const models = {
       'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
-    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b',] as const,
+    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'] as const,
     supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'] as const,
     supportsToolCalls: [
       'gemini-1.5-pro',
