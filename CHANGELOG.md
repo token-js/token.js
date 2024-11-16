@@ -1,5 +1,13 @@
 # Token.js
 
+## 0.4.6
+
+### Patch Changes
+
+- 4d3a3f9: Support Claude 3.5 models in AWS Bedrock
+- b5d8fa6: Support o1-preview and o1-mini
+- b5d8fa6: Support gemini-1.5-flash-8b
+
 ## 0.4.5
 
 ### Patch Changes
