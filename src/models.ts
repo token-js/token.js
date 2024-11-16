@@ -125,6 +125,7 @@ export const models = {
   anthropic: {
     models: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -135,6 +136,7 @@ export const models = {
     supportsCompletion: true,
     supportsStreaming: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -151,6 +153,7 @@ export const models = {
     ] as const,
     supportsToolCalls: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -223,6 +226,9 @@ export const models = {
     models: [
       'amazon.titan-text-lite-v1',
       'amazon.titan-text-express-v1',
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
@@ -245,6 +251,9 @@ export const models = {
     supportsStreaming: [
       'amazon.titan-text-lite-v1',
       'amazon.titan-text-express-v1',
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
@@ -269,11 +278,16 @@ export const models = {
     // `responseFormat` field.
     supportsJSON: [],
     supportsImages: [
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
     ] as const,
     supportsToolCalls: [
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
