@@ -28,15 +28,15 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.24.3",
-    "@aws-sdk/client-bedrock-runtime": "^3.609.0",
-    "@google/generative-ai": "^0.14.1",
-    "@mistralai/mistralai": "^0.5.0",
+    "@anthropic-ai/sdk": "0.24.3",
+    "@aws-sdk/client-bedrock-runtime": "3.609.0",
+    "@google/generative-ai": "0.14.1",
+    "@mistralai/mistralai": "0.5.0",
     "chalk": "^4.1.2",
-    "cohere-ai": "^7.10.6",
+    "cohere-ai": "7.10.6",
     "mime-types": "^2.1.35",
     "nanoid": "^5.0.7",
-    "openai": "^4.52.2"
+    "openai": "4.52.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",
