@@ -34,6 +34,10 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-16k-0613',
+      'o1-mini',
+      'o1-mini-2024-09-12',
+      'o1-preview',
+      'o1-preview-2024-09-12',
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
@@ -155,18 +159,33 @@ export const models = {
     generateDocs: true,
   },
   gemini: {
-    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
+    models: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+      'gemini-1.0-pro',
+    ] as const,
     supportsCompletion: true,
     supportsStreaming: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
-    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
-    supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
+    supportsJSON: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+    ] as const,
+    supportsImages: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+    ] as const,
     supportsToolCalls: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
     supportsN: true,
