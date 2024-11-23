@@ -38,6 +38,10 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-16k-0613',
+      'o1-mini',
+      'o1-mini-2024-09-12',
+      'o1-preview',
+      'o1-preview-2024-09-12',
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
@@ -125,6 +129,7 @@ export const models = {
   anthropic: {
     models: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -135,6 +140,7 @@ export const models = {
     supportsCompletion: true,
     supportsStreaming: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -151,6 +157,7 @@ export const models = {
     ] as const,
     supportsToolCalls: [
       'claude-3-5-sonnet-20240620',
+      'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
       'claude-3-haiku-20240307',
@@ -159,18 +166,33 @@ export const models = {
     generateDocs: true,
   },
   gemini: {
-    models: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro'] as const,
+    models: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+      'gemini-1.0-pro',
+    ] as const,
     supportsCompletion: true,
     supportsStreaming: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
-    supportsJSON: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
-    supportsImages: ['gemini-1.5-pro', 'gemini-1.5-flash'] as const,
+    supportsJSON: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+    ] as const,
+    supportsImages: [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
+    ] as const,
     supportsToolCalls: [
       'gemini-1.5-pro',
       'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-1.0-pro',
     ] as const,
     supportsN: true,
@@ -208,6 +230,9 @@ export const models = {
     models: [
       'amazon.titan-text-lite-v1',
       'amazon.titan-text-express-v1',
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
@@ -230,6 +255,9 @@ export const models = {
     supportsStreaming: [
       'amazon.titan-text-lite-v1',
       'amazon.titan-text-express-v1',
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
@@ -254,11 +282,16 @@ export const models = {
     // `responseFormat` field.
     supportsJSON: [],
     supportsImages: [
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',
     ] as const,
     supportsToolCalls: [
+      'anthropic.claude-3-5-sonnet-20240620-v1:0',
+      'anthropic.claude-3-5-sonnet-20241022-v2:0',
+      'anthropic.claude-3-5-haiku-20241022-v1:0',
       'anthropic.claude-3-opus-20240229-v1:0',
       'anthropic.claude-3-sonnet-20240229-v1:0',
       'anthropic.claude-3-haiku-20240307-v1:0',

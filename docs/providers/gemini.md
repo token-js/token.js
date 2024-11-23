@@ -38,11 +38,12 @@ main()
 <!-- compatibility -->
 ## Supported Models
 
-| Model            | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
-| ---------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
-| gemini-1.5-pro   | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
-| gemini-1.5-flash | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
-| gemini-1.0-pro   | ✅               | ✅         | ➖           | ➖           | ✅                | ✅     |
+| Model               | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
+| ------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
+| gemini-1.5-pro      | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
+| gemini-1.5-flash    | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
+| gemini-1.5-flash-8b | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
+| gemini-1.0-pro      | ✅               | ✅         | ➖           | ➖           | ✅                | ✅     |
 
 ### Legend
 | Symbol             | Description                           |
