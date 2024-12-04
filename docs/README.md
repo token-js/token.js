@@ -25,6 +25,7 @@ description: >-
 * OpenAI
 * Perplexity
 * OpenRouter
+* Any other model provider with an OpenAI compatible API
 
 ## Setup
 
@@ -324,6 +325,8 @@ OPENROUTER_API_KEY=
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
+# OpenAI Compatible
+OPENAI_COMPATIBLE_API_KEY=
 ```
 
 ### Streaming
@@ -418,6 +421,8 @@ This table provides an overview of the features that Token.js supports from each
 | Gemini     | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
 | Groq       | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :white\_check\_mark: | :heavy\_minus\_sign: |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
+| OpenRouter | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| OpenAI Compatible | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 
 ### Legend
 
