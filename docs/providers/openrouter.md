@@ -1,4 +1,4 @@
-# Perplexity
+# OpenRouter
 
 [Get an OpenRouter API key](https://openrouter.ai/settings/keys)
 
