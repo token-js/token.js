@@ -4,7 +4,7 @@ Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open
 
 ## Features
 
-* Use OpenAI's format to call 200+ LLMs from 10 providers.
+* Use OpenAI's format to call 200+ LLMs from 10+ providers.
 * Supports tools, JSON outputs, image inputs, streaming, and more.
 * Runs completely on the client side. No proxy server needed.
 * Free and open source under MIT.
@@ -21,6 +21,7 @@ Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open
 * OpenAI
 * Perplexity
 * OpenRouter
+* Any other model provider with an OpenAI compatible API
 
 ## [Documentation](https://docs.tokenjs.ai/)
 
@@ -91,6 +92,8 @@ OPENROUTER_API_KEY=
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
+# OpenAI Compatible
+OPENAI_COMPATIBLE_API_KEY=
 ```
 
 ### Streaming
