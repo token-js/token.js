@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.7
+
+### Patch Changes
+
+- 1e529df: Offically support generic Openai compatible providers
+
 ## 0.4.6
 
 ### Patch Changes

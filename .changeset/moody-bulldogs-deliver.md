@@ -1,0 +1,5 @@
+---
+'supertokenai': patch
+---
+
+Updated Providers

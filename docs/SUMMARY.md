@@ -12,5 +12,6 @@
   * [OpenAI](providers/openai.md)
   * [OpenRouter](providers/openrouter.md)
   * [Perplexity](providers/perplexity.md)
+  * [OpenAI Compatible](providers/openai-compatible.md)
 * [Contact Us](contact-us.md)
 * [Contributing](https://github.com/token-js/token.js/blob/main/CONTRIBUTING.md)

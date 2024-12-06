@@ -12,6 +12,7 @@ import { CohereHandler } from './cohere.js'
 import { GeminiHandler } from './gemini.js'
 import { GroqHandler } from './groq.js'
 import { MistralHandler } from './mistral.js'
+import { OpenAICompatibleHandler } from './openai-compatible.js'
 import { OpenAIHandler } from './openai.js'
 import { OpenRouterHandler } from './openrouter.js'
 import { PerplexityHandler } from './perplexity.js'
@@ -110,6 +111,16 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
     ),
   ['openrouter']: (opts: ConfigOptions) =>
     new OpenRouterHandler(
+      opts,
+      models.openrouter.models,
+      models.openrouter.supportsJSON,
+      models.openrouter.supportsImages,
+      models.openrouter.supportsToolCalls,
+      models.openrouter.supportsN,
+      models.openrouter.supportsStreaming
+    ),
+  ['openai-compatible']: (opts: ConfigOptions) =>
+    new OpenAICompatibleHandler(
       opts,
       models.openrouter.models,
       models.openrouter.supportsJSON,
