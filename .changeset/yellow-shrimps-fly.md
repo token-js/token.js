@@ -1,0 +1,5 @@
+---
+'supertokenai': patch
+---
+
+fix: openai
