@@ -1,4 +1,4 @@
-import { LLMChat, LLMChatModel } from './chat/index.js'
+import { LLMChat, LLMChatModel, LLMProvider } from './chat/index.js'
 import { ConfigOptions } from './userTypes/index.js'
 export * from './userTypes/index.js'
 
@@ -53,6 +53,7 @@ export type {
 
 // Export a combined type of all models for convenience
 export type SupportedModel = LLMChatModel
+export type SupportedProvider = LLMProvider
 
 // Export completion request types
 export type {
