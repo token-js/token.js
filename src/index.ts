@@ -1,4 +1,4 @@
-import { LLMChat } from './chat/index.js'
+import { LLMChat, LLMChatModel } from './chat/index.js'
 import { ConfigOptions } from './userTypes/index.js'
 export * from './userTypes/index.js'
 
@@ -33,3 +33,44 @@ export class TokenJS implements TokenJSInterface {
     this.chat = new LLMChat(opts)
   }
 }
+
+// Export all provider and model types
+export type {
+  AI21Model,
+  AnthropicModel,
+  BedrockModel,
+  CohereModel,
+  GeminiModel,
+  GroqModel,
+  LLMProvider,
+  MistralModel,
+  OpenAICompatibleModel,
+  OpenAIModel,
+  OpenRouterModel,
+  PerplexityModel,
+  ProviderModelMap,
+} from './chat/index.js'
+
+// Export a combined type of all models for convenience
+export type SupportedModel = LLMChatModel
+
+// Export completion request types
+export type {
+  CompletionBase,
+  CompletionNonStreaming,
+  CompletionParams,
+  CompletionStreaming,
+  ProviderCompletionParams,
+} from './chat/index.js'
+
+// Export completion response types
+export type {
+  ChatCompletionMessageParam,
+  ChatCompletionTool,
+  CompletionResponse,
+  CompletionResponseChunk,
+  StreamCompletionResponse,
+} from './userTypes/index.js'
+
+// Export configuration types
+export type { ConfigOptions } from './userTypes/index.js'

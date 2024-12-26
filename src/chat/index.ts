@@ -35,7 +35,7 @@ export type LLMChatModel =
 
 export type LLMProvider = keyof typeof models
 
-type ProviderModelMap = {
+export type ProviderModelMap = {
   openai: OpenAIModel
   ai21: AI21Model
   anthropic: AnthropicModel
@@ -49,7 +49,7 @@ type ProviderModelMap = {
   'openai-compatible': OpenAICompatibleModel
 }
 
-type CompletionBase<P extends LLMProvider> = Pick<
+export type CompletionBase<P extends LLMProvider> = Pick<
   ChatCompletionCreateParamsBase,
   | 'temperature'
   | 'top_p'
