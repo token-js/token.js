@@ -65,6 +65,31 @@ async function main() {
 main()
 ```
 
+### Using an Unlisted Model
+
+If you need to use a model that's not in Token.js's predefined list (such as a fine-tuned model or a newly released one), you can use the `byPassModelCheck` option:
+
+```ts
+// Initialize with model check bypassed
+const tokenjs = new TokenJS({
+  byPassModelCheck: true
+})
+
+// Now you can use any model name
+await tokenjs.chat.completions.create({
+  provider: 'bedrock',
+  model: 'us.anthropic.claude-3-sonnet', // Would normally throw an error if unlisted
+  messages: [
+    { role: 'user', content: 'Hello!' }
+  ]
+})
+```
+
+When using TypeScript, you may need to cast unlisted model names:
+```ts
+model: 'your-custom-model' as any
+```
+
 ### Access Credentials
 
 We recommend using environment variables to configure the credentials for each LLM provider.

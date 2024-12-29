@@ -154,7 +154,7 @@ export abstract class BaseHandler<T extends LLMChatModel> {
   // We make this public so that we can mock it in tests, which is fine because the `BaseHandler`
   // class isn't exposed to the user.
   public isSupportedModel(model: string): model is T {
-    return this.isSupportedFeature(this.models, model as T)
+    return this.opts.byPassModelCheck || this.isSupportedFeature(this.models, model as T)
   }
 
   protected supportsJSONMode(model: T): boolean {

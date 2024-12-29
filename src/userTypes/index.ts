@@ -11,6 +11,26 @@ import {
 } from 'openai/resources/index'
 
 export type ConfigOptions = Pick<ClientOptions, 'apiKey' | 'baseURL'> & {
+  /**
+   * When set to true, skips validation of model names. This is useful when using models that are not
+   * in the predefined list, such as fine-tuned models or models from providers that frequently add new ones.
+   *
+   * @example
+   * // Initialize with model check bypassed
+   * const tokenjs = new TokenJS({
+   *   byPassModelCheck: true
+   * })
+   *
+   * // Now you can use any model name
+   * await tokenjs.chat.completions.create({
+   *   provider: 'bedrock',
+   *   model: 'us.anthropic.claude-3-sonnet', // Would normally throw an error if unlisted
+   *   messages: [
+   *     { role: 'user', content: 'Hello!' }
+   *   ]
+   * })
+   */
+  byPassModelCheck?: boolean,
   bedrock?: {
     region?: string
     accessKeyId?: string
