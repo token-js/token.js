@@ -173,6 +173,44 @@ async function main() {
 main()
 ```
 
+### Extending Model Support
+
+Token.js allows you to extend the predefined model list using the `extendModelList` method. Here are some example scenarios where this is useful:
+1. Adding AWS Bedrock models with regional prefixes like `us.anthropic.claude-3-sonnet`
+2. Supporting new model versions like `gpt-4-1106-preview` before they're added to the predefined list
+3. Using custom model deployments with unique names
+4. Adding experimental or beta models during testing
+
+```ts
+import { TokenJS } from 'token.js'
+
+// Example from main.ts - Adding AWS Bedrock Claude models with region prefix
+// Note: 'as any' must be used here since the model name is not in the predefined list
+const tokenjs = new TokenJS().extendModelList(
+  "bedrock",
+  'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any,
+  "anthropic.claude-3-sonnet-20240229-v1:0" // Copy features from existing model
+);
+
+console.log(TokenJS.extendedModelList);
+// TokenJS.extendedModelList will contain:
+// [{
+//   provider: "bedrock",
+//   name: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
+//   featureSupport: "anthropic.claude-3-sonnet-20240229-v1:0"
+// }]
+```
+
+The `featureSupport` parameter can be either:
+- A string matching an existing model name from the same provider to copy its feature support
+- An object specifying which features the model supports:
+  | Feature    | Type    | Description                                  |
+  |------------|---------|----------------------------------------------|
+  | streaming  | boolean | Whether the model supports streaming responses|
+  | json       | boolean | Whether the model supports JSON mode         |
+  | toolCalls  | boolean | Whether the model supports function calling  |
+  | images     | boolean | Whether the model supports image inputs      |
+
 ## Feature Compatibility
 
 This table provides an overview of the features that Token.js supports from each LLM provider.
