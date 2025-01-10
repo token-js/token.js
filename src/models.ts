@@ -364,6 +364,8 @@ export const models = {
   },
   groq: {
     models: [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
       'llama3-8b-8192',
       'llama3-70b-8192',
       'mixtral-8x7b-32768',
@@ -372,6 +374,8 @@ export const models = {
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
       'llama3-8b-8192',
       'llama3-70b-8192',
       'mixtral-8x7b-32768',
@@ -382,7 +386,7 @@ export const models = {
     // produce valid JSON or produce very low quality results for the following prompt: "Generate a
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
     // to ensure that we only support models that reliably produce decent results.
-    supportsJSON: ['llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
+    supportsJSON: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
     supportsN: false,
@@ -390,23 +394,15 @@ export const models = {
   },
   perplexity: {
     models: [
-      'llama-3-sonar-small-32k-chat',
-      'llama-3-sonar-small-32k-online',
-      'llama-3-sonar-large-32k-chat',
-      'llama-3-sonar-large-32k-online',
-      'llama-3-8b-instruct',
-      'llama-3-70b-instruct',
-      'mixtral-8x7b-instruct',
+      'llama-3.1-sonar-small-128k-online',
+      'llama-3.1-sonar-large-128k-online',
+      'llama-3.1-sonar-huge-128k-online',
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
-      'llama-3-sonar-small-32k-chat',
-      'llama-3-sonar-small-32k-online',
-      'llama-3-sonar-large-32k-chat',
-      'llama-3-sonar-large-32k-online',
-      'llama-3-8b-instruct',
-      'llama-3-70b-instruct',
-      'mixtral-8x7b-instruct',
+      'llama-3.1-sonar-small-128k-online',
+      'llama-3.1-sonar-large-128k-online',
+      'llama-3.1-sonar-huge-128k-online',
     ] as const,
     supportsJSON: [] as const,
     supportsImages: [] as const,
