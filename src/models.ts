@@ -386,7 +386,13 @@ export const models = {
     // produce valid JSON or produce very low quality results for the following prompt: "Generate a
     // JSON that maps ten athletes to their jersey numbers". We removed these models from the list
     // to ensure that we only support models that reliably produce decent results.
-    supportsJSON: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant', 'llama3-70b-8192', 'gemma-7b-it', 'gemma2-9b-it'] as const,
+    supportsJSON: [
+      'llama-3.3-70b-versatile',
+      'llama-3.1-8b-instant',
+      'llama3-70b-8192',
+      'gemma-7b-it',
+      'gemma2-9b-it',
+    ] as const,
     supportsImages: [] as const,
     supportsToolCalls: [] as const,
     supportsN: false,
