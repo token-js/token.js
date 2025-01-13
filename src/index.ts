@@ -1,5 +1,6 @@
 import { LLMChat } from './chat/index.js'
 import { ConfigOptions } from './userTypes/index.js'
+export * from './models.js'
 export * from './userTypes/index.js'
 
 // Extract the public interface from OpenAI, including both properties and methods
