@@ -1,4 +1,5 @@
 import { LLMChat, LLMProvider } from './chat/index.js'
+import { InputError } from './handlers/types.js'
 import { models } from './models.js'
 import { ConfigOptions } from './userTypes/index.js'
 export * from './userTypes/index.js'
@@ -80,34 +81,43 @@ export class TokenJS implements TokenJSInterface {
    * @param provider - The LLM provider (e.g., 'bedrock', 'openai')
    * @param name - The model name/identifier to add
    * @param featureSupport - Either:
-   *- A string matching an existing model name from the same provider to copy its feature support
-   *- An object specifying which features the model supports:
-   *| Feature    | Type    | Description                                  |
-   *|------------|---------|----------------------------------------------|
-   *| streaming  | boolean | Whether the model supports streaming responses|
-   *| json       | boolean | Whether the model supports JSON mode         |
-   *| toolCalls  | boolean | Whether the model supports function calling  |
-   *| images     | boolean | Whether the model supports image inputs      |
+   * - A string matching an existing model name from the same provider to copy its feature support
+   * - An object specifying which features the model supports:
+   * | Feature    | Type    | Description                                  |
+   * |------------|---------|----------------------------------------------|
+   * | streaming  | boolean | Whether the model supports streaming responses|
+   * | json       | boolean | Whether the model supports JSON mode         |
+   * | toolCalls  | boolean | Whether the model supports function calling  |
+   * | images     | boolean | Whether the model supports image inputs      |
    * @returns The TokenJS instance for chaining
    *
    * @example
    * ```typescript
-   * // Example from main.ts - Adding AWS Bedrock Claude models with region prefix
-   * // Note: 'as any' must be used here since the model name is not in the predefined list
-   * const tokenjs = new TokenJS().extendModelList(
+   * // Example in 2 steps: Adding AWS Bedrock Claude models with region prefix
+   * const tokenjs = new TokenJS();
+   *
+   * // Step 1: Register the new model name
+   * tokenjs.extendModelList(
    *   "bedrock",
-   *   'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any,
+   *   'us.anthropic.claude-3-5-sonnet-20241022-v2:0',
    *   "anthropic.claude-3-sonnet-20240229-v1:0" // Copy features from existing model
    * );
    *
-   * console.log(TokenJS.extendedModelList);
-   * // TokenJS.extendedModelList will contain:
-   * // [{
-   * //   provider: "bedrock",
-   * //   name: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-   * //   featureSupport: "anthropic.claude-3-sonnet-20240229-v1:0"
-   * // }]
+   * // Step 2: Using the extended model in a chat completion
+   * const result = await tokenjs.chat.completions.create({
+   *   stream: true,
+   *   provider: 'bedrock',
+   *   model: 'us.anthropic.claude-3-5-sonnet-20241022-v2:0' as any, // Note: Type casting as 'any' required
+   *   messages: [
+   *     {
+   *       role: 'user',
+   *       content: 'Tell me about yourself.',
+   *     },
+   *   ],
+   * });
    * ```
+   *
+   * Note: When using extended models, type casting (`as any`) is required
    */
   extendModelList<
     P extends Exclude<LLMProvider, 'openrouter' | 'openai-compatible'>
@@ -115,6 +125,15 @@ export class TokenJS implements TokenJSInterface {
     // Do nothing if the model already added in the extendedModeList
     if (this.extendedModelExist(provider, name)) {
       return this
+    }
+    // If a model name is pre-defined, there is a conflict so we throw an error
+    if (
+      Array.isArray(models[provider].models) &&
+      models[provider].models.includes(name)
+    ) {
+      throw new InputError(
+        `You tried to add the following custom model name: "${name}", for provider: "${provider}". But it conflicts with an existing pre-defined model name. Please try again using different name e.g.: "${name}-custom"`
+      )
     }
 
     const modelsRef = models[provider] as any
