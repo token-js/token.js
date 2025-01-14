@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.4.8
+
+### Patch Changes
+
+- f11d766: Update groq and perplexity models
+
 ## 0.4.7
 
 ### Patch Changes
