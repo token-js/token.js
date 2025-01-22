@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.5.0
+
+### Minor Changes
+
+- b68f2a4: Feat: Add support for extending model lists without official support
+
 ## 0.4.8
 
 ### Patch Changes
