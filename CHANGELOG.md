@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.5.1
+
+### Patch Changes
+
+- de139f6: Default to hardcoded empty string for API key in the OpenAI compatible provider if no API key is provided
+
 ## 0.5.0
 
 ### Minor Changes
