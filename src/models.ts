@@ -34,6 +34,7 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-16k-0613',
+      'o3-mini',
       'o1-mini',
       'o1-mini-2024-09-12',
       'o1-preview',
@@ -64,6 +65,7 @@ export const models = {
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-16k-0613',
+      'o3-mini',
     ] as const,
     supportsJSON: [
       'gpt-4o',
@@ -79,6 +81,7 @@ export const models = {
       'gpt-3.5-turbo',
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0125',
+      'o3-mini',
     ] as const,
     supportsImages: [
       'gpt-4o',
@@ -108,6 +111,7 @@ export const models = {
       'gpt-3.5-turbo-0125',
       'gpt-3.5-turbo-1106',
       'gpt-3.5-turbo-0613',
+      'o3-mini',
     ] as const,
     supportsN: true,
     generateDocs: true,
