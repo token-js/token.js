@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.5.2
+
+### Patch Changes
+
+- 1f4b166: Support o3-mini
+
 ## 0.5.1
 
 ### Patch Changes
