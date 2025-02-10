@@ -1,6 +1,10 @@
 {
   "name": "token.js",
   "version": "0.5.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/token-js/token.js"
+  },
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format.",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
