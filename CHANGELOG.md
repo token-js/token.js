@@ -1,5 +1,12 @@
 # Token.js
 
+## 0.5.3
+
+### Patch Changes
+
+- b30ebe2: Link to repository from NPM
+- 2e5a4d7: Add gemini-2.0 models
+
 ## 0.5.2
 
 ### Patch Changes
