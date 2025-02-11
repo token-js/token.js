@@ -104,7 +104,9 @@ export async function* createCompletionResponseStreaming(
       // Anthropic streaming api includes usage at different chunks, and we'll check every chunk and sum
       // the usage to get end totals. it also returns usage by default.
       // docs: https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request
+      console.log('BEFORE usage message_start', usage)
       usage = getRollingUsage(message, usage)
+      console.log('AFTER usage message_start', usage)
       // Yield the first element
       yield {
         choices: [
@@ -196,8 +198,9 @@ export async function* createCompletionResponseStreaming(
       logprobs: null,
       delta,
     }
-
+    console.log('BEFORE usage message_start', usage)
     usage = getRollingUsage(message, usage)
+    console.log('AFTER usage message_start', usage)
     if (_.isEmpty(model) && !_.isEmpty(message.model)) {
       model = message.model
     }
@@ -214,6 +217,7 @@ export async function* createCompletionResponseStreaming(
   }
   // Yield the last element which is the total usage
   if (usage && model && messageId) {
+    console.log('usage', usage)
     yield {
       choices: [],
       created,
