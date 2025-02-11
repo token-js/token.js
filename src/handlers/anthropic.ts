@@ -229,10 +229,14 @@ const getRollingUsage = (message: Message, usage: TokenUsage): TokenUsage => {
   if (!message.usage) {
     return usage
   }
+  const prompt_tokens = usage.prompt_tokens + message.usage.input_tokens
+  const completion_tokens =
+    usage.completion_tokens + message.usage.output_tokens
+  const total_tokens = prompt_tokens + completion_tokens
   return {
-    prompt_tokens: usage.prompt_tokens + message.usage.input_tokens,
-    completion_tokens: usage.completion_tokens + message.usage.output_tokens,
-    total_tokens: message.usage.input_tokens + message.usage.output_tokens,
+    prompt_tokens,
+    completion_tokens,
+    total_tokens,
   }
 }
 const isTextBlock = (contentBlock: ContentBlock): contentBlock is TextBlock => {
