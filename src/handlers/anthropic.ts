@@ -190,8 +190,8 @@ export async function* createCompletionResponseStreaming(
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
       console.log('BEFORE usage message_delta', usage)
-      usage.completion_tokens += chunk.usage.output_tokens
-      usage.total_tokens += chunk.usage.output_tokens
+      usage.completion_tokens = chunk.usage.output_tokens
+      usage.total_tokens = usage.prompt_tokens + usage.completion_tokens
       console.log('AFTER usage message_delta', usage)
     }
 
