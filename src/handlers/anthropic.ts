@@ -33,6 +33,12 @@ import {
   isEmptyObject,
 } from './utils.js'
 
+export interface TokenUsage {
+  prompt_tokens: number
+  completion_tokens: number
+  total_tokens: number
+}
+
 export const createCompletionResponseNonStreaming = (
   response: Message,
   created: number,
@@ -71,6 +77,13 @@ export async function* createCompletionResponseStreaming(
   created: number
 ): StreamCompletionResponse {
   let message: Message | undefined
+  let usage: TokenUsage = {
+    prompt_tokens: 0,
+    completion_tokens: 0,
+    total_tokens: 0,
+  }
+  let messageId: string
+  let model: string
 
   // We manually keep track of the tool call index because some providers, like Anthropic, start
   // with a tool call index of 1 because they're preceded by a text block that has an index of 0 in
@@ -81,6 +94,12 @@ export async function* createCompletionResponseStreaming(
   for await (const chunk of response) {
     if (chunk.type === 'message_start') {
       message = chunk.message
+      model = message.model
+      messageId = message.id
+      // Anthropic streaming api includes usage at different chunks, and we'll check every chunk and sum
+      // the usage to get end totals. it also returns usage by default.
+      // docs: https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request
+      usage = getRollingUsage(message, usage)
       // Yield the first element
       yield {
         choices: [
@@ -173,18 +192,39 @@ export async function* createCompletionResponseStreaming(
       delta,
     }
 
+    usage = getRollingUsage(message, usage)
+    model = message.model
     yield {
       choices: [chunkChoice],
       created,
       model: message.model,
       id: message.id,
       object: 'chat.completion.chunk',
-      // Our SDK doesn't currently support OpenAI's `stream_options`, so we don't include a `usage`
-      // field here.
+    }
+  }
+  // Yield the last element which is the total usage
+  if (usage) {
+    yield {
+      choices: [],
+      created,
+      model,
+      id: messageId,
+      object: 'chat.completion.chunk',
+      usage,
     }
   }
 }
 
+const getRollingUsage = (message: Message, usage: TokenUsage): TokenUsage => {
+  if (!message.usage) {
+    return usage
+  }
+  return {
+    prompt_tokens: usage.prompt_tokens + message.usage.input_tokens,
+    completion_tokens: usage.completion_tokens + message.usage.output_tokens,
+    total_tokens: message.usage.input_tokens + message.usage.output_tokens,
+  }
+}
 const isTextBlock = (contentBlock: ContentBlock): contentBlock is TextBlock => {
   return contentBlock.type === 'text'
 }
