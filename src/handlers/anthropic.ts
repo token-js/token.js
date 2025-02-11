@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk'
 import {
   ContentBlock,
   ImageBlockParam,
@@ -11,8 +12,6 @@ import {
   ToolUseBlock,
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/messages'
-import { Anthropic } from '@libretto/anthropic'
-import { LibrettoCreateParams } from '@libretto/openai'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
@@ -581,8 +580,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
 
       return createCompletionResponseStreaming(response, created)
     } else {
-      const convertedBody: MessageCreateParamsNonStreaming &
-        LibrettoCreateParams = {
+      const convertedBody: MessageCreateParamsNonStreaming = {
         max_tokens: maxTokens,
         messages,
         model: body.model,
@@ -592,7 +590,6 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         system: systemMessage,
         tools,
         tool_choice: toolChoice,
-        libretto: body.libretto,
       }
 
       const created = getTimestamp()

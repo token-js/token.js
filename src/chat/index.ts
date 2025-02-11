@@ -1,4 +1,3 @@
-import { LibrettoCreateParams } from '@libretto/openai'
 import { ChatCompletionCreateParamsBase } from 'openai/resources/chat/completions'
 
 import { getHandler } from '../handlers/utils.js'
@@ -64,7 +63,6 @@ type CompletionBase<P extends LLMProvider> = Pick<
 > & {
   provider: P
   model: ProviderModelMap[P]
-  libretto?: LibrettoCreateParams
 }
 
 export type CompletionStreaming<P extends LLMProvider> = CompletionBase<P> & {

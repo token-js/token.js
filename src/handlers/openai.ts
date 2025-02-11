@@ -1,4 +1,4 @@
-import { OpenAI } from '@libretto/openai'
+import OpenAI from 'openai'
 import { Stream } from 'openai/streaming'
 
 import { OpenAIModel, ProviderCompletionParams } from '../chat/index.js'

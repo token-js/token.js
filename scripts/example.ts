@@ -1,71 +1,51 @@
 import * as dotenv from 'dotenv'
 import { OpenAI } from 'openai'
 
-import { objectTemplate as anthropicObjectTemplate } from '@libretto/anthropic'
-import { objectTemplate as openaiObjectTemplate } from '@libretto/openai'
 import { TokenJS } from '../src'
 dotenv.config()
 
-const callLLMOpenAI = async () => {
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-    openaiObjectTemplate([
-      {
-        role: 'system',
-        content:
-          'You are an angry comedian that tells jokes in an irate tone, but are very funny and original.',
-      },
-      {
-        role: 'user',
-        content: `{joke_topic}`,
-      },
-    ])
+const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+  {
+    role: 'user',
+    content: `Tell me a joke about the moon.`,
+  },
+]
 
-  const tokenjs = new TokenJS()
+const callLLM = async () => {
+  const tokenjs = new TokenJS({
+    baseURL: 'http://localhost:3000/api/',
+  })
   const result = await tokenjs.chat.completions.create({
-    provider: 'openai',
-    model: 'gpt-4o-mini',
+    // stream: true,
+    provider: 'openai-compatible',
+    model: 'gemini-1.5-pro',
     messages,
-    libretto: {
-      promptTemplateName: 'tokenjs-events-openai',
-      templateParams: {
-        joke_topic: 'Tell me a joke about the moon.',
-      },
-    },
   })
 
   console.log(result.choices)
+
+  // for await (const part of result) {
+  // process.stdout.write(part.choices[0]?.delta?.content || "");
+  // }
 }
 
-const callLLMAnthropic = async () => {
-  const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
-    anthropicObjectTemplate([
-      {
-        role: 'system',
-        content:
-          'You are an angry comedian that tells jokes in an irate tone, but are very funny and original.',
-      },
-      {
-        role: 'user',
-        content: `{joke_topic}`,
-      },
-    ])
-
-  const tokenjs = new TokenJS()
-  const result = await tokenjs.chat.completions.create({
-    provider: 'anthropic',
-    model: 'claude-3-5-sonnet-20240620',
-    messages,
-    libretto: {
-      promptTemplateName: 'tokenjs-events-anthropic',
-      templateParams: {
-        joke_topic: 'Tell me a joke about the moon.',
-      },
-    },
+const callOpenAI = async () => {
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
   })
 
-  console.log(result.choices)
+  const result = await openai.chat.completions.create({
+    messages,
+    model: 'gpt-4o',
+    stream: true,
+  })
+
+  for await (const part of result) {
+    console.log(part.choices[0].finish_reason)
+  }
+
+  // console.log(result.choices[0].message.content)
 }
 
-//callOpenAI()
-//callLLMOpenAI()
-callLLMAnthropic()
+// callOpenAI()
+callLLM()
