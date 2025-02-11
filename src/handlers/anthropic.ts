@@ -101,8 +101,8 @@ export async function* createCompletionResponseStreaming(
       if (_.isEmpty(messageId) && !_.isEmpty(message.id)) {
         messageId = message.id
       }
-      // Anthropic streaming api includes usage at the start of the stream, and in message_delta
-      // chunks. we'll sum the usage to get end totals. it also returns usage by default.
+      // Anthropic streaming api includes usage at the start of the stream,
+      // and an updated sum of output tokens in message_delta chunks.
       // docs: https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request
       usage.prompt_tokens = message.usage.input_tokens
       usage.completion_tokens = message.usage.output_tokens
@@ -228,20 +228,6 @@ export async function* createCompletionResponseStreaming(
   }
 }
 
-const getUsage = (message: Message, usage: TokenUsage): TokenUsage => {
-  if (!message.usage) {
-    return usage
-  }
-  const prompt_tokens = usage.prompt_tokens + message.usage.input_tokens
-  const completion_tokens =
-    usage.completion_tokens + message.usage.output_tokens
-  const total_tokens = prompt_tokens + completion_tokens
-  return {
-    prompt_tokens,
-    completion_tokens,
-    total_tokens,
-  }
-}
 const isTextBlock = (contentBlock: ContentBlock): contentBlock is TextBlock => {
   return contentBlock.type === 'text'
 }
