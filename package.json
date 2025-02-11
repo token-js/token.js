@@ -38,6 +38,7 @@
     "@mistralai/mistralai": "0.5.0",
     "chalk": "^4.1.2",
     "cohere-ai": "7.10.6",
+    "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
     "nanoid": "^5.0.7",
     "openai": "4.52.2"

@@ -12,6 +12,7 @@ import {
   ToolUseBlock,
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/messages'
+import _ from 'lodash'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
@@ -82,8 +83,8 @@ export async function* createCompletionResponseStreaming(
     completion_tokens: 0,
     total_tokens: 0,
   }
-  let messageId: string
-  let model: string
+  let messageId: string = ''
+  let model: string = ''
 
   // We manually keep track of the tool call index because some providers, like Anthropic, start
   // with a tool call index of 1 because they're preceded by a text block that has an index of 0 in
@@ -94,8 +95,12 @@ export async function* createCompletionResponseStreaming(
   for await (const chunk of response) {
     if (chunk.type === 'message_start') {
       message = chunk.message
-      model = message.model
-      messageId = message.id
+      if (_.isEmpty(model) && !_.isEmpty(message.model)) {
+        model = message.model
+      }
+      if (_.isEmpty(messageId) && !_.isEmpty(message.id)) {
+        messageId = message.id
+      }
       // Anthropic streaming api includes usage at different chunks, and we'll check every chunk and sum
       // the usage to get end totals. it also returns usage by default.
       // docs: https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request
@@ -193,7 +198,12 @@ export async function* createCompletionResponseStreaming(
     }
 
     usage = getRollingUsage(message, usage)
-    model = message.model
+    if (_.isEmpty(model) && !_.isEmpty(message.model)) {
+      model = message.model
+    }
+    if (_.isEmpty(messageId) && !_.isEmpty(message.id)) {
+      messageId = message.id
+    }
     yield {
       choices: [chunkChoice],
       created,
@@ -203,7 +213,7 @@ export async function* createCompletionResponseStreaming(
     }
   }
   // Yield the last element which is the total usage
-  if (usage) {
+  if (usage && model && messageId) {
     yield {
       choices: [],
       created,
