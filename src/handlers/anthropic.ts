@@ -104,11 +104,9 @@ export async function* createCompletionResponseStreaming(
       // Anthropic streaming api includes usage at the start of the stream, and in message_delta
       // chunks. we'll sum the usage to get end totals. it also returns usage by default.
       // docs: https://docs.anthropic.com/en/api/messages-streaming#basic-streaming-request
-      console.log('BEFORE usage message_start', usage)
       usage.prompt_tokens = message.usage.input_tokens
       usage.completion_tokens = message.usage.output_tokens
       usage.total_tokens = usage.prompt_tokens + usage.completion_tokens
-      console.log('AFTER usage message_start', usage)
 
       // Yield the first element
       yield {
@@ -189,10 +187,8 @@ export async function* createCompletionResponseStreaming(
       }
     } else if (chunk.type === 'message_delta') {
       newStopReason = chunk.delta.stop_reason
-      console.log('BEFORE usage message_delta', usage)
       usage.completion_tokens = chunk.usage.output_tokens
       usage.total_tokens = usage.prompt_tokens + usage.completion_tokens
-      console.log('AFTER usage message_delta', usage)
     }
 
     const stopReason =
@@ -221,7 +217,6 @@ export async function* createCompletionResponseStreaming(
   }
   // Yield the last element which is the total usage
   if (usage && model && messageId) {
-    console.log('FINAL usage', usage)
     yield {
       choices: [],
       created,
