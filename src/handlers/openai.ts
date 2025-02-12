@@ -1,4 +1,5 @@
-import OpenAI from 'openai'
+import { OpenAI } from '@libretto/openai'
+import { ChatCompletionChunk } from 'openai/resources/chat/completions'
 import { Stream } from 'openai/streaming'
 
 import { OpenAIModel, ProviderCompletionParams } from '../chat/index.js'
@@ -9,7 +10,7 @@ import {
 import { BaseHandler } from './base.js'
 
 async function* streamOpenAI(
-  response: Stream<OpenAI.Chat.Completions.ChatCompletionChunk>
+  response: Stream<ChatCompletionChunk>
 ): StreamCompletionResponse {
   for await (const chunk of response) {
     yield chunk

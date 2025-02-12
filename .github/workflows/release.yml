@@ -1,11 +1,9 @@
-name: Release packages (prod)
+name: Publish NPM package
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-
+  release:
+    types: [published]
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -24,11 +22,20 @@ jobs:
       run: pnpm install
     - name: Build
       run: pnpm build
-    - name: Publish to NPM
-      uses: changesets/action@v1
-      id: changesets
-      with:
-        publish: pnpm changeset publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-npm:
+    name: upload release to NPM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          registry-url: https://registry.npmjs.org/
+      - run: npm ci
+      - run: npm publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
