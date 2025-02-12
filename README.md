@@ -61,14 +61,18 @@ async function main() {
     // Define your message
     messages: [
       {
+        role: 'system',
+        content: 'You are a friendly greeter. Greet the person by name.'
+      },
+      {
         role: 'user',
-        content: 'Hello!',
+        content: '{person_name}',
       },
     ],
     libretto: {
-      promptTemplateName: "name",
+      promptTemplateName: "friendly-greeter",
       templateParams: {
-        param1: "test",
+        person_name: "Robert",
       }
     }
   })
