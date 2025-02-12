@@ -20,15 +20,12 @@ jobs:
       with:
         node-version: 20
         cache: 'pnpm'
+        registry-url: https://registry.npmjs.org/
     - name: Install dependencies
       run: pnpm install
     - name: Build
       run: pnpm build
     - name: Publish to NPM
-      uses: changesets/action@v1
-      id: changesets
-      with:
-        publish: pnpm changeset publish
+      run: pnpm publish
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
