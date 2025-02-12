@@ -1,6 +1,6 @@
 {
   "name": "@libretto/token.js",
-  "version": "0.5.3",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/libretto-ai/token.js"
@@ -28,7 +28,7 @@
     "docs:check": "vite-node ./scripts/docs/check.ts",
     "clean": "rimraf dist/ ./tsconfig.tsbuildinfo"
   },
-  "author": "Sam Goldman",
+  "author": "Sam Goldman & Libretto AI",
   "keywords": [],
   "license": "MIT",
   "dependencies": {
