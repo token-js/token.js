@@ -2,13 +2,13 @@ name: Release packages (prod)
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
 
 jobs:
   build:
     runs-on: ubuntu-22.04
+    environment: release
     steps:
     - uses: actions/checkout@v4
     - name: Install pnpm

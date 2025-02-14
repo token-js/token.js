@@ -11,8 +11,11 @@ import {
   ToolUseBlock,
   ToolUseBlockParam,
 } from '@anthropic-ai/sdk/resources/messages'
-import { Anthropic, objectTemplate } from '@libretto/anthropic'
-import { LibrettoCreateParams } from '@libretto/openai'
+import {
+  Anthropic,
+  LibrettoCreateParams,
+  objectTemplate,
+} from '@libretto/anthropic'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
 import {
@@ -589,7 +592,7 @@ export class AnthropicHandler extends BaseHandler<AnthropicModel> {
         stop_sequences: stopSequences,
         temperature,
         top_p: topP,
-        system: systemMessage,
+        system: objectTemplate(systemMessage),
         tools,
         tool_choice: toolChoice,
         libretto: body.libretto,

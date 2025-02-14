@@ -18,8 +18,8 @@ importers:
         specifier: 0.14.1
         version: 0.14.1
       '@libretto/anthropic':
-        specifier: ^1.2.0
-        version: 1.2.0(@anthropic-ai/sdk@0.24.3)(@google-cloud/dlp@5.12.0)
+        specifier: ^1.3.0
+        version: 1.3.0(@anthropic-ai/sdk@0.24.3)(@google-cloud/dlp@5.12.0)
       '@libretto/openai':
         specifier: ^1.3.1
         version: 1.3.1(@google-cloud/dlp@5.12.0)(openai@4.52.2)
@@ -1030,8 +1030,8 @@ packages:
   '@js-sdsl/ordered-map@4.4.2':
     resolution: {integrity: sha512-iUKgm52T8HOE/makSxjqoWhe95ZJA1/G1sYsGev2JDKUSS14KAgg1LHb+Ba+IPow0xflbnSkOsZcO08C7w1gYw==}
 
-  '@libretto/anthropic@1.2.0':
-    resolution: {integrity: sha512-JlK+UZRqS9/q04rhtqbQZiHXYZIxZ56qrBPqOeUj+yYziq4r4mqQgOec9wWmthx7fPsC78lHyfMnZsvhxKb4nA==}
+  '@libretto/anthropic@1.3.0':
+    resolution: {integrity: sha512-jX2qJy+vbzxUtYZaVkC6MVF20er12/Id4OJMIS+KQl7fy6EPk2rFCZbizbGU2RqR8cxUnQzqM98K+z/UoeiYFQ==}
     peerDependencies:
       '@anthropic-ai/sdk': '>0.29.0'
 
@@ -5797,7 +5797,7 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
-  '@libretto/anthropic@1.2.0(@anthropic-ai/sdk@0.24.3)(@google-cloud/dlp@5.12.0)':
+  '@libretto/anthropic@1.3.0(@anthropic-ai/sdk@0.24.3)(@google-cloud/dlp@5.12.0)':
     dependencies:
       '@anthropic-ai/sdk': 0.24.3
       '@libretto/redact-pii-light': 1.0.1(@google-cloud/dlp@5.12.0)
