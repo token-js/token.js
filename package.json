@@ -1,10 +1,11 @@
 {
   "name": "@libretto/token.js",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/libretto-ai/token.js"
   },
+  "homepage": "https://www.libretto.ai/",
   "description": "Integrate 9 LLM providers with a single Typescript SDK using OpenAIs format, and send events to Libretto.",
   "main": "dist/index.cjs",
   "types": "dist/index.d.ts",
