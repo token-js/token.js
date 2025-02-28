@@ -11,6 +11,8 @@ export const TableDisplayNames = {
 export const models = {
   openai: {
     models: [
+      'gpt-4.5-preview',
+      'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4o-2024-05-13',
@@ -42,6 +44,8 @@ export const models = {
     ] as const,
     supportsCompletion: true,
     supportsStreaming: [
+      'gpt-4.5-preview',
+      'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4o-2024-05-13',
@@ -68,6 +72,8 @@ export const models = {
       'o3-mini',
     ] as const,
     supportsJSON: [
+      'gpt-4.5-preview',
+      'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4o-2024-05-13',
@@ -84,6 +90,8 @@ export const models = {
       'o3-mini',
     ] as const,
     supportsImages: [
+      'gpt-4.5-preview',
+      'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4o-2024-05-13',
@@ -96,6 +104,8 @@ export const models = {
       'gpt-4-vision-preview',
     ] as const,
     supportsToolCalls: [
+      'gpt-4.5-preview',
+      'gpt-4.5-preview-2025-02-27',
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4o-2024-05-13',
