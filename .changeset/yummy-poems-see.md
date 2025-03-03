@@ -2,4 +2,4 @@
 'token.js': patch
 ---
 
-Added gpt-4.5 models
+Added claude 3-7 models
