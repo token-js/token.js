@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.5.4
+
+### Patch Changes
+
+- 3d76ec4: Added claude 3-7 models
+
 ## 0.5.3
 
 ### Patch Changes
