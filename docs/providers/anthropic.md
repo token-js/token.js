@@ -38,30 +38,27 @@ main()
 ```
 
 <!-- compatibility -->
-
 ## Supported Models
 
 | Model                      | Chat Completion | Streaming | JSON Output | Image Input | Function Calling | N > 1 |
 | -------------------------- | --------------- | --------- | ----------- | ----------- | ---------------- | ----- |
-| claude-3-7-sonnet-latest   | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-7-sonnet-20250219 | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-5-sonnet-latest   | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-5-sonnet-20240620 | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-5-haiku-20241022  | ✅              | ✅        | ➖          | ➖          | ✅               | ➖    |
-| claude-3-opus-20240229     | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-sonnet-20240229   | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-3-haiku-20240307    | ✅              | ✅        | ➖          | ✅          | ✅               | ➖    |
-| claude-2.1                 | ✅              | ✅        | ➖          | ➖          | ➖               | ➖    |
-| claude-2.0                 | ✅              | ✅        | ➖          | ➖          | ➖               | ➖    |
-| claude-instant-1.2         | ✅              | ✅        | ➖          | ➖          | ➖               | ➖    |
+| claude-3-7-sonnet-latest   | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-7-sonnet-20250219 | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-5-sonnet-latest   | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-5-sonnet-20240620 | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-5-haiku-20241022  | ✅               | ✅         | ➖           | ➖           | ✅                | ➖     |
+| claude-3-opus-20240229     | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-sonnet-20240229   | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-3-haiku-20240307    | ✅               | ✅         | ➖           | ✅           | ✅                | ➖     |
+| claude-2.1                 | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| claude-2.0                 | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
+| claude-instant-1.2         | ✅               | ✅         | ➖           | ➖           | ➖                | ➖     |
 
 ### Legend
-
-| Symbol             | Description                                                      |
-| ------------------ | ---------------------------------------------------------------- |
-| :white_check_mark: | Supported by Token.js                                            |
-| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it |
-
+| Symbol             | Description                           |
+|--------------------|---------------------------------------|
+| :white_check_mark: | Supported by Token.js                 |
+| :heavy_minus_sign: | Not supported by the LLM provider, so Token.js cannot support it     |
 <!-- end compatibility -->
 
 ## Additional Resources
