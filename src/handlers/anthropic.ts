@@ -341,9 +341,19 @@ export const getDefaultMaxTokens = (model: string): number => {
     model === 'claude-instant-1.2'
   ) {
     return 4096
-  } else {
-    throw new InputError(`Unknown model: ${model}`)
   }
+
+  if (
+    model === 'claude-3-5-sonnet-latest' ||
+    model === 'claude-3-5-sonnet-20241022' ||
+    model === 'claude-3-7-sonnet-latest' ||
+    model === 'claude-3-7-sonnet-20250219' ||
+    model === 'claude-3-5-haiku-20241022'
+  ) {
+    return 8192
+  }
+
+  throw new InputError(`Unknown model: ${model}`)
 }
 
 export const convertMessages = async (
