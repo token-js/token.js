@@ -1,26 +1,25 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "ES2015",
-    "moduleResolution": "NodeNext",
-    "sourceMap": true,
-    "esModuleInterop": true,
     "composite": true,
-    "noImplicitAny": false,
-    "removeComments": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "strictNullChecks": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "skipLibCheck": true,
     "declaration": true,
     "declarationDir": "./dist",
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noImplicitAny": false,
+    "noLib": false,
+    "outDir": "./dist",
+    "removeComments": true,
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
   "exclude": [
     "node_modules",

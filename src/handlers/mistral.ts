@@ -26,6 +26,7 @@ import {
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
 import { InputError } from './types.js'
+import { convertMessageContentToString } from './utils.js'
 
 export const findLinkedToolCallName = (
   messages: ChatCompletionMessage[],
@@ -46,6 +47,7 @@ export const convertMessages = (
   messages: (ChatCompletionMessageParam | ChatCompletionMessage)[]
 ): Array<Message | ChatCompletionResponseChoice['message']> => {
   return messages.map((message) => {
+    const messageContent = convertMessageContentToString(message.content)
     if (message.role === 'tool') {
       const name = findLinkedToolCallName(
         messages as ChatCompletionMessage[],
@@ -55,7 +57,7 @@ export const convertMessages = (
       return {
         name,
         role: 'tool',
-        content: message.content,
+        content: messageContent,
         tool_call_id: message.tool_call_id,
       }
     }
@@ -63,12 +65,12 @@ export const convertMessages = (
     if (message.role === 'system') {
       return {
         role: message.role,
-        content: message.content ?? '',
+        content: messageContent,
       }
     } else if (message.role === 'assistant') {
       return {
         role: message.role,
-        content: message.content ?? '',
+        content: messageContent,
         tool_calls: message.tool_calls ?? null,
       }
     } else if (message.role === 'user') {
@@ -239,6 +241,7 @@ const toCompletionResponse = (
         index: choice.index,
         message: {
           role: 'assistant',
+          refusal: null,
           content: choice.message.content,
           tool_calls: convertToolCalls(choice.message.tool_calls),
         },
