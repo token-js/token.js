@@ -41,7 +41,7 @@
     "cohere-ai": "7.10.6",
     "mime-types": "^2.1.35",
     "nanoid": "^5.0.7",
-    "openai": "4.52.2"
+    "openai": "4.91.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.18.2",

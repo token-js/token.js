@@ -10,7 +10,7 @@ import {
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
 import { InputError } from './types.js'
-import { getTimestamp } from './utils.js'
+import { convertMessageContentToString, getTimestamp } from './utils.js'
 
 type AI21ChatCompletionParams = {
   model: string
@@ -73,7 +73,7 @@ const convertMessages = (
     if (i === 0 && message.role === 'system') {
       output.push({
         role: 'system',
-        content: message.content,
+        content: convertMessageContentToString(message.content),
       })
     } else if (
       message.role === 'user' ||
@@ -268,6 +268,10 @@ export class AI21Handler extends BaseHandler<AI21Model> {
       const convertedChoices = data.choices.map((choice) => {
         return {
           ...choice,
+          message: {
+            ...choice.message,
+            refusal: null,
+          },
           logprobs: null,
         }
       })

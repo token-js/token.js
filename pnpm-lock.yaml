@@ -30,8 +30,8 @@ dependencies:
     specifier: ^5.0.7
     version: 5.0.8
   openai:
-    specifier: 4.52.2
-    version: 4.52.2
+    specifier: 4.91.1
+    version: 4.91.1
 
 devDependencies:
   '@babel/eslint-parser':
@@ -6609,9 +6609,17 @@ packages:
       mimic-fn: 2.1.0
     dev: true
 
-  /openai@4.52.2:
-    resolution: {integrity: sha512-mMc0XgFuVSkcm0lRIi8zaw++otC82ZlfkCur1qguXYWPETr/+ZwL9A/vvp3YahX+shpaT6j03dwsmUyLAfmEfg==}
+  /openai@4.91.1:
+    resolution: {integrity: sha512-DbjrR0hIMQFbxz8+3qBsfPJnh3+I/skPgoSlT7f9eiZuhGBUissPQULNgx6gHNkLoZ3uS0uYS6eXPUdtg4nHzw==}
     hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.23.8
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
     dependencies:
       '@types/node': 18.19.64
       '@types/node-fetch': 2.6.12
@@ -6620,7 +6628,6 @@ packages:
       form-data-encoder: 1.7.2
       formdata-node: 4.4.1
       node-fetch: 2.7.0
-      web-streams-polyfill: 3.3.3
     transitivePeerDependencies:
       - encoding
     dev: false

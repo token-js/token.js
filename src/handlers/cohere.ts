@@ -28,7 +28,11 @@ import {
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
 import { InputError, InvariantError, MessageRole } from './types.js'
-import { consoleWarn, getTimestamp } from './utils.js'
+import {
+  consoleWarn,
+  convertMessageContentToString,
+  getTimestamp,
+} from './utils.js'
 
 type CohereMessageRole = 'CHATBOT' | 'SYSTEM' | 'USER' | 'TOOL'
 
@@ -41,6 +45,8 @@ const convertRole = (role: MessageRole): CohereMessageRole => {
     return 'TOOL'
   } else if (role === 'user') {
     return 'USER'
+  } else if (role === 'developer') {
+    return 'SYSTEM'
   } else {
     throw new InputError(`Unknown role: ${role}`)
   }
@@ -259,12 +265,13 @@ const toToolResult = (
     )
   }
 
+  const tollCallContentStr = convertMessageContentToString(toolMessage.content)
   const toolResult: ToolResult = {
     call: {
       name: toolCall.function.name,
       parameters: JSON.parse(toolCall.function.arguments),
     },
-    outputs: [JSON.parse(toolMessage.content)],
+    outputs: [JSON.parse(tollCallContentStr)],
   }
   return toolResult
 }
@@ -318,9 +325,10 @@ export const convertMessages = (
         })
       }
     } else if (message.role === 'assistant') {
+      const messageContentStr = convertMessageContentToString(message.content)
       chatHistory.push({
         role: convertRole(message.role),
-        message: message.content ?? '',
+        message: messageContentStr,
         toolCalls: message.tool_calls?.map((toolCall) => {
           return {
             name: toolCall.function.name,
@@ -567,6 +575,7 @@ export class CohereHandler extends BaseHandler<CohereModel> {
             logprobs: null,
             message: {
               role: 'assistant',
+              refusal: null, // openai requires this field, fill in if Cohere ever supports
               content: response.text,
               tool_calls: toolCalls,
             },

@@ -1,4 +1,10 @@
-export type MessageRole = 'system' | 'user' | 'assistant' | 'tool' | 'function'
+export type MessageRole =
+  | 'system'
+  | 'user'
+  | 'assistant'
+  | 'tool'
+  | 'function'
+  | 'developer'
 export type MIMEType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp'
 
 export class InputError extends Error {

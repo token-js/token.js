@@ -9,7 +9,10 @@ import {
   ConverseStreamCommandOutput,
   ImageFormat,
   SystemContentBlock,
+  Tool,
   ToolChoice,
+  ToolConfiguration,
+  ToolSpecification,
 } from '@aws-sdk/client-bedrock-runtime'
 import { ChatCompletionMessageToolCall } from 'openai/resources/index'
 
@@ -29,6 +32,7 @@ import { BaseHandler } from './base.js'
 import { InputError, InvariantError, MIMEType } from './types.js'
 import {
   consoleWarn,
+  convertMessageContentToString,
   fetchThenParseImage,
   getTimestamp,
   normalizeTemperature,
@@ -84,6 +88,7 @@ const toChatCompletionChoiceMessage = (
 ): CompletionResponse['choices'][0]['message'] => {
   if (output?.message?.content === undefined) {
     return {
+      refusal: null,
       content: '',
       role: 'assistant',
     }
@@ -146,6 +151,7 @@ const toChatCompletionChoiceMessage = (
       : ''
     return {
       role,
+      refusal: null,
       content: messageContent,
       tool_calls: toolCalls,
     }
@@ -153,6 +159,7 @@ const toChatCompletionChoiceMessage = (
     const content = textBlocks.map((textBlock) => textBlock.text).join('\n')
     return {
       role,
+      refusal: null,
       content,
       tool_calls: toolCalls,
     }
@@ -187,7 +194,10 @@ export const convertMessages = async (
   const systemMessages: Array<SystemContentBlock> = []
   if (supportsSystemMessages(model)) {
     while (clonedMessages.length > 0 && clonedMessages[0].role === 'system') {
-      systemMessages.push({ text: clonedMessages[0].content })
+      const messageContent = convertMessageContentToString(
+        clonedMessages[0].content
+      )
+      systemMessages.push({ text: messageContent })
       clonedMessages.shift()
     }
   }
@@ -247,7 +257,7 @@ export const convertMessages = async (
           toolUseId: message.tool_call_id,
           content: [
             {
-              text: message.content,
+              text: convertMessageContentToString(message.content),
             },
           ],
         },
@@ -288,7 +298,7 @@ export const convertMessages = async (
             const text = makeTextContent(message.role, e.text)
             return {
               text,
-            }
+            } as ContentBlock.TextMember
           } else {
             const parsedImage = await fetchThenParseImage(e.image_url.url)
             return {
@@ -298,7 +308,7 @@ export const convertMessages = async (
                   bytes: Buffer.from(parsedImage.content, 'base64'),
                 },
               },
-            }
+            } as ContentBlock.ImageMember
           }
         })
       )
@@ -354,27 +364,24 @@ export const convertToolParams = (
     return undefined
   }
 
-  const convertedTools =
+  const convertedTools: (Tool | undefined)[] =
     tools.length > 0
       ? tools.map((tool) => {
-          const inputSchema = tool.function.parameters
-            ? {
+          const inputSchema: ToolSpecification['inputSchema'] | undefined = tool
+            .function.parameters
+            ? ({
                 // Bedrock and OpenAI's function parameter types are incompatible even though they both
                 // adhere to the JSON schema, so we set the type to `any` to prevent a TypeScript error.
                 json: tool.function.parameters as any,
-                // TypeScript throws a type error if we don't define this field:
-                $unknown: undefined,
-              }
+              } satisfies ToolSpecification['inputSchema'])
             : undefined
           return {
-            // TypeScript throws a type error if we don't define this field:
-            $unknown: undefined,
             toolSpec: {
               name: tool.function.name,
               description: tool.function.description,
               inputSchema,
             },
-          }
+          } satisfies Tool
         })
       : undefined
 
@@ -387,7 +394,10 @@ export const convertToolParams = (
     convertedToolChoice = { tool: { name: toolChoice.function.name } }
   }
 
-  return { toolChoice: convertedToolChoice, tools: convertedTools }
+  return {
+    toolChoice: convertedToolChoice,
+    tools: convertedTools,
+  } satisfies ToolConfiguration
 }
 
 const convertStopReason = (

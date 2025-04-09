@@ -10,6 +10,7 @@ import {
   GenerateContentResult,
   GenerateContentStreamResult,
   GoogleGenerativeAI,
+  InlineDataPart,
   Part,
   TextPart,
   Tool,
@@ -31,7 +32,12 @@ import {
 } from '../userTypes/index.js'
 import { BaseHandler } from './base.js'
 import { InputError } from './types.js'
-import { consoleWarn, fetchThenParseImage, getTimestamp } from './utils.js'
+import {
+  consoleWarn,
+  convertMessageContentToString,
+  fetchThenParseImage,
+  getTimestamp,
+} from './utils.js'
 
 // Google's `GenerateContentCandidate.content` field should be optional, but it's a required field
 // in Google's types. This field can be undefined if a content filter is triggered when the user
@@ -81,29 +87,28 @@ export const convertContentsToParts = async (
       },
     ]
   } else {
-    return Promise.all(
-      contents.map(async (part) => {
-        if (part.type === 'text') {
-          return {
-            text: `${systemPrefix}${part.text}`,
-          }
-        } else if (part.type === 'image_url') {
-          const imageData = await fetchThenParseImage(part.image_url.url)
-          return {
-            inlineData: {
-              mimeType: imageData.mimeType,
-              data: imageData.content,
-            },
-          }
-        } else {
-          throw new InputError(
-            `Invalid content part type: ${
-              (part as any).type
-            }. Must be "text" or "image_url".`
-          )
-        }
-      })
-    )
+    const allParts: Promise<Part>[] = contents.map(async (part) => {
+      if (part.type === 'text') {
+        return {
+          text: `${systemPrefix}${part.text}`,
+        } as TextPart
+      } else if (part.type === 'image_url') {
+        const imageData = await fetchThenParseImage(part.image_url.url)
+        return {
+          inlineData: {
+            mimeType: imageData.mimeType,
+            data: imageData.content,
+          },
+        } satisfies InlineDataPart
+      } else {
+        throw new InputError(
+          `Invalid content part type: ${
+            (part as any).type
+          }. Must be "text" or "image_url".`
+        )
+      }
+    })
+    return Promise.all(allParts)
   }
 }
 
@@ -164,7 +169,9 @@ export const convertMessageToContent = async (
           {
             functionResponse: {
               name: message.tool_call_id,
-              response: JSON.parse(message.content),
+              response: JSON.parse(
+                convertMessageContentToString(message.content)
+              ),
             },
           },
         ],
@@ -304,6 +311,7 @@ export const convertResponseMessage = (
     content: candidate.content?.parts.map((part) => part.text).join('') ?? null,
     role: 'assistant',
     tool_calls: convertToolCalls(candidate),
+    refusal: null,
   }
 }
 

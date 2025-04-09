@@ -143,6 +143,7 @@ describe('convertAssistantMessage', () => {
   it('should convert a message with text content and no tool calls', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'assistant',
+      refusal: null,
       content: 'Hello, world!',
       tool_calls: undefined,
     }
@@ -158,6 +159,7 @@ describe('convertAssistantMessage', () => {
   it('should convert a message with tool calls and no text content', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'assistant',
+      refusal: null,
       content: null,
       tool_calls: [
         {
@@ -181,6 +183,7 @@ describe('convertAssistantMessage', () => {
   it('should convert a message with both text content and tool calls', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'assistant',
+      refusal: null,
       content: 'Hello, world!',
       tool_calls: [
         {
@@ -205,6 +208,7 @@ describe('convertAssistantMessage', () => {
   it('should convert a message with null content and no tool calls', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'assistant',
+      refusal: null,
       content: null,
       tool_calls: undefined,
     }
@@ -220,6 +224,7 @@ describe('convertAssistantMessage', () => {
   it('should handle messages with multiple tool calls', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'assistant',
+      refusal: null,
       content: null,
       tool_calls: [
         {
@@ -249,6 +254,7 @@ describe('convertAssistantMessage', () => {
   it('should throw an InputError for an unexpected message role', () => {
     const message: OpenAI.Chat.Completions.ChatCompletionMessage = {
       role: 'unexpectedRole' as any,
+      refusal: null,
       content: 'Hello, world!',
       tool_calls: undefined,
     }
@@ -1012,6 +1018,7 @@ describe('convertResponseMessage', () => {
     expect(result).toEqual({
       content: 'Hello world',
       role: 'assistant',
+      refusal: null,
       tool_calls: [
         {
           id: 'mockId',
@@ -1040,6 +1047,7 @@ describe('convertResponseMessage', () => {
     expect(result).toEqual({
       content: 'Hello world',
       role: 'assistant',
+      refusal: null,
       tool_calls: undefined,
     })
   })
@@ -1058,6 +1066,7 @@ describe('convertResponseMessage', () => {
     expect(result).toEqual({
       content: '',
       role: 'assistant',
+      refusal: null,
       tool_calls: undefined,
     })
   })
@@ -1079,6 +1088,7 @@ describe('convertResponseMessage', () => {
     expect(result).toEqual({
       content: '',
       role: 'assistant',
+      refusal: null,
       tool_calls: [
         {
           id: 'mockId',
@@ -1421,6 +1431,7 @@ describe('GeminiHandler', () => {
           index: 0,
           message: {
             role: 'assistant',
+            refusal: null,
             content:
               mockBasicChatResponse.response.candidates![0].content.parts[0]
                 .text,
@@ -1464,6 +1475,7 @@ describe('GeminiHandler', () => {
           index: 0,
           message: {
             role: 'assistant',
+            refusal: null,
             content: '',
             tool_calls: [
               {

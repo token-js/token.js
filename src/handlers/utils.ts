@@ -1,5 +1,6 @@
 import chalk from 'chalk'
 import { lookup } from 'mime-types'
+import OpenAI from 'openai'
 
 import { LLMChatModel, LLMProvider } from '../chat/index.js'
 import { models } from '../models.js'
@@ -268,5 +269,23 @@ export const isEmptyObject = (variable: any): boolean => {
 export const isObject = (variable: any): boolean => {
   return (
     variable && typeof variable === 'object' && variable.constructor === Object
+  )
+}
+
+export const convertMessageContentToString = (
+  messageContent: OpenAI.Chat.Completions.ChatCompletionMessageParam['content']
+): string => {
+  if (!messageContent) {
+    return ''
+  }
+
+  return (
+    (typeof messageContent === 'string'
+      ? messageContent
+      : messageContent
+          .map(
+            (m: OpenAI.Chat.Completions.ChatCompletionContentPartText) => m.text
+          )
+          .join('\n')) ?? ''
   )
 }

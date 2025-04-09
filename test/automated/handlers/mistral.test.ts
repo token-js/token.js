@@ -776,6 +776,7 @@ describe('MistralHandler', () => {
           index: 0,
           message: {
             role: 'assistant',
+            refusal: null,
             content: mockBasicChatResponse.choices[0].message.content,
             tool_calls: undefined,
           },
@@ -809,6 +810,7 @@ describe('MistralHandler', () => {
           index: 0,
           message: {
             role: 'assistant',
+            refusal: null,
             content: mockToolChatResponse.choices[0].message.content,
             tool_calls: [
               {

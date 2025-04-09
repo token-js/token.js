@@ -299,6 +299,13 @@ describe('convertMessages', () => {
         role: 'tool',
         content: '{"temperature":"22","unit":"fahrenheit"}',
       },
+      {
+        tool_call_id: 'call_lhMKBlOSnwwq5BZDCGo5SVTJ',
+        role: 'tool',
+        content: [
+          { text: '{"temperature":"100","unit":"fahrenheit"}', type: 'text' },
+        ],
+      },
     ]
 
     const { messages, lastUserMessage, toolResults } =
@@ -375,6 +382,20 @@ describe('convertMessages', () => {
         outputs: [
           {
             temperature: '22',
+            unit: 'fahrenheit',
+          },
+        ],
+      },
+      {
+        call: {
+          name: 'get_current_weather',
+          parameters: {
+            location: 'Paris, France',
+          },
+        },
+        outputs: [
+          {
+            temperature: '100',
             unit: 'fahrenheit',
           },
         ],
