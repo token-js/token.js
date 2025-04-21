@@ -344,8 +344,17 @@ export const getDefaultMaxTokens = (model: string): number => {
     model === 'claude-instant-1.2'
   ) {
     return 4096
+  } else if (
+    model === 'claude-3-5-sonnet-latest' ||
+    model === 'claude-3-5-sonnet-20241022' ||
+    model === 'claude-3-7-sonnet-latest' ||
+    model === 'claude-3-7-sonnet-20250219' ||
+    model === 'claude-3-5-haiku-20241022'
+  ) {
+    return 8192
   } else {
-    throw new InputError(`Unknown model: ${model}`)
+    // We default to 8192 when the model is not specifically handled here to avoid throwing errors
+    return 8192
   }
 }
 
