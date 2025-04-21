@@ -1,4 +1,4 @@
-Thank you for your contribution! To help get your changes merged as quickly as possible, please fill out this template and confirm you've completed all of the pre-submission checks.
+Thank you for your contribution! To help get your changes merged as quickly as possible, please fill out this template and confirm you've completed all of the pre-submission checks. You may remove this note from your PR if you'd like.
 
 Cheers,
 Pate
@@ -9,6 +9,7 @@ Pate
 * [ ] Have you updated the documentation with `pnpm docs`?
 * [ ] Have you ran the linter with `pnpm lint:fix`?
 * [ ] Have you successfully ran the tests locally with `pnpm test`?
+* [ ] Have you added a changeset file with `pnpm changeset`?
 * [ ] Please link any relevant GitHub issue here.
 
 ### New Feature Submissions (optional):
