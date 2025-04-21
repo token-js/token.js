@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.7.0
+
+### Minor Changes
+
+- 9b53159: Add gpt 4.1 models
+
 ## 0.6.0
 
 ### Minor Changes
