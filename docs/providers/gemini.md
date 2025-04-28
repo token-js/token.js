@@ -46,6 +46,8 @@ main()
 | gemini-1.5-flash                    | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 | gemini-1.5-flash-8b                 | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 | gemini-1.0-pro                      | ✅               | ✅         | ➖           | ➖           | ✅                | ✅     |
+| gemini-2.5-flash-preview-04-17      | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
+| gemini-2.5-pro-preview-03-25        | ✅               | ✅         | ✅           | ✅           | ✅                | ✅     |
 
 ### Legend
 | Symbol             | Description                           |
