@@ -1,5 +1,15 @@
 # Token.js
 
+## 0.8.0
+
+### Minor Changes
+
+- a3a51af: Support usage metrics (e.g., totalTokens) in the Bedrock provider
+
+### Patch Changes
+
+- 0a82651: Add gpt-4.1-mini and gpt-4.1-nano models
+
 ## 0.7.1
 
 ### Patch Changes
