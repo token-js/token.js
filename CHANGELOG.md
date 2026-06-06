@@ -1,5 +1,11 @@
 # Token.js
 
+## 0.8.1
+
+### Patch Changes
+
+- 012e032: Add gemini 2.5 pro and flash preview models
+
 ## 0.8.0
 
 ### Minor Changes
