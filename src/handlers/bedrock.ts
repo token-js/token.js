@@ -549,7 +549,15 @@ async function* createCompletionResponseStreaming(
         created,
         model,
         object: 'chat.completion.chunk',
+        ...(stream.metadata?.usage && {
+          usage: {
+            prompt_tokens: stream.metadata.usage.inputTokens,
+            completion_tokens: stream.metadata.usage.outputTokens,
+            total_tokens: stream.metadata.usage.totalTokens,
+          },
+        }),
       }
+
       yield convertedResponse
     }
   }
