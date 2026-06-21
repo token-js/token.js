@@ -17,6 +17,7 @@ import { OpenAICompatibleHandler } from './openai-compatible.js'
 import { OpenAIHandler } from './openai.js'
 import { OpenRouterHandler } from './openrouter.js'
 import { PerplexityHandler } from './perplexity.js'
+import { RequestyHandler } from './requesty.js'
 import { InputError, MIMEType } from './types.js'
 
 export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
@@ -119,6 +120,16 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.openrouter.supportsToolCalls,
       models.openrouter.supportsN,
       models.openrouter.supportsStreaming
+    ),
+  ['requesty']: (opts: ConfigOptions) =>
+    new RequestyHandler(
+      opts,
+      models.requesty.models,
+      models.requesty.supportsJSON,
+      models.requesty.supportsImages,
+      models.requesty.supportsToolCalls,
+      models.requesty.supportsN,
+      models.requesty.supportsStreaming
     ),
   ['openai-compatible']: (opts: ConfigOptions) =>
     new OpenAICompatibleHandler(

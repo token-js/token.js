@@ -501,6 +501,16 @@ export const models = {
     supportsN: true,
     generateDocs: false,
   },
+  requesty: {
+    models: true,
+    supportsCompletion: true,
+    supportsStreaming: true,
+    supportsJSON: true,
+    supportsImages: true,
+    supportsToolCalls: true,
+    supportsN: true,
+    generateDocs: false,
+  },
   'openai-compatible': {
     models: true,
     supportsCompletion: true,

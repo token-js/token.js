@@ -24,7 +24,10 @@ export * from './userTypes/index.js'
 type TokenJSInterface = {
   chat: LLMChat
   extendModelList<
-    P extends Exclude<LLMProvider, 'openrouter' | 'openai-compatible'>
+    P extends Exclude<
+      LLMProvider,
+      'openrouter' | 'requesty' | 'openai-compatible'
+    >
   >(
     provider: P,
     name: string,
@@ -69,7 +72,10 @@ export class TokenJS implements TokenJSInterface {
    * @returns boolean indicating if the model exists
    */
   extendedModelExist<
-    P extends Exclude<LLMProvider, 'openrouter' | 'openai-compatible'>
+    P extends Exclude<
+      LLMProvider,
+      'openrouter' | 'requesty' | 'openai-compatible'
+    >
   >(provider: P, name: string): boolean {
     return TokenJS.extendedModelList.some(
       (model) => model.provider === provider && model.name === name
@@ -121,7 +127,10 @@ export class TokenJS implements TokenJSInterface {
    * Note: When using extended models, type casting (`as any`) is required
    */
   extendModelList<
-    P extends Exclude<LLMProvider, 'openrouter' | 'openai-compatible'>
+    P extends Exclude<
+      LLMProvider,
+      'openrouter' | 'requesty' | 'openai-compatible'
+    >
   >(provider: P, name: string, featureSupport: extendedModelFeatureSupport<P>) {
     // Do nothing if the model already added in the extendedModeList
     if (this.extendedModelExist(provider, name)) {

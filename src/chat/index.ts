@@ -18,6 +18,7 @@ export type MistralModel = (typeof models.mistral.models)[number]
 export type PerplexityModel = (typeof models.perplexity.models)[number]
 export type GroqModel = (typeof models.groq.models)[number]
 export type OpenRouterModel = string
+export type RequestyModel = string
 export type OpenAICompatibleModel = string
 
 export type LLMChatModel =
@@ -31,6 +32,7 @@ export type LLMChatModel =
   | PerplexityModel
   | GroqModel
   | OpenRouterModel
+  | RequestyModel
   | OpenAICompatibleModel
 
 export type LLMProvider = keyof typeof models
@@ -46,6 +48,7 @@ type ProviderModelMap = {
   perplexity: PerplexityModel
   groq: GroqModel
   openrouter: OpenRouterModel
+  requesty: RequestyModel
   'openai-compatible': OpenAICompatibleModel
 }
 

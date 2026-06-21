@@ -25,6 +25,7 @@ description: >-
 * OpenAI
 * Perplexity
 * OpenRouter
+* Requesty
 * Any other model provider with an OpenAI compatible API
 
 ## Setup
@@ -296,6 +297,37 @@ async function main() {
 main()
 ```
 {% endtab %}
+
+{% tab title="Requesty" %}
+{% code title=".env" %}
+```bash
+REQUESTY_API_KEY=*** endcode %}
+
+```typescript
+import { TokenJS } from 'token.js'
+
+// Create the Token.js client
+const tokenjs = new TokenJS()
+
+async function main() {
+  // Create a model response
+  const completion = await tokenjs.chat.completions.create({
+    // Specify the provider and model
+    provider: 'requesty',
+    model: 'openai/gpt-4o-mini',
+    // Define your message
+    messages: [
+      {
+        role: 'user',
+        content: 'Hello!',
+      },
+    ],
+  })
+  console.log(completion.choices[0])
+}
+main()
+```
+{% endtab %}
 {% endtabs %}
 
 ### Access Credentials
@@ -320,8 +352,8 @@ MISTRAL_API_KEY=
 # Perplexity
 PERPLEXITY_API_KEY=
 # OpenRouter
-OPENROUTER_API_KEY=
-# AWS Bedrock
+OPENROUTER_API_KEY=*** Requesty
+REQUESTY_API_KEY=*** AWS Bedrock
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
@@ -422,6 +454,7 @@ This table provides an overview of the features that Token.js supports from each
 | Groq       | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :white\_check\_mark: | :heavy\_minus\_sign: |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
 | OpenRouter | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| Requesty | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
 | OpenAI Compatible | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 
 ### Legend
