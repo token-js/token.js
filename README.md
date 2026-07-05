@@ -21,6 +21,7 @@ Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open
 * OpenAI
 * Perplexity
 * OpenRouter
+* Requesty
 * Any other model provider with an OpenAI compatible API
 
 ## [Documentation](https://docs.tokenjs.ai/)
@@ -88,6 +89,8 @@ MISTRAL_API_KEY=
 PERPLEXITY_API_KEY=
 # OpenRouter
 OPENROUTER_API_KEY=
+# Requesty
+REQUESTY_API_KEY=
 # AWS Bedrock
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=
@@ -235,6 +238,7 @@ This table provides an overview of the features that Token.js supports from each
 | Groq       | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  | :white\_check\_mark: |  :heavy_minus_sign:  |
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: |  :heavy_minus_sign:  |  :heavy_minus_sign:  |  :heavy_minus_sign:  |
 | OpenRouter | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
+| Requesty | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 | OpenAI Compatible | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 
 ### Legend
