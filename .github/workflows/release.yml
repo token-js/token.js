@@ -9,17 +9,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    # Required for npm trusted publishing (OIDC). `id-token: write` lets the
+    # runner mint the short-lived OIDC token npm exchanges for a publish
+    # credential; contents/pull-requests are what changesets/action needs to
+    # create git tags and GitHub releases.
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
     - uses: actions/checkout@v4
     - name: Install pnpm
       uses: pnpm/action-setup@v4
       with:
         version: 8.6.12
-    - name: Use Node.js 20
+    - name: Use Node.js 22
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         cache: 'pnpm'
+    # npm trusted publishing (OIDC) requires npm >= 11.5.1. Older versions
+    # silently fall back to token auth, so upgrade the runner's global npm that
+    # `changeset publish` shells out to.
+    - name: Update npm for trusted publishing
+      run: npm install -g npm@latest
     - name: Install dependencies
       run: pnpm install
     - name: Build
@@ -31,4 +44,3 @@ jobs:
         publish: pnpm changeset publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
