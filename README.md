@@ -1,8 +1,6 @@
-# Token.js - not actively maintained
+# Token.js
 
 Integrate 200+ LLMs with one TypeScript SDK using OpenAI's format. Free and open source. No proxy server required.
-
-> Token.js is not an actively maintained project and is behind on security patches as a result. You are welcome to fork and publish your own version.
 
 ## Features
 
