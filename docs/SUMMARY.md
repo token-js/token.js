@@ -12,6 +12,7 @@
   * [OpenAI](providers/openai.md)
   * [OpenRouter](providers/openrouter.md)
   * [Requesty](providers/requesty.md)
+  * [Eden AI](providers/edenai.md)
   * [Perplexity](providers/perplexity.md)
   * [OpenAI Compatible](providers/openai-compatible.md)
 * [Contact Us](contact-us.md)

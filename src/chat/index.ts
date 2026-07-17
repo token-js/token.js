@@ -20,6 +20,7 @@ export type GroqModel = (typeof models.groq.models)[number]
 export type OpenRouterModel = string
 export type RequestyModel = string
 export type OpenAICompatibleModel = string
+export type EdenAIModel = string
 
 export type LLMChatModel =
   | OpenAIModel
@@ -34,6 +35,7 @@ export type LLMChatModel =
   | OpenRouterModel
   | RequestyModel
   | OpenAICompatibleModel
+  | EdenAIModel
 
 export type LLMProvider = keyof typeof models
 
@@ -50,6 +52,7 @@ type ProviderModelMap = {
   openrouter: OpenRouterModel
   requesty: RequestyModel
   'openai-compatible': OpenAICompatibleModel
+  edenai: EdenAIModel
 }
 
 type CompletionBase<P extends LLMProvider> = Pick<

@@ -26,7 +26,7 @@ type TokenJSInterface = {
   extendModelList<
     P extends Exclude<
       LLMProvider,
-      'openrouter' | 'requesty' | 'openai-compatible'
+      'openrouter' | 'requesty' | 'openai-compatible' | 'edenai'
     >
   >(
     provider: P,
@@ -74,7 +74,7 @@ export class TokenJS implements TokenJSInterface {
   extendedModelExist<
     P extends Exclude<
       LLMProvider,
-      'openrouter' | 'requesty' | 'openai-compatible'
+      'openrouter' | 'requesty' | 'openai-compatible' | 'edenai'
     >
   >(provider: P, name: string): boolean {
     return TokenJS.extendedModelList.some(
@@ -129,7 +129,7 @@ export class TokenJS implements TokenJSInterface {
   extendModelList<
     P extends Exclude<
       LLMProvider,
-      'openrouter' | 'requesty' | 'openai-compatible'
+      'openrouter' | 'requesty' | 'openai-compatible' | 'edenai'
     >
   >(provider: P, name: string, featureSupport: extendedModelFeatureSupport<P>) {
     // Do nothing if the model already added in the extendedModeList

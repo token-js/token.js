@@ -26,6 +26,7 @@ description: >-
 * Perplexity
 * OpenRouter
 * Requesty
+* Eden AI
 * Any other model provider with an OpenAI compatible API
 
 ## Setup
@@ -357,6 +358,8 @@ REQUESTY_API_KEY=*** AWS Bedrock
 AWS_REGION_NAME=
 AWS_ACCESS_KEY_ID=
 AWS_SECRET_ACCESS_KEY=
+# Eden AI
+EDENAI_API_KEY=
 # OpenAI Compatible
 OPENAI_COMPATIBLE_API_KEY=
 ```
@@ -455,6 +458,7 @@ This table provides an overview of the features that Token.js supports from each
 | Perplexity | :white\_check\_mark: | :white\_check\_mark: | :heavy\_minus\_sign:  | :heavy\_minus\_sign: | :heavy\_minus\_sign: |
 | OpenRouter | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
 | Requesty | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
+| Eden AI | :white\_check\_mark: | :white\_check\_mark: | :white\_check\_mark:  | :white\_check\_mark: | :white\_check\_mark: |
 | OpenAI Compatible | :white\_check\_mark: | :white\_check\_mark: |  :white\_check\_mark:  |  :white\_check\_mark: |  :white\_check\_mark:  |
 
 ### Legend
