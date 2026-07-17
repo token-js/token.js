@@ -10,6 +10,7 @@ import { AnthropicHandler } from './anthropic.js'
 import { BaseHandler } from './base.js'
 import { BedrockHandler } from './bedrock.js'
 import { CohereHandler } from './cohere.js'
+import { EdenAIHandler } from './edenai.js'
 import { GeminiHandler } from './gemini.js'
 import { GroqHandler } from './groq.js'
 import { MistralHandler } from './mistral.js'
@@ -130,6 +131,16 @@ export const Handlers: Record<string, (opts: ConfigOptions) => any> = {
       models.requesty.supportsToolCalls,
       models.requesty.supportsN,
       models.requesty.supportsStreaming
+    ),
+  ['edenai']: (opts: ConfigOptions) =>
+    new EdenAIHandler(
+      opts,
+      models.edenai.models,
+      models.edenai.supportsJSON,
+      models.edenai.supportsImages,
+      models.edenai.supportsToolCalls,
+      models.edenai.supportsN,
+      models.edenai.supportsStreaming
     ),
   ['openai-compatible']: (opts: ConfigOptions) =>
     new OpenAICompatibleHandler(
